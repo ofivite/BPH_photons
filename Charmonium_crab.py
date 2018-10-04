@@ -8,7 +8,7 @@ config.General.transferLogs = True
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'python/ConfFile_cfg.py'
+config.JobType.psetName = 'test/miniAODmuonsRootupler.py'
 
 config.section_("Data")
 config.Data.inputDataset = '/MuOnia/Run2012B-22Jan2013-v1/AOD'
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     import sys
     from CRABAPI.RawCommand import crabCommand
     from httplib import HTTPException
-    task = '2017_j3'
+    task = '2017_j1'
     ####
     ## MY: b1 == Bc+ --> J/psi pi+
     ##      x1 = Xi-    -> Lambda pi
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     #
     ## 2017_bs = B0s (Jpsi phi)
     ####
-    units_per_job = 14
+    units_per_job = 140
     #
     n = 0
     if len(sys.argv) >= 2:
