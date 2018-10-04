@@ -12,7 +12,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '92X_dataRun2_Prompt_v4', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '94X_dataRun2_v6', '')
 
 process.MessageLogger.cerr.FwkReport.reportEvery = 200
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -23,7 +23,7 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(2000),SkipEve
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 
-'/store/data/Run2017B/Charmonium/MINIAOD/PromptReco-v1/000/297/050/00000/183B4680-3356-E711-B33A-02163E014487.root',
+'/store/data/Run2017B/Charmonium/MINIAOD/31Mar2018-v1/00000/42559AB2-9F37-E811-9BB0-38EAA78D89AC.root',
 
  )
 )
@@ -41,5 +41,3 @@ process.TFileService = cms.Service("TFileService",
 )
 
 process.p = cms.Path(process.rootuple)
-
-
