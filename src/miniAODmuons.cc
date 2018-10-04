@@ -2,12 +2,12 @@
 //
 // Package:    miniAODmuons
 // Class:      miniAODmuons
-// 
+//
 
 //=================================================
 // original author:  Jhovanny Andres Mejia        |
 //         created:  Monday Aug 28 (2017)         |
-//         <jhovanny.andres.mejia.guisao@cern.ch> | 
+//         <jhovanny.andres.mejia.guisao@cern.ch> |
 //=================================================
 
 // system include files
@@ -30,11 +30,19 @@
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+#include "DataFormats/EgammaCandidates/interface/ConversionFwd.h"
+#include "DataFormats/TrackReco/interface/HitPattern.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
+#include "DataFormats/Candidate/interface/CompositeCandidate.h"
+#include "DataFormats/Candidate/interface/VertexCompositeCandidate.h"
 
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
-#include "MagneticField/Engine/interface/MagneticField.h"            
+#include "MagneticField/Engine/interface/MagneticField.h"
 #include "CommonTools/Statistics/interface/ChiSquaredProbability.h"
 
 #include "RecoVertex/KinematicFit/interface/KinematicParticleVertexFitter.h"
@@ -71,33 +79,34 @@
 
 miniAODmuons::miniAODmuons(const edm::ParameterSet& iConfig)
   :
-  dimuon_Label(consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("dimuons"))),
-  trakCollection_label(consumes<edm::View<pat::PackedCandidate>>(iConfig.getParameter<edm::InputTag>("Trak"))),
-  primaryVertices_Label(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertices"))),
-   
+  dimuon_token(consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("dimuons"))),
+  trackCollection_token(consumes<edm::View<pat::PackedCandidate>>(iConfig.getParameter<edm::InputTag>("Trak"))),
+  primaryVertices_token(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("primaryVertices"))),
+  conv_photons_token(consumes<edm::View<pat::CompositeCandidate>>(iConfig.getParameter<edm::InputTag>("conv_photons"))),
   isMC_(iConfig.getParameter<bool>("isMC")),
 
 
-  tree_(0), 
+  tree_(0),
 
   mumC2(0), mumNHits(0), mumNPHits(0),
   mupC2(0), mupNHits(0), mupNPHits(0),
   mumdxy(0), mupdxy(0), mumdz(0), mupdz(0),
   muon_dca(0),
 
-  mu1soft(0), mu2soft(0), mu1tight(0), mu2tight(0), 
+  mu1soft(0), mu2soft(0), mu1tight(0), mu2tight(0),
   mu1PF(0), mu2PF(0), mu1loose(0), mu2loose(0),
- 
+
   nB(0),
-  
+
   B_J_mass(0), B_J_px(0), B_J_py(0), B_J_pz(0),
 
   B_J_px1(0), B_J_py1(0), B_J_pz1(0),
-  B_J_px2(0), B_J_py2(0), B_J_pz2(0), 
-  B_J_charge1(0), B_J_charge2(0)
+  B_J_px2(0), B_J_py2(0), B_J_pz2(0),
+  B_J_charge1(0), B_J_charge2(0),
+  photon_mass(0),     chi_mass(0)
 
 {
-   //now do what ever initialization is needed
+
 }
 
 
@@ -118,60 +127,62 @@ void miniAODmuons::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   using namespace edm;
   using namespace reco;
   using namespace std;
-  
+
   //*********************************
   // Get event content information
-  //*********************************  
+  //*********************************
 
   // Kinematic fit
-  edm::ESHandle<TransientTrackBuilder> theB; 
-  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB); 
+  edm::ESHandle<TransientTrackBuilder> theB;
+  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theB);
 
   edm::Handle< View<pat::PackedCandidate> > thePATTrackHandle;
-  iEvent.getByToken(trakCollection_label,thePATTrackHandle);
+  iEvent.getByToken(trackCollection_token,thePATTrackHandle);
 
 
   edm::Handle< View<pat::Muon> > thePATMuonHandle;
-  iEvent.getByToken(dimuon_Label,thePATMuonHandle);
+  iEvent.getByToken(dimuon_token,thePATMuonHandle);
 
- 
+  edm::Handle< View<pat::CompositeCandidate> > photonHandle;
+  iEvent.getByToken(conv_photons_token, photonHandle);
+
   //*********************************
-  //Now we get the primary vertex 
+  //Now we get the primary vertex
   //*********************************
 
   reco::Vertex bestVtx;
   edm::Handle<reco::VertexCollection> primaryVertices_handle;
-  iEvent.getByToken(primaryVertices_Label, primaryVertices_handle);
+  iEvent.getByToken(primaryVertices_token, primaryVertices_handle);
 
   bestVtx = *(primaryVertices_handle->begin());
 
-  //nVtx = primaryVertices_handle->size(); 
-  
+  //nVtx = primaryVertices_handle->size();
+
   //*****************************************
   //Let's begin by looking for J/psi
 
   //unsigned int nMu_tmp = thePATMuonHandle->size();
 
- for(View<pat::Muon>::const_iterator iMuon1 = thePATMuonHandle->begin(); iMuon1 != thePATMuonHandle->end(); ++iMuon1) 
+ for(View<pat::Muon>::const_iterator iMuon1 = thePATMuonHandle->begin(); iMuon1 != thePATMuonHandle->end(); ++iMuon1)
     {
-      
-      for(View<pat::Muon>::const_iterator iMuon2 = iMuon1+1; iMuon2 != thePATMuonHandle->end(); ++iMuon2) 
+
+      for(View<pat::Muon>::const_iterator iMuon2 = iMuon1+1; iMuon2 != thePATMuonHandle->end(); ++iMuon2)
 	{
 	  if(iMuon1==iMuon2) continue;
-	  
-	  //opposite charge 
+
+	  //opposite charge
 	  if( (iMuon1->charge())*(iMuon2->charge()) == 1) continue;
 
-	  TrackRef glbTrackP;	  
-	  TrackRef glbTrackM;	  
-	  
+	  TrackRef glbTrackP;
+	  TrackRef glbTrackM;
+
 	  if(iMuon1->charge() == 1){ glbTrackP = iMuon1->track();}
 	  if(iMuon1->charge() == -1){ glbTrackM = iMuon1->track();}
-	  
+
 	  if(iMuon2->charge() == 1) { glbTrackP = iMuon2->track();}
 	  if(iMuon2->charge() == -1){ glbTrackM = iMuon2->track();}
-	  
-	  if( glbTrackP.isNull() || glbTrackM.isNull() ) 
+
+	  if( glbTrackP.isNull() || glbTrackM.isNull() )
 	    {
 	      //std::cout << "continue due to no track ref" << endl;
 	      continue;
@@ -181,8 +192,8 @@ void miniAODmuons::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  if(iMuon2->track()->pt()<4.0) continue;
 
 	  if(!(glbTrackM->quality(reco::TrackBase::highPurity))) continue;
-	  if(!(glbTrackP->quality(reco::TrackBase::highPurity))) continue;	 
-	  
+	  if(!(glbTrackP->quality(reco::TrackBase::highPurity))) continue;
+
 	  reco::TransientTrack muon1TT((*theB).build(glbTrackP));
 	  reco::TransientTrack muon2TT((*theB).build(glbTrackM));
 
@@ -196,7 +207,7 @@ void miniAODmuons::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  ClosestApproachInRPhi cApp;
 	  cApp.calculate(mu1State, mu2State);
 	  if( !cApp.status() ) continue;
-	  float dca = fabs( cApp.distance() );	  
+	  float dca = fabs( cApp.distance() );
 	  if (dca < 0. || dca > 0.5) continue;
 	  //cout<<" closest approach  "<<dca<<endl;
 
@@ -215,20 +226,20 @@ void miniAODmuons::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	      cout<<" it is not category muon  "<<endl;
 	    }
 	  */
-	  
+
 	  // ******   Let's check the vertex and mass ****
 
-	  
-	  //The mass of a muon and the insignificant mass sigma 
-	  //to avoid singularities in the covariance matrix.
+
+	  // The mass of a muon and the insignificant mass sigma
+	  // to avoid singularities in the covariance matrix.
 	  ParticleMass muon_mass = 0.10565837; //pdg mass
-	  //ParticleMass psi_mass = 3.096916;
+	  ParticleMass psi_mass = 3.096916;
 	  float muon_sigma = muon_mass*1.e-6;
-	  //float psi_sigma = psi_mass*1.e-6;
-	  
+	  float psi_sigma = psi_mass*1.e-6;
+
 	  //Creating a KinematicParticleFactory
 	  KinematicParticleFactoryFromTransientTrack pFactory;
-	  
+
 	  //initial chi2 and ndf before kinematic fits.
 	  float chi = 0.;
 	  float ndf = 0.;
@@ -237,63 +248,76 @@ void miniAODmuons::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	    muonParticles.push_back(pFactory.particle(muon1TT,muon_mass,chi,ndf,muon_sigma));
 	    muonParticles.push_back(pFactory.particle(muon2TT,muon_mass,chi,ndf,muon_sigma));
 	  }
-	  catch(...) { 
-	    std::cout<<" Exception caught ... continuing 1 "<<std::endl; 
+	  catch(...) {
+	    std::cout<<" Exception caught ... continuing 1 "<<std::endl;
 	    continue;
 	  }
-	  
-	  KinematicParticleVertexFitter fitter;   
-	  
+
+	  KinematicParticleVertexFitter fitter;
+
 	  RefCountedKinematicTree psiVertexFitTree;
 	  try {
-	    psiVertexFitTree = fitter.fit(muonParticles); 
+	    psiVertexFitTree = fitter.fit(muonParticles);
 	  }
-	  catch (...) { 
-	    std::cout<<" Exception caught ... continuing 2 "<<std::endl; 
+	  catch (...) {
+	    std::cout<<" Exception caught ... continuing 2 "<<std::endl;
 	    continue;
 	  }
-	  
-	  if (!psiVertexFitTree->isValid()) 
+
+	  if (!psiVertexFitTree->isValid())
 	    {
 	      //std::cout << "caught an exception in the psi vertex fit" << std::endl;
-	      continue; 
+	      continue;
 	    }
-	  
+
 	  psiVertexFitTree->movePointerToTheTop();
-	  
+
 	  RefCountedKinematicParticle psi_vFit_noMC = psiVertexFitTree->currentParticle();
 	  RefCountedKinematicVertex psi_vFit_vertex_noMC = psiVertexFitTree->currentDecayVertex();
-	  
+
 	  if( psi_vFit_vertex_noMC->chiSquared() < 0 )
 	    {
 	      //std::cout << "negative chisq from psi fit" << endl;
 	      continue;
 	    }
-	  
+
 	  //some loose cuts go here
-	  
+
 	  if(psi_vFit_vertex_noMC->chiSquared()>50.) continue;
 	  if(psi_vFit_noMC->currentState().mass()<2.9 || psi_vFit_noMC->currentState().mass()>3.3) continue;
-	  
+
+    TLorentzVector p4mup_0c, p4mum_0c;
+    p4mup_0c.SetPtEtaPhiM(glbTrackP->pt(), glbTrackP->eta(), glbTrackP->phi(), muon_mass);
+    p4mum_0c.SetPtEtaPhiM(glbTrackM->pt(), glbTrackM->eta(), glbTrackM->phi(), muon_mass);
+
+    for (View < pat::CompositeCandidate > ::const_iterator iPhoton = photonHandle->begin(); iPhoton != photonHandle->end(); ++iPhoton)
+            {
+              TLorentzVector p4photon, p4chi;
+              p4photon.SetPtEtaPhiM(iPhoton->pt(), iPhoton->eta(), iPhoton->phi(), iPhoton->mass());
+              p4chi = p4mup_0c + p4mum_0c + p4photon;
+              if (p4chi.M() < 3.3 || p4chi.M() > 3.6) continue;
+
+
+
 	  //fill variables?iMuon1->track()->pt()
-	  
+
 	  B_J_mass->push_back( psi_vFit_noMC->currentState().mass() );
 	  B_J_px->push_back( psi_vFit_noMC->currentState().globalMomentum().x() );
 	  B_J_py->push_back( psi_vFit_noMC->currentState().globalMomentum().y() );
 	  B_J_pz->push_back( psi_vFit_noMC->currentState().globalMomentum().z() );
-	  
+
 	  B_J_px1->push_back(iMuon1->track()->px());
 	  B_J_py1->push_back(iMuon1->track()->py());
 	  B_J_pz1->push_back(iMuon1->track()->pz());
 	  B_J_charge1->push_back(iMuon1->charge());
-	  
+
 	  B_J_px2->push_back(iMuon2->track()->px());
 	  B_J_py2->push_back(iMuon2->track()->py());
 	  B_J_pz2->push_back(iMuon2->track()->pz());
 	  B_J_charge2->push_back(iMuon2->charge());
-	  
+
 	   // ************
-	  
+
 	  mu1soft->push_back(iMuon1->isSoftMuon(bestVtx) );
 	  mu2soft->push_back(iMuon2->isSoftMuon(bestVtx) );
 	  mu1tight->push_back(iMuon1->isTightMuon(bestVtx) );
@@ -302,38 +326,42 @@ void miniAODmuons::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	  mu2PF->push_back(iMuon2->isPFMuon());
 	  mu1loose->push_back(muon::isLooseMuon(*iMuon1));
 	  mu2loose->push_back(muon::isLooseMuon(*iMuon2));
-	  
+
 	  mumC2->push_back( glbTrackP->normalizedChi2() );
-	  //mumAngT->push_back( muon::isGoodMuon(*iMuon1,muon::TMLastStationAngTight) ); // 
+	  //mumAngT->push_back( muon::isGoodMuon(*iMuon1,muon::TMLastStationAngTight) ); //
 	  mumNHits->push_back( glbTrackP->numberOfValidHits() );
-	  mumNPHits->push_back( glbTrackP->hitPattern().numberOfValidPixelHits() );	       
+	  mumNPHits->push_back( glbTrackP->hitPattern().numberOfValidPixelHits() );
 	  mupC2->push_back( glbTrackM->normalizedChi2() );
-	  //mupAngT->push_back( muon::isGoodMuon(*iMuon2,muon::TMLastStationAngTight) );  // 
+	  //mupAngT->push_back( muon::isGoodMuon(*iMuon2,muon::TMLastStationAngTight) );  //
 	  mupNHits->push_back( glbTrackM->numberOfValidHits() );
 	  mupNPHits->push_back( glbTrackM->hitPattern().numberOfValidPixelHits() );
 	  mumdxy->push_back(glbTrackP->dxy(bestVtx.position()) );
 	  mupdxy->push_back(glbTrackM->dxy(bestVtx.position()) );
 	  mumdz->push_back(glbTrackP->dz(bestVtx.position()) );
 	  mupdz->push_back(glbTrackM->dz(bestVtx.position()) );
-	  muon_dca->push_back(dca);          	  
-	  
-	  nB++;	       
+	  muon_dca->push_back(dca);
+
+    photon_mass     ->push_back(p4photon.M());
+    chi_mass        ->push_back(p4chi.M());
+
+
+	  nB++;
 	  muonParticles.clear();
-	  
+}
 	}
     }
 
-   
-  if (nB > 0 ) 
+
+  if (nB > 0 )
     {
 
       //std::cout << "filling tree" << endl;
       tree_->Fill();
     }
 
-   nB = 0; 
+   nB = 0;
 
-   B_J_mass->clear();  B_J_px->clear();  B_J_py->clear();  B_J_pz->clear();  
+   B_J_mass->clear();  B_J_px->clear();  B_J_py->clear();  B_J_pz->clear();
    B_J_px1->clear();  B_J_py1->clear();  B_J_pz1->clear(), B_J_charge1->clear();
    B_J_px2->clear();  B_J_py2->clear();  B_J_pz2->clear(), B_J_charge2->clear();
 
@@ -344,15 +372,16 @@ void miniAODmuons::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
    mumdxy->clear(); mupdxy->clear(); mumdz->clear(); mupdz->clear(); muon_dca->clear();
 
    mu1soft->clear(); mu2soft->clear(); mu1tight->clear(); mu2tight->clear();
-   mu1PF->clear(); mu2PF->clear(); mu1loose->clear(); mu2loose->clear(); 
-  
-  
+   mu1PF->clear(); mu2PF->clear(); mu1loose->clear(); mu2loose->clear();
+
+   photon_mass->clear(); chi_mass->clear();
+
 }
 
 
 // ------------ method called once each job just before starting event loop  ------------
 
-void 
+void
 miniAODmuons::beginJob()
 {
 
@@ -378,11 +407,11 @@ miniAODmuons::beginJob()
   tree_->Branch("B_J_pz2", &B_J_pz2);
   tree_->Branch("B_J_charge2", &B_J_charge2);
 
- 
-  tree_->Branch("mumC2",&mumC2);  
+
+  tree_->Branch("mumC2",&mumC2);
   tree_->Branch("mumNHits",&mumNHits);
   tree_->Branch("mumNPHits",&mumNPHits);
-  tree_->Branch("mupC2",&mupC2);  
+  tree_->Branch("mupC2",&mupC2);
   tree_->Branch("mupNHits",&mupNHits);
   tree_->Branch("mupNPHits",&mupNPHits);
   tree_->Branch("mumdxy",&mumdxy);
@@ -399,6 +428,8 @@ miniAODmuons::beginJob()
   tree_->Branch("mu2PF",&mu2PF);
   tree_->Branch("mu1loose",&mu1loose);
   tree_->Branch("mu2loose",&mu2loose);
+  tree_->Branch("photon_mass"        , &photon_mass      );
+  tree_->Branch("chi_mass"           , &chi_mass         );
 
 }
 

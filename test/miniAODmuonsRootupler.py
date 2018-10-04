@@ -33,6 +33,8 @@ process.rootuple = cms.EDAnalyzer('miniAODmuons',
                           Trak = cms.InputTag("packedPFCandidates"),
                           primaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
                           isMC = cms.bool(False),
+                          conv_photons = cms.InputTag('oniaPhotonCandidates:conversions')
+
                           )
 
 process.TFileService = cms.Service("TFileService",
