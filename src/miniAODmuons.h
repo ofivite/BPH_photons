@@ -142,7 +142,7 @@ private:
 
   std::vector<float>       *e1dxy, *e2dxy, *e1dz, *e2dz;
   std::vector<float>       *e1dxy_e, *e2dxy_e, *e1dz_e, *e2dz_e;
-  std::vector<int>         *photon_charge1, *photon_charge2;
+  std::vector<int>         *photon_charge1, *photon_charge2, *nPhotonDaughters;
 
   std::vector<float>       *B_J_mass, *B_J_px, *B_J_py, *B_J_pz;
   std::vector<float>       *B_J_pt1, *B_J_px1, *B_J_py1, *B_J_pz1;

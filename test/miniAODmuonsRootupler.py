@@ -19,7 +19,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.options.allowUnscheduled = cms.untracked.bool(True)
 #process.load("FWCore.MessageLogger.MessageLogger_cfi")
 #process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(2000),SkipEvent = cms.untracked.vstring('ProductNotFound'))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000),SkipEvent = cms.untracked.vstring('ProductNotFound'))
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 
