@@ -118,8 +118,8 @@ miniAODmuons::miniAODmuons(const edm::ParameterSet& iConfig)
   photon_px1_track(0), photon_py1_track(0), photon_pz1_track(0),
   photon_px2_track(0), photon_py2_track(0), photon_pz2_track(0),
 
-  e1dxy(0), e2dxy(0), e1dz(0), e2dz(0),
-  e1dxy_e(0), e2dxy_e(0), e1dz_e(0), e2dz_e(0),
+  // e1dxy(0), e2dxy(0), e1dz(0), e2dz(0),
+  // e1dxy_e(0), e2dxy_e(0), e1dz_e(0), e2dz_e(0),
   photon_charge1(0), photon_charge2(0), nPhotonDaughters(0),
 
   B_J_mass(0), B_J_px(0), B_J_py(0), B_J_pz(0),
@@ -217,8 +217,8 @@ void miniAODmuons::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 	      continue;
 	    }
 
-	  if(iMuon1->track()->pt()<4.0) continue;
-	  if(iMuon2->track()->pt()<4.0) continue;
+	  if(iMuon1->track()->pt()<5.0) continue;
+	  if(iMuon2->track()->pt()<5.0) continue;
 
 	  if(!(glbTrackM->quality(reco::TrackBase::highPurity))) continue;
 	  if(!(glbTrackP->quality(reco::TrackBase::highPurity))) continue;
@@ -317,8 +317,8 @@ void miniAODmuons::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
 	  if(psi_vFit_vertex_noMC->chiSquared()>50.) continue;
     double J_Prob_tmp   = TMath::Prob(psi_vFit_vertex_noMC->chiSquared(),(int)psi_vFit_vertex_noMC->degreesOfFreedom());
-    if (J_Prob_tmp < 0.01) continue;
-	  if(psi_vFit_noMC->currentState().mass()<2.9 || psi_vFit_noMC->currentState().mass()>3.3) continue;
+    if (J_Prob_tmp < 0.1) continue;
+	  if(psi_vFit_noMC->currentState().mass()<2.99 || psi_vFit_noMC->currentState().mass()>3.19) continue;
 
     TLorentzVector p4mup_0c, p4mum_0c;
     p4mup_0c.SetPtEtaPhiM(glbTrackP->pt(), glbTrackP->eta(), glbTrackP->phi(), muon_mass);
@@ -393,6 +393,7 @@ void miniAODmuons::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
                 if(photon_vFit_vertex_noMC->chiSquared()>50) continue;
                 double photon_Prob_tmp  = TMath::Prob(photon_vFit_vertex_noMC->chiSquared(),(int)photon_vFit_vertex_noMC->degreesOfFreedom());
+                if (photon_Prob_tmp < 0.05) continue;
                 // if(photon_vFit_noMC->currentState().mass()< 0.45 || photon_vFit_noMC->currentState().mass()>0.55) continue;
 
                 photonVertexFitTree->movePointerToTheFirstChild();
@@ -454,10 +455,7 @@ void miniAODmuons::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
                   }
 
                 double B_Prob_tmp       = TMath::Prob(bDecayVertexMC->chiSquared(),(int)bDecayVertexMC->degreesOfFreedom());
-                if(B_Prob_tmp<0.01)
-                  {
-              continue;
-                  }
+                if(B_Prob_tmp<0.05) continue;
 
               // get children from final B fit
               vertexFitTree->movePointerToTheFirstChild();
@@ -629,15 +627,15 @@ void miniAODmuons::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
               mumdz->push_back(glbTrackM->dz(bestVtx.position()) );
               mupdz->push_back(glbTrackP->dz(bestVtx.position()) );
 
-              e1dxy->push_back(photon_daughters[0].dxy());
-              e2dxy->push_back(photon_daughters[1].dxy());
-              e1dz->push_back(photon_daughters[0].dz());
-              e2dz->push_back(photon_daughters[1].dz());
-
-              e1dxy_e->push_back(photon_daughters[0].dxyError());
-              e2dxy_e->push_back(photon_daughters[1].dxyError());
-              e1dz_e->push_back(photon_daughters[0].dzError());
-              e2dz_e->push_back(photon_daughters[1].dzError());
+              // e1dxy->push_back(photon_daughters[0].dxy());
+              // e2dxy->push_back(photon_daughters[1].dxy());
+              // e1dz->push_back(photon_daughters[0].dz());
+              // e2dz->push_back(photon_daughters[1].dz());
+              //
+              // e1dxy_e->push_back(photon_daughters[0].dxyError());
+              // e2dxy_e->push_back(photon_daughters[1].dxyError());
+              // e1dz_e->push_back(photon_daughters[0].dzError());
+              // e2dz_e->push_back(photon_daughters[1].dzError());
 
               // try refitting the primary without the tracks in the B reco candidate
 
@@ -691,8 +689,8 @@ void miniAODmuons::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     PhotonDecayVtxXE->clear(); PhotonDecayVtxYE->clear(); PhotonDecayVtxZE->clear();
     PhotonDecayVtxXYE->clear(); PhotonDecayVtxXZE->clear(); PhotonDecayVtxYZE->clear();
 
-    e1dxy->clear(); e2dxy->clear(); e1dz->clear(); e2dz->clear();
-    e1dxy_e->clear(); e2dxy_e->clear(); e1dz_e->clear(); e2dz_e->clear();
+    // e1dxy->clear(); e2dxy->clear(); e1dz->clear(); e2dz->clear();
+    // e1dxy_e->clear(); e2dxy_e->clear(); e1dz_e->clear(); e2dz_e->clear();
 
     mumC2->clear();
     mumNHits->clear(); mumNPHits->clear();
@@ -803,15 +801,15 @@ miniAODmuons::beginJob()
   tree_->Branch("PhotonDecayVtxXZE",&PhotonDecayVtxXZE);
   tree_->Branch("PhotonDecayVtxYZE",&PhotonDecayVtxYZE);
 
-  tree_->Branch("e1dxy",&e1dxy);
-  tree_->Branch("e2dxy",&e2dxy);
-  tree_->Branch("e1dz",&e1dz);
-  tree_->Branch("e2dz",&e2dz);
-
-  tree_->Branch("e1dxy_e",&e1dxy_e);
-  tree_->Branch("e2dxy_e",&e2dxy_e);
-  tree_->Branch("e1dz_e",&e1dz_e);
-  tree_->Branch("e2dz_e",&e2dz_e);
+  // tree_->Branch("e1dxy",&e1dxy);
+  // tree_->Branch("e2dxy",&e2dxy);
+  // tree_->Branch("e1dz",&e1dz);
+  // tree_->Branch("e2dz",&e2dz);
+  //
+  // tree_->Branch("e1dxy_e",&e1dxy_e);
+  // tree_->Branch("e2dxy_e",&e2dxy_e);
+  // tree_->Branch("e1dz_e",&e1dz_e);
+  // tree_->Branch("e2dz_e",&e2dz_e);
 
   tree_->Branch("mumC2",&mumC2);
   tree_->Branch("mumNHits",&mumNHits);

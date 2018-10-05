@@ -5,6 +5,7 @@ config.section_("General")
 config.General.requestName = 'Bfinder'
 config.General.workArea = 'crab_projects'
 config.General.transferLogs = True
+config.General.transferOutputs = True
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
@@ -21,8 +22,8 @@ config.Data.outputDatasetTag = 'CRAB3_Bfinder'
 config.Data.outLFNDirBase = '/store/user/'+getUsernameFromSiteDB()+'/Bfinder/'
 
 config.section_("Site")
-# config.Site.storageSite = 'T2_RU_IHEP'
-config.Site.storageSite = 'T2_RU_JINR'
+config.Site.storageSite = 'T2_RU_IHEP'
+# config.Site.storageSite = 'T2_RU_JINR'
 
 DS_names = [ '' , ## 5 items
 '/Charmonium/Run2017B-31Mar2018-v1/MINIAOD',
