@@ -5,11 +5,11 @@ config.section_("General")
 config.General.requestName = 'Bfinder'
 config.General.workArea = 'crab_projects'
 config.General.transferLogs = True
-config.General.transferOutputs = True
+# config.General.transferOutputs = True
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'test/miniAODmuonsRootupler.py'
+config.JobType.psetName = 'test/Psiks0Rootupler.py'
 
 config.section_("Data")
 config.Data.inputDataset = '/MuOnia/Run2012B-22Jan2013-v1/AOD'
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     import sys
     from CRABAPI.RawCommand import crabCommand
     from httplib import HTTPException
-    task = '2017_jKF_morejobs'
+    task = '2017_jKF_v1'
     ####
     ## MY: b1 == Bc+ --> J/psi pi+
     ##      x1 = Xi-    -> Lambda pi
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     #
     ## 2017_bs = B0s (Jpsi phi)
     ####
-    units_per_job = 14
+    units_per_job = 140
     #
     n = 0
     if len(sys.argv) >= 2:

@@ -33,6 +33,7 @@
 #include "TrackingTools/PatternTools/interface/ClosestApproachInRPhi.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 
+#include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
@@ -62,6 +63,7 @@
 
 #include "TFile.h"
 #include "TTree.h"
+#include "TLorentzVector.h"
 
 //
 // class decleration
@@ -75,8 +77,8 @@ public:
   void fillV0(const reco::Candidate& genv0);
   int const getMuCat(reco::Muon const& muon) const;
   bool IsTheSame(const reco::Track& tk, const pat::Muon& mu);
-  
-  
+
+
 private:
   virtual void beginJob() ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
@@ -84,14 +86,14 @@ private:
   void printout(const RefCountedKinematicVertex& myVertex) const;
   void printout(const RefCountedKinematicParticle& myParticle) const;
   void printout(const RefCountedKinematicTree& myTree) const;
- 
+
   // ----------member data ---------------------------
-  edm::EDGetTokenT<edm::View<pat::Muon>> dimuon_Label;
-  edm::EDGetTokenT<edm::View<pat::PackedCandidate>> trakCollection_label;
-  edm::EDGetTokenT<reco::VertexCollection> primaryVertices_Label;
+  edm::EDGetTokenT<edm::View<pat::Muon>> dimuon_token;
+  edm::EDGetTokenT<edm::View<pat::PackedCandidate>> trackCollection_token;
+  edm::EDGetTokenT<reco::VertexCollection> primaryVertices_token;
   edm::EDGetTokenT<reco::BeamSpot> BSLabel_;
-  edm::EDGetTokenT<edm::TriggerResults> triggerResults_Label;
-  edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> v0PtrCollection_;
+  edm::EDGetTokenT<edm::TriggerResults> triggerResults_token;
+  edm::EDGetTokenT<edm::View<pat::CompositeCandidate>> conv_photons_token;
 
   std::string genParticles_;
   bool OnlyBest_;
@@ -100,39 +102,41 @@ private:
   bool doMC_;
 
   TTree*      tree_;
+
   int mupCategory;
   int mumCategory;
   int mupME1Clean;
   int mumME1Clean;
-  
+
   std::vector<float>       *mumC2;
-  std::vector<int>         *mumNHits, *mumNPHits; 
+  std::vector<int>         *mumNHits, *mumNPHits;
   std::vector<float>       *mupC2;
   std::vector<int>         *mupNHits, *mupNPHits;
   std::vector<float>       *mumdxy, *mupdxy, *mumdz, *mupdz;
-  std::vector<float>       *muon_dca;
 
   std::vector<int>         *tri_Dim25, *tri_JpsiTk, *tri_JpsiTkTk;
- 
-  std::vector<bool>        *mu1soft, *mu2soft, *mu1tight, *mu2tight;  
-  std::vector<bool>        *mu1PF, *mu2PF, *mu1loose, *mu2loose;  
- 
+
+  std::vector<bool>        *mu1soft, *mu2soft, *mu1tight, *mu2tight;
+  std::vector<bool>        *mu1PF, *mu2PF, *mu1loose, *mu2loose;
+
   int                      muAcc, muTrig, weight;
- 
+
   // vertice primario CON mayor Pt
   unsigned int             nVtx;
-  float                    priVtxX, priVtxY, priVtxZ, priVtxXE, priVtxYE, priVtxZE, priVtxCL;
-  float                    priVtxXYE, priVtxXZE, priVtxYZE;
- 
+
   // ********************************** ************************************************************************
 
   std::vector<float>       *bDecayVtxX, *bDecayVtxY, *bDecayVtxZ;
   std::vector<double>      *bDecayVtxXE, *bDecayVtxYE, *bDecayVtxZE;
   std::vector<double>      *bDecayVtxXYE, *bDecayVtxXZE, *bDecayVtxYZE;
 
-  std::vector<float>       *VDecayVtxX, *VDecayVtxY, *VDecayVtxZ;
-  std::vector<float>       *VDecayVtxXE, *VDecayVtxYE, *VDecayVtxZE;
-  std::vector<float>       *VDecayVtxXYE, *VDecayVtxXZE, *VDecayVtxYZE;
+  std::vector<float>       *psiDecayVtxX, *psiDecayVtxY, *psiDecayVtxZ;
+  std::vector<double>      *psiDecayVtxXE, *psiDecayVtxYE, *psiDecayVtxZE;
+  std::vector<double>      *psiDecayVtxXYE, *psiDecayVtxXZE, *psiDecayVtxYZE;
+
+  std::vector<float>       *PhotonDecayVtxX, *PhotonDecayVtxY, *PhotonDecayVtxZ;
+  std::vector<float>       *PhotonDecayVtxXE, *PhotonDecayVtxYE, *PhotonDecayVtxZE;
+  std::vector<float>       *PhotonDecayVtxXYE, *PhotonDecayVtxXZE, *PhotonDecayVtxYZE;
 
   // *************************************
 
@@ -140,25 +144,25 @@ private:
   unsigned int             nMu;
 
   std::vector<float>       *B_mass, *B_px, *B_py, *B_pz;
- 
-  std::vector<float>       *B_Ks0_mass, *B_Ks0_px, *B_Ks0_py, *B_Ks0_pz;
-  std::vector<float>       *B_Ks0_pt1, *B_Ks0_px1, *B_Ks0_py1, *B_Ks0_pz1;
-  std::vector<float>       *B_Ks0_pt2, *B_Ks0_px2, *B_Ks0_py2, *B_Ks0_pz2;
-  
-  std::vector<float>       *B_Ks0_px1_track, *B_Ks0_py1_track, *B_Ks0_pz1_track;
-  std::vector<float>       *B_Ks0_px2_track, *B_Ks0_py2_track, *B_Ks0_pz2_track;
 
-  std::vector<float>       *pi1dxy, *pi2dxy, *pi1dz, *pi2dz;
-  std::vector<float>       *pi1dxy_e, *pi2dxy_e, *pi1dz_e, *pi2dz_e;
-  std::vector<int>         *B_Ks0_charge1, *B_Ks0_charge2;
-  
+  std::vector<float>       *photon_mass, *photon_px, *photon_py, *photon_pz;
+  std::vector<float>       *photon_pt1, *photon_px1, *photon_py1, *photon_pz1;
+  std::vector<float>       *photon_pt2, *photon_px2, *photon_py2, *photon_pz2;
+
+  std::vector<float>       *photon_px1_track, *photon_py1_track, *photon_pz1_track;
+  std::vector<float>       *photon_px2_track, *photon_py2_track, *photon_pz2_track;
+
+  // std::vector<float>       *e1dxy, *e2dxy, *e1dz, *e2dz;
+  // std::vector<float>       *e1dxy_e, *e2dxy_e, *e1dz_e, *e2dz_e;
+  std::vector<int>         *photon_charge1, *photon_charge2, *nPhotonDaughters;
+
   std::vector<float>       *B_J_mass, *B_J_px, *B_J_py, *B_J_pz;
   std::vector<float>       *B_J_pt1, *B_J_px1, *B_J_py1, *B_J_pz1;
   std::vector<float>       *B_J_pt2, *B_J_px2, *B_J_py2, *B_J_pz2;
   std::vector<int>         *B_J_charge1, *B_J_charge2;
-  
-  std::vector<float>       *B_Ks0_chi2, *B_J_chi2, *B_chi2;
-  std::vector<float>       *B_Prob, *B_J_Prob, *B_ks0_Prob;
+
+  std::vector<float>       *photon_chi2, *J_chi2, *B_chi2;
+  std::vector<float>       *B_Prob, *J_Prob, *photon_Prob;
 
   int  run, event;
   int  lumiblock;
