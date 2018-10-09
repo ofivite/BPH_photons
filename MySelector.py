@@ -9,8 +9,8 @@ isMC = 0
 MyFileNamesMC = glob.glob( MCpath(1) + "*.root")
 MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_9_4_10/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2017_jKF_v1_PV_and_vars_*/results/*.root")
 
-##__aa = 0;    __bb = 100
-__aa = 0;  __bb =  len(MyFileNamesDA);
+#__aa = 0;    __bb = 500
+ __aa = 0;  __bb =  len(MyFileNamesDA);
 MyFileNames = (MyFileNamesMC if isMC else MyFileNamesDA[__aa: __bb]); ch = TChain('rootuple/ntuple');
 
 for fName in  MyFileNames:
@@ -18,7 +18,7 @@ for fName in  MyFileNames:
 
 print 'get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created'
 
-_fileOUT = 'chi_notall_' + str(len(MyFileNames)) + '.root'
+_fileOUT = 'chi_notall_' + str(len(MyFileNames)) + '_of_1271.root'
 fileOUT  = TFile (_fileOUT, "recreate");    mytree = TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print "entries: from", 0, 'to', nEvt-1;
@@ -76,7 +76,7 @@ _MY_VARS_ = [
 ##"JP_vtxprob_Cmumu", "JP_pvcos2_Cmumu", "JP_DS_2D_Cmumu",
 
 #-----~-----
-"chi_mass_Cjp",
+"chi_mass_Cjp", 'chi_mass_P4', 'chi_mass_P4_tracks',
 "chi_pt_Cjp", "chi_pvdistsignif2_Cjp",
 "chi_pvcos2_Cjp", "chi_vtxprob_Cjp",
 "chi_Eta_cjp", "chi_Phi_cjp",
@@ -183,6 +183,8 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~Photon~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~~~#####
 
+        photonV     = TVector3(ch.PhotonDecayVtxX[ibs],  ch.PhotonDecayVtxY[ibs],  ch.PhotonDecayVtxZ[ibs]   )
+        photonVE     = TVector3(ch.PhotonDecayVtxXE[ibs],  ch.PhotonDecayVtxYE[ibs],  ch.PhotonDecayVtxZE[ibs]   )
         photon_P4_0c.SetXYZM(ch.photon_px[ibs], ch.photon_py[ibs], ch.photon_pz[ibs], ch.photon_mass[ibs] )
 
 
@@ -220,6 +222,8 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~ CHI ~~~~~~~~~~###
 
         chi_mass_Cjp[0]          = ch.B_mass[ibs]
+        chi_mass_P4[0]           = (pos_P4_0c + e_P4_0c + MUMUP4_cjp).M()
+        chi_mass_P4_tracks[0]    = (e1_P4_track + e2_P4_track + MUMUP4_cjp).M()
         chi_pt_Cjp[0]            = chiP4_Cjp.Pt()
 
         chi_pvdistsignif2_Cjp[0] = DetachSignificance2( chiV_Cjp - PV, PVE, chiVE_Cjp)
