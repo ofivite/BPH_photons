@@ -103,10 +103,16 @@ private:
 
   TTree*      tree_;
 
-  int mupCategory;
-  int mumCategory;
-  int mupME1Clean;
-  int mumME1Clean;
+  // *************************************
+
+  int  run, event;
+  int  lumiblock;
+
+  unsigned int             nB;
+  unsigned int             nMu;
+  unsigned int             nVtx;
+
+  // *************************************
 
   std::vector<float>       *mumC2;
   std::vector<int>         *mumNHits, *mumNPHits;
@@ -114,15 +120,53 @@ private:
   std::vector<int>         *mupNHits, *mupNPHits;
   std::vector<float>       *mumdxy, *mupdxy, *mumdz, *mupdz;
 
-  std::vector<int>         *tri_Dim25, *tri_JpsiTk, *tri_JpsiTkTk;
-
   std::vector<bool>        *mu1soft, *mu2soft, *mu1tight, *mu2tight;
   std::vector<bool>        *mu1PF, *mu2PF, *mu1loose, *mu2loose;
+  std::vector<float>       *mu1_mvaValue, *mu2_mvaValue;
 
-  int                      muAcc, muTrig, weight;
+  std::vector<int>         *tri_Dim25, *tri_JpsiTk, *tri_JpsiTkTk;
 
-  // vertice primario CON mayor Pt
-  unsigned int             nVtx;
+
+  // *************************************
+
+  std::vector<float>       *photon_mass, *photon_px, *photon_py, *photon_pz;
+  std::vector<int>         *photon_flags;
+
+  // *************************************
+
+  std::vector<float>       *photon_pt1, *photon_px1, *photon_py1, *photon_pz1;
+  std::vector<float>       *photon_pt2, *photon_px2, *photon_py2, *photon_pz2;
+
+  std::vector<float>       *photon_px1_track, *photon_py1_track, *photon_pz1_track;
+  std::vector<float>       *photon_px2_track, *photon_py2_track, *photon_pz2_track;
+
+  // std::vector<float>       *e1dxy, *e2dxy, *e1dz, *e2dz;
+  // std::vector<float>       *e1dxy_e, *e2dxy_e, *e1dz_e, *e2dz_e;
+  std::vector<int>         *photon_charge1, *photon_charge2;
+
+  std::vector<float>       *photon1_track_normchi2;
+  std::vector<int>         *photon1_Hits,  *photon1_PHits;
+  std::vector<int>         *photon1_NTrackerLayers,  *photon1_NPixelLayers;
+
+  std::vector<float>       *photon2_track_normchi2;
+  std::vector<int>         *photon2_Hits,  *photon2_PHits;
+  std::vector<int>         *photon2_NTrackerLayers,  *photon2_NPixelLayers;
+
+  // *************************************
+
+  std::vector<float>       *B_mass, *B_px, *B_py, *B_pz;
+
+  // *************************************
+
+  std::vector<float>       *B_J_mass, *B_J_px, *B_J_py, *B_J_pz;
+  std::vector<float>       *B_J_pt1, *B_J_px1, *B_J_py1, *B_J_pz1;
+  std::vector<float>       *B_J_pt2, *B_J_px2, *B_J_py2, *B_J_pz2;
+  std::vector<int>         *B_J_charge1, *B_J_charge2;
+
+  // *************************************
+
+  std::vector<float>       *photon_chi2, *J_chi2, *B_chi2;
+  std::vector<float>       *B_Prob, *J_Prob, *photon_Prob;
 
   // ********************************** ************************************************************************
 
@@ -138,34 +182,10 @@ private:
   std::vector<float>       *PhotonDecayVtxXE, *PhotonDecayVtxYE, *PhotonDecayVtxZE;
   std::vector<float>       *PhotonDecayVtxXYE, *PhotonDecayVtxXZE, *PhotonDecayVtxYZE;
 
-  // *************************************
-
-  unsigned int             nB;
-  unsigned int             nMu;
-
-  std::vector<float>       *B_mass, *B_px, *B_py, *B_pz;
-
-  std::vector<float>       *photon_mass, *photon_px, *photon_py, *photon_pz;
-  std::vector<float>       *photon_pt1, *photon_px1, *photon_py1, *photon_pz1;
-  std::vector<float>       *photon_pt2, *photon_px2, *photon_py2, *photon_pz2;
-
-  std::vector<float>       *photon_px1_track, *photon_py1_track, *photon_pz1_track;
-  std::vector<float>       *photon_px2_track, *photon_py2_track, *photon_pz2_track;
-
-  // std::vector<float>       *e1dxy, *e2dxy, *e1dz, *e2dz;
-  // std::vector<float>       *e1dxy_e, *e2dxy_e, *e1dz_e, *e2dz_e;
-  std::vector<int>         *photon_charge1, *photon_charge2, *nPhotonDaughters;
-
-  std::vector<float>       *B_J_mass, *B_J_px, *B_J_py, *B_J_pz;
-  std::vector<float>       *B_J_pt1, *B_J_px1, *B_J_py1, *B_J_pz1;
-  std::vector<float>       *B_J_pt2, *B_J_px2, *B_J_py2, *B_J_pz2;
-  std::vector<int>         *B_J_charge1, *B_J_charge2;
-
-  std::vector<float>       *photon_chi2, *J_chi2, *B_chi2;
-  std::vector<float>       *B_Prob, *J_Prob, *photon_Prob;
-
-  int  run, event;
-  int  lumiblock;
+  std::vector<float>       *PV_bestBang_RF_X   , *PV_bestBang_RF_Y , *PV_bestBang_RF_Z;
+  std::vector<float>       *PV_bestBang_RF_XE  , *PV_bestBang_RF_YE, *PV_bestBang_RF_ZE;
+  std::vector<float>       *PV_bestBang_RF_XYE , *PV_bestBang_RF_XZE , *PV_bestBang_RF_YZE;
+  std::vector<float>       *PV_bestBang_RF_CL;
 
 };
 

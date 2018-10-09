@@ -41,7 +41,7 @@ if __name__ == '__main__':
     import sys
     from CRABAPI.RawCommand import crabCommand
     from httplib import HTTPException
-    task = '2017_jKF_v1'
+    task = '2017_jKF_v1_PV_and_vars'
     ####
     ## MY: b1 == Bc+ --> J/psi pi+
     ##      x1 = Xi-    -> Lambda pi
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     #
     ## 2017_bs = B0s (Jpsi phi)
     ####
-    units_per_job = 140
+    units_per_job = 220
     #
     n = 0
     if len(sys.argv) >= 2:
