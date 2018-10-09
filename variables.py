@@ -1,4 +1,6 @@
 from ROOT import *
+from math import sqrt
+
 PDG_MUON_MASS       =   0.10565837
 PDG_ELECTRON_MASS   =   0.0005109989461
 PDG_PION_MASS       =   0.13957061
@@ -30,10 +32,13 @@ PDG_DMBstB          =   0.04538
 bmin = 6; bmax = 6.6; binN = 120
 
 def DetachSignificance2(vtx, vtxE1, vtxE2):
-    return sqrt( vtx.X()**2 / (vtxE1.X()**2 + vtxE2.X()**2) + vtx.Y()**2 / (vtxE1.Y()**2 + vtxE2.Y()**2));
+    return ( 9999 if vtxE1.X() * vtxE1.Y() * vtxE1.Z() * vtxE2.X() * vtxE2.Y() * vtxE2.Z() == 0. else
+    sqrt( vtx.X()**2 / (vtxE1.X()**2 + vtxE2.X()**2) + vtx.Y()**2 / (vtxE1.Y()**2 + vtxE2.Y()**2)) )
+    # return sqrt( vtx.X()**2 + vtx.Y()**2 )
 
 def DetachSignificance3(vtx, vtxE1, vtxE2):
-    return sqrt( vtx.X()**2 / (vtxE1.X()**2 + vtxE2.X()**2) + vtx.Y()**2 / (vtxE1.Y()**2 + vtxE2.Y()**2) + vtx.Z()**2 / (vtxE1.Z()**2 + vtxE2.Z()**2));
+    return ( 9999 if vtxE1.X() * vtxE1.Y() * vtxE1.Z() * vtxE2.X() * vtxE2.Y() * vtxE2.Z() == 0. else
+    sqrt( vtx.X()**2 / (vtxE1.X()**2 + vtxE2.X()**2) + vtx.Y()**2 / (vtxE1.Y()**2 + vtxE2.Y()**2) + vtx.Z()**2 / (vtxE1.Z()**2 + vtxE2.Z()**2)) )
 
 def DirectionCos2 (v1, v2):
     r1 = sqrt(v1.X()**2 + v1.Y()**2);
