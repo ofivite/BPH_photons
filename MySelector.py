@@ -9,8 +9,8 @@ isMC = 0
 MyFileNamesMC = glob.glob( MCpath(1) + "*.root")
 MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_9_4_10/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2017_jKF_v1_PV_and_vars_*/results/*.root")
 
-#__aa = 0;    __bb = 500
- __aa = 0;  __bb =  len(MyFileNamesDA);
+# __aa = 0;    __bb = 500
+__aa = 0;  __bb =  len(MyFileNamesDA);
 MyFileNames = (MyFileNamesMC if isMC else MyFileNamesDA[__aa: __bb]); ch = TChain('rootuple/ntuple');
 
 for fName in  MyFileNames:
@@ -146,14 +146,14 @@ for evt in range(0, nEvt):
             H_cuts.Fill(12)
             continue
 
-        if ch.J_Prob[ibs] < 0.1:
+        if ch.J_Prob[ibs] < 0.05:
             H_cuts.Fill(13)
             continue
 
         if ch.B_J_mass[ibs]   <   3.04    :continue
         if ch.B_J_mass[ibs]   >   3.15    :continue
 
-        if DirectionCos2 ( JPV - PV, JPP3 ) < 0.9:
+        if DirectionCos2 ( JPV - PV, JPP3 ) < 0.5:
             H_cuts.Fill(14)
             continue
 
@@ -202,7 +202,7 @@ for evt in range(0, nEvt):
 
         if DetachSignificance2( chiV_Cjp - PV, PVE, chiVE_Cjp) < 3. :continue
 
-        if DirectionCos2 ( chiV_Cjp - PV, chiP3_Cjp ) < 0.9 :
+        if DirectionCos2 ( chiV_Cjp - PV, chiP3_Cjp ) < 0.5 :
             H_cuts.Fill(9)
             continue
 
@@ -294,10 +294,11 @@ for evt in range(0, nEvt):
         mu1_eta_Cjp[0] = MU1P4_cjp.Eta()
         mu2_eta_Cjp[0] = MU2P4_cjp.Eta()
 
-        mu1soft_bestVtx[0] = float(ch.mu1soft[ibs].__bool__());             mu2soft_bestVtx[0] = float(ch.mu2soft[ibs].__bool__());
-        mu1tight_bestVtx[0] = float(ch.mu1tight[ibs].__bool__());           mu2tight_bestVtx[0] = float(ch.mu2tight[ibs].__bool__());
-        mu1PF[0] = float(ch.mu1PF[ibs].__bool__());                 mu2PF[0] = float(ch.mu2PF[ibs].__bool__());
-        mu1loose[0] = float(ch.mu1loose[ibs].__bool__());           mu2loose[0] = float(ch.mu2loose[ibs].__bool__());
+        # in case of a problem try .__bool__()
+        mu1soft_bestVtx[0] = float(ch.mu1soft[ibs]);             mu2soft_bestVtx[0] = float(ch.mu2soft[ibs]);
+        mu1tight_bestVtx[0] = float(ch.mu1tight[ibs]);           mu2tight_bestVtx[0] = float(ch.mu2tight[ibs]);
+        mu1PF[0] = float(ch.mu1PF[ibs]);                 mu2PF[0] = float(ch.mu2PF[ibs]);
+        mu1loose[0] = float(ch.mu1loose[ibs]);           mu2loose[0] = float(ch.mu2loose[ibs]);
         mu1_mvaValue[0] = ch.mu1_mvaValue[ibs];   mu2_mvaValue[0] = ch.mu2_mvaValue[ibs];
 
         # # Soft J/psi muons #
