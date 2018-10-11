@@ -18,7 +18,7 @@ for fName in  MyFileNames:
 
 print 'get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created'
 
-_fileOUT = 'chi_notall_' + str(len(MyFileNames)) + '_of_1271.root'
+_fileOUT = 'chi_notall_' + str(len(MyFileNames)) + '_of_1271_loose.root'
 fileOUT  = TFile (_fileOUT, "recreate");    mytree = TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print "entries: from", 0, 'to', nEvt-1;
@@ -119,7 +119,7 @@ for evt in range(0, nEvt):
 
         if MU1P4_cjp.Pt() < 4.0 or MU2P4_cjp.Pt() < 4.0:
             H_cuts.Fill(11)
-            continue
+            # continue
         #
         # if (not 'HLT_DoubleMu4_Jpsi_Displaced' in ch.triggersMuPL[ibs]) or (not 'HLT_DoubleMu4_Jpsi_Displaced' in ch.triggersMuML[ibs])  :continue
 
@@ -144,7 +144,7 @@ for evt in range(0, nEvt):
 
         if MUMUP4_cjp.Pt() < 7.:
             H_cuts.Fill(12)
-            continue
+            # continue
 
         if ch.J_Prob[ibs] < 0.05:
             H_cuts.Fill(13)
@@ -155,11 +155,11 @@ for evt in range(0, nEvt):
 
         if DirectionCos2 ( JPV - PV, JPP3 ) < 0.5:
             H_cuts.Fill(14)
-            continue
+            # continue
 
         if DetachSignificance2( JPV - PV, PVE, JPVE) < 3.0:
             H_cuts.Fill(15)
-            continue
+            # continue
 
         if abs(MUMUP4_cjp.Eta()) > 2.2  :continue
 
@@ -200,11 +200,11 @@ for evt in range(0, nEvt):
                                  0 if ch.bDecayVtxZE[ibs] <= 0 else sqrt(ch.bDecayVtxZE[ibs])  )
         chiP3_Cjp    = chiP4_Cjp.Vect()
 
-        if DetachSignificance2( chiV_Cjp - PV, PVE, chiVE_Cjp) < 3. :continue
+        # if DetachSignificance2( chiV_Cjp - PV, PVE, chiVE_Cjp) < 3. :continue
 
         if DirectionCos2 ( chiV_Cjp - PV, chiP3_Cjp ) < 0.5 :
             H_cuts.Fill(9)
-            continue
+            # continue
 
         if ch.B_Prob[ibs] < 0.05 :
             H_cuts.Fill(10)
