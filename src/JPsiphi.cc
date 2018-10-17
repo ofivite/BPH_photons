@@ -134,6 +134,10 @@ JPsiphi::JPsiphi(const edm::ParameterSet& iConfig)
 
   // *******************************************************
 
+  photon0_mass(0), photon0_px(0), photon0_py(0), photon0_pz(0),
+
+  // *******************************************************
+
   photon_pt1(0), photon_px1(0), photon_py1(0), photon_pz1(0),
   photon_pt2(0), photon_px2(0), photon_py2(0), photon_pz2(0),
 
@@ -153,6 +157,10 @@ JPsiphi::JPsiphi(const edm::ParameterSet& iConfig)
   // *******************************************************
 
   B_mass(0), B_px(0), B_py(0), B_pz(0),
+
+  // *******************************************************
+
+  Bstar_mass0(0), Bstar_mass(0), Bstar_px(0), Bstar_py(0), Bstar_pz(0),
 
   // *******************************************************
 
@@ -182,6 +190,11 @@ JPsiphi::JPsiphi(const edm::ParameterSet& iConfig)
   PV_bestBang_RF_XYE(0), PV_bestBang_RF_XZE(0),PV_bestBang_RF_YZE(0),
   PV_bestBang_RF_CL(0),
 
+  bStarDecayVtxX(0), bStarDecayVtxY(0), bStarDecayVtxZ(0), bStarDecayVtxXE(0), bStarDecayVtxYE(0), bStarDecayVtxZE(0),
+  bStarDecayVtxXYE(0), bStarDecayVtxXZE(0), bStarDecayVtxYZE(0),
+
+  Photon0DecayVtxX(0), Photon0DecayVtxY(0), Photon0DecayVtxZ(0), Photon0DecayVtxXE(0), Photon0DecayVtxYE(0), Photon0DecayVtxZE(0),
+  Photon0DecayVtxXYE(0), Photon0DecayVtxXZE(0), Photon0DecayVtxYZE(0),
 
 /////////////////////////////
 
@@ -197,6 +210,7 @@ JPsiphi::JPsiphi(const edm::ParameterSet& iConfig)
   k1dxy(0), k2dxy(0), k1dz(0), k2dz(0),
   k1dxy_e(0), k2dxy_e(0), k1dz_e(0), k2dz_e(0),
   k1InnerHits(0), k2InnerHits(0),
+  k1_pdgID(0), k2_pdgID(0),
 
   priVtxX(0), priVtxY(0), priVtxZ(0), priVtxXE(0), priVtxYE(0), priVtxZE(0), priVtxCL(0),
   priVtxXYE(0), priVtxXZE(0), priVtxYZE(0)
@@ -442,14 +456,14 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        if(!kaon2TT.isValid()) continue;
 
 
-		   TLorentzVector kaon14V,kaon24V,pipi4V, Jpsi4V;
+		   TLorentzVector kaon14V,kaon24V,kk4V, Jpsi4V;
 		   kaon14V.SetXYZM(iTrack1->px(),iTrack1->py(),iTrack1->pz(),kaon_mass);
 		   kaon24V.SetXYZM(iTrack2->px(),iTrack2->py(),iTrack2->pz(),kaon_mass);
        Jpsi4V.SetXYZM(psi_vFit_noMC->currentState().globalMomentum().x(),psi_vFit_noMC->currentState().globalMomentum().y(),psi_vFit_noMC->currentState().globalMomentum().z(),psi_vFit_noMC->currentState().mass());
 
-		   pipi4V=kaon14V+kaon24V;
-		   if(pipi4V.M()<0.6 || pipi4V.M()>1.6) continue;
-		   if ( (pipi4V + Jpsi4V).M()<4.6 || (pipi4V + Jpsi4V).M()>6.1 ) continue;
+		   kk4V=kaon14V+kaon24V;
+		   if(kk4V.M()<0.8 || kk4V.M()>1.2) continue;
+		   if ( (kk4V + Jpsi4V).M()<4.8 || (kk4V + Jpsi4V).M()>5.9 ) continue;
 
 
 /////////////////////
@@ -521,6 +535,13 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   KinematicParameters phiPi1KP = T1CandMC->currentState().kinematicParameters();
 		   KinematicParameters phiPi2KP = T2CandMC->currentState().kinematicParameters();
 
+       TLorentzVector p4K1, p4K2, p4phi;
+       p4K1.SetXYZM(phiPi1KP.momentum().x(), phiPi1KP.momentum().y(), phiPi1KP.momentum().z(), kaon_mass);
+       p4K2.SetXYZM(phiPi2KP.momentum().x(), phiPi2KP.momentum().y(), phiPi2KP.momentum().z(), kaon_mass);
+
+       p4phi = p4K1 + p4K2;
+       if (p4phi.M() < 0.99|| p4phi.M() > 1.05) continue;
+
 
 /////////////////////
 ////////************      PHOTON LOOP
@@ -532,11 +553,6 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   	   for ( View< pat::CompositeCandidate > ::const_iterator iPhoton = photonHandle->begin(); iPhoton != photonHandle->end(); ++iPhoton )
   		 {
-         TLorentzVector p4photon, p4Bs;
-         p4Bs.SetXYZM(bCandMC->currentState().globalMomentum().x(),bCandMC->currentState().globalMomentum().y(),bCandMC->currentState().globalMomentum().z(), bCandMC->currentState().mass());
-         p4photon.SetXYZM(iPhoton->px(), iPhoton->py(), iPhoton->pz(), iPhoton->mass());
-
-        //  if ((p4photon + p4Bs).M() < 4. || (p4photon + p4Bs).M() > 7.) continue;
 
          reco::TrackCollection convTracks;
 
@@ -591,13 +607,13 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          // if(photon_vFit_noMC->currentState().mass()< 0.45 || photon_vFit_noMC->currentState().mass()>0.55) continue;
 
          photonVertexFitTree->movePointerToTheFirstChild();
-         RefCountedKinematicParticle T1CandMC = photonVertexFitTree->currentParticle();
+         RefCountedKinematicParticle e1Cand = photonVertexFitTree->currentParticle();
 
          photonVertexFitTree->movePointerToTheNextChild();
-         RefCountedKinematicParticle T2CandMC = photonVertexFitTree->currentParticle();
+         RefCountedKinematicParticle e2Cand = photonVertexFitTree->currentParticle();
 
-         if (!T1CandMC->currentState().isValid()) continue;
-         if (!T2CandMC->currentState().isValid()) continue;
+         if (!e1Cand->currentState().isValid()) continue;
+         if (!e2Cand->currentState().isValid()) continue;
 
 
 /////////////////////
@@ -623,8 +639,16 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
          photonVertexFitTree->movePointerToTheTop();
          RefCountedKinematicParticle photon_vFit_withMC = photonVertexFitTree->currentParticle();
+         RefCountedKinematicVertex photon_vFit_vertex_withMC = photonVertexFitTree->currentDecayVertex();
          if (!photon_vFit_withMC->currentState().isValid()) continue;
+         if (!photon_vFit_vertex_withMC->vertexIsValid())  continue;
 
+         TLorentzVector p4photon, p4photon0, p4Bs;
+         p4Bs.SetXYZM(bCandMC->currentState().globalMomentum().x(),bCandMC->currentState().globalMomentum().y(),bCandMC->currentState().globalMomentum().z(), bCandMC->currentState().mass());
+         p4photon.SetXYZM(iPhoton->px(), iPhoton->py(), iPhoton->pz(), iPhoton->mass());
+         p4photon0.SetXYZM(photon_vFit_withMC->currentState().globalMomentum().x(), photon_vFit_withMC->currentState().globalMomentum().y(), photon_vFit_withMC->currentState().globalMomentum().z(), photon_vFit_withMC->currentState().mass());
+
+          if ((p4photon0 + p4Bs).M() > 7. ) continue;
 
 /////////////////////
 ////////************      BS* VERTEX FIT
@@ -685,16 +709,16 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                 mu2CandMC->currentState().globalMomentum().y(),
                 mu2CandMC->currentState().globalMomentum().z());
 
-        GlobalVector photon_p1_vec(T1CandMC->currentState().globalMomentum().x(),
-                 T1CandMC->currentState().globalMomentum().y(),
-                 T1CandMC->currentState().globalMomentum().z());
+        GlobalVector photon_p1_vec(e1Cand->currentState().globalMomentum().x(),
+                 e1Cand->currentState().globalMomentum().y(),
+                 e1Cand->currentState().globalMomentum().z());
 
-        GlobalVector photon_p2_vec(T2CandMC->currentState().globalMomentum().x(),
-           T2CandMC->currentState().globalMomentum().y(),
-           T2CandMC->currentState().globalMomentum().z());
+        GlobalVector photon_p2_vec(e2Cand->currentState().globalMomentum().x(),
+           e2Cand->currentState().globalMomentum().y(),
+           e2Cand->currentState().globalMomentum().z());
 
-        KinematicParameters photon_e1KP = T1CandMC->currentState().kinematicParameters();
-        KinematicParameters photon_e2KP = T2CandMC->currentState().kinematicParameters();
+        KinematicParameters photon_e1KP = e1Cand->currentState().kinematicParameters();
+        KinematicParameters photon_e2KP = e2Cand->currentState().kinematicParameters();
 
 
 
@@ -741,11 +765,22 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        B_py->push_back(bCandMC->currentState().globalMomentum().y());
        B_pz->push_back(bCandMC->currentState().globalMomentum().z());
 
+       Bstar_mass0->push_back((p4photon0 + p4Bs).M());
+       Bstar_mass->push_back(Bstar_vFit->currentState().mass());
+       Bstar_px->push_back(Bstar_vFit->currentState().globalMomentum().x());
+       Bstar_py->push_back(Bstar_vFit->currentState().globalMomentum().y());
+       Bstar_pz->push_back(Bstar_vFit->currentState().globalMomentum().z());
+
        photon_mass->push_back( photon_vFit_noMC->currentState().mass() );
        photon_px->push_back( photon_vFit_noMC->currentState().globalMomentum().x() );
        photon_py->push_back( photon_vFit_noMC->currentState().globalMomentum().y() );
        photon_pz->push_back( photon_vFit_noMC->currentState().globalMomentum().z() );
        photon_flags->push_back( iPhoton->userInt("flags") );
+
+       photon0_mass->push_back( photon_vFit_withMC->currentState().mass() );
+       photon0_px->push_back( photon_vFit_withMC->currentState().globalMomentum().x() );
+       photon0_py->push_back( photon_vFit_withMC->currentState().globalMomentum().y() );
+       photon0_pz->push_back( photon_vFit_withMC->currentState().globalMomentum().z() );
 
        B_J_mass->push_back( psi_vFit_noMC->currentState().mass() );
        B_J_px->push_back( psi_vFit_noMC->currentState().globalMomentum().x() );
@@ -759,7 +794,7 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        photon_px1_track->push_back(e1_track->px());
        photon_py1_track->push_back(e1_track->py());
        photon_pz1_track->push_back(e1_track->pz());
-       photon_charge1->push_back(T1CandMC->currentState().particleCharge());
+       photon_charge1->push_back(e1Cand->currentState().particleCharge());
        photon1_track_normchi2  ->push_back(e1_track->normalizedChi2());
        photon1_Hits       ->push_back(e1_track->numberOfValidHits() );
        photon1_PHits      ->push_back(e1_track->hitPattern().numberOfValidPixelHits() );
@@ -773,7 +808,7 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        photon_px2_track->push_back(e2_track->px());
        photon_py2_track->push_back(e2_track->py());
        photon_pz2_track->push_back(e2_track->pz());
-       photon_charge2->push_back(T2CandMC->currentState().particleCharge());
+       photon_charge2->push_back(e2Cand->currentState().particleCharge());
        photon2_track_normchi2  ->push_back(e2_track->normalizedChi2());
        photon2_Hits       ->push_back(e2_track->numberOfValidHits() );
        photon2_PHits      ->push_back(e2_track->hitPattern().numberOfValidPixelHits() );
@@ -842,6 +877,25 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        PV_bestBang_RF_YZE->push_back(   bestVtxRf.covariance(1, 2) );
        PV_bestBang_RF_CL->push_back(    ChiSquaredProbability((double)(bestVtxRf.chi2()),(double)(bestVtxRf.ndof())) );
 
+       bStarDecayVtxX->push_back((*Bstar_vFit_vertex).position().x());
+       bStarDecayVtxY->push_back((*Bstar_vFit_vertex).position().y());
+       bStarDecayVtxZ->push_back((*Bstar_vFit_vertex).position().z());
+       bStarDecayVtxXE->push_back(Bstar_vFit_vertex->error().cxx());
+       bStarDecayVtxYE->push_back(Bstar_vFit_vertex->error().cyy());
+       bStarDecayVtxZE->push_back(Bstar_vFit_vertex->error().czz());
+       bStarDecayVtxXYE->push_back(Bstar_vFit_vertex->error().cyx());
+       bStarDecayVtxXZE->push_back(Bstar_vFit_vertex->error().czx());
+       bStarDecayVtxYZE->push_back(Bstar_vFit_vertex->error().czy());
+
+       Photon0DecayVtxX->push_back( photon_vFit_vertex_withMC->position().x() );
+       Photon0DecayVtxY->push_back( photon_vFit_vertex_withMC->position().y() );
+       Photon0DecayVtxZ->push_back( photon_vFit_vertex_withMC->position().z() );
+       Photon0DecayVtxXE->push_back( photon_vFit_vertex_withMC->error().cxx() );
+       Photon0DecayVtxYE->push_back( photon_vFit_vertex_withMC->error().cyy() );
+       Photon0DecayVtxZE->push_back( photon_vFit_vertex_withMC->error().czz() );
+       Photon0DecayVtxXYE->push_back( photon_vFit_vertex_withMC->error().cyx() );
+       Photon0DecayVtxXZE->push_back( photon_vFit_vertex_withMC->error().czx() );
+       Photon0DecayVtxYZE->push_back( photon_vFit_vertex_withMC->error().czy() );
 
   // ********************* muon-trigger-machint****************
 
@@ -883,7 +937,7 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        mupC2->push_back( glbTrackP->normalizedChi2() );
        mupNHits->push_back( glbTrackP->numberOfValidHits() );
        mupNPHits->push_back( glbTrackP->hitPattern().numberOfValidPixelHits() );
-                   mumdxy->push_back(glbTrackM->dxy(bestVtx.position()) );
+       mumdxy->push_back(glbTrackM->dxy(bestVtx.position()) );
        mupdxy->push_back(glbTrackP->dxy(bestVtx.position()) );
        mumdz->push_back(glbTrackM->dz(bestVtx.position()) );
        mupdz->push_back(glbTrackP->dz(bestVtx.position()) );
@@ -892,7 +946,7 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 /////////////////////////////////////////
 
-		   B_phi_mass->push_back( pipi4V.M() );
+		   B_phi_mass->push_back( p4phi.M() );
 
 	           // You can get the momentum components (for muons and kaon) from the final B childrens or of the original Tracks. Here, a example for the kaons:
 		   B_phi_px1->push_back(phiPi1KP.momentum().x());
@@ -923,6 +977,9 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 		   k1InnerHits->push_back(iTrack1->lostInnerHits());
 		   k2InnerHits->push_back(iTrack2->lostInnerHits());
+
+       k1_pdgID->push_back(iTrack1->pdgId());
+		   k2_pdgID->push_back(iTrack2->pdgId());
 
 		   nB++;
 
@@ -972,6 +1029,8 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    photon_mass->clear(); photon_px->clear(); photon_py->clear(); photon_pz->clear();
    photon_flags->clear();
 
+   photon0_mass->clear(); photon0_px->clear(); photon0_py->clear(); photon0_pz->clear();
+
    photon_pt1->clear(); photon_px1->clear(); photon_py1->clear(); photon_pz1->clear();
    photon_pt2->clear(); photon_px2->clear(); photon_py2->clear(); photon_pz2->clear();
    photon_px1_track->clear(); photon_py1_track->clear(); photon_pz1_track->clear();
@@ -986,6 +1045,7 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
    B_mass->clear();    B_px->clear();    B_py->clear();    B_pz->clear();
+   Bstar_mass0->clear(); Bstar_mass->clear();    Bstar_px->clear();    Bstar_py->clear();    Bstar_pz->clear();
 
    B_J_mass->clear();  B_J_px->clear();  B_J_py->clear();  B_J_pz->clear();
    B_J_pt1->clear();  B_J_px1->clear();  B_J_py1->clear();  B_J_pz1->clear(), B_J_charge1->clear();
@@ -1014,7 +1074,13 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    PV_bestBang_RF_XYE->clear(); PV_bestBang_RF_XZE->clear();PV_bestBang_RF_YZE->clear();
    PV_bestBang_RF_CL->clear();
 
+   bStarDecayVtxX->clear(); bStarDecayVtxY->clear(); bStarDecayVtxZ->clear();
+   bStarDecayVtxXE->clear(); bStarDecayVtxYE->clear(); bStarDecayVtxZE->clear();
+   bStarDecayVtxXYE->clear(); bStarDecayVtxXZE->clear(); bStarDecayVtxYZE->clear();
 
+   Photon0DecayVtxX->clear(); Photon0DecayVtxY->clear(); Photon0DecayVtxZ->clear();
+   Photon0DecayVtxXE->clear(); Photon0DecayVtxYE->clear(); Photon0DecayVtxZE->clear();
+   Photon0DecayVtxXYE->clear(); Photon0DecayVtxXZE->clear(); Photon0DecayVtxYZE->clear();
 
 
 ///////////////////////////////////
@@ -1034,6 +1100,7 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    k1dxy->clear(); k2dxy->clear(); k1dz->clear(); k2dz->clear();
    k1dxy_e->clear(); k2dxy_e->clear(); k1dz_e->clear(); k2dz_e->clear();
    k1InnerHits->clear(); k2InnerHits->clear();
+   k1_pdgID->clear(); k2_pdgID->clear();
 
 }
 
@@ -1053,10 +1120,6 @@ JPsiphi::beginJob()
 
   edm::Service<TFileService> fs;
   tree_ = fs->make<TTree>("ntuple","Bs->J/psi phi ntuple");
-
-
-
-
 
   tree_->Branch("run",        &run,       "run/I");
   tree_->Branch("event",        &event,     "event/I");
@@ -1101,6 +1164,13 @@ JPsiphi::beginJob()
 
   // *************************
 
+  tree_->Branch("photon0_mass", &photon0_mass);
+  tree_->Branch("photon0_px", &photon0_px);
+  tree_->Branch("photon0_py", &photon0_py);
+  tree_->Branch("photon0_pz", &photon0_pz);
+
+  // *************************
+
   tree_->Branch("photon_pt1", &photon_pt1);
   tree_->Branch("photon_px1", &photon_px1);
   tree_->Branch("photon_py1", &photon_py1);
@@ -1139,6 +1209,13 @@ JPsiphi::beginJob()
   tree_->Branch("B_px", &B_px);
   tree_->Branch("B_py", &B_py);
   tree_->Branch("B_pz", &B_pz);
+
+  // *************************
+  tree_->Branch("Bstar_mass0", &Bstar_mass0);
+  tree_->Branch("Bstar_mass", &Bstar_mass);
+  tree_->Branch("Bstar_px", &Bstar_px);
+  tree_->Branch("Bstar_py", &Bstar_py);
+  tree_->Branch("Bstar_pz", &Bstar_pz);
 
   // *************************
 
@@ -1213,10 +1290,25 @@ JPsiphi::beginJob()
   tree_->Branch("PV_bestBang_RF_YZE", &PV_bestBang_RF_YZE   );
   tree_->Branch("PV_bestBang_RF_CL" , &PV_bestBang_RF_CL    );
 
+  tree_->Branch("bStarDecayVtxX",&bStarDecayVtxX);
+  tree_->Branch("bStarDecayVtxY",&bStarDecayVtxY);
+  tree_->Branch("bStarDecayVtxZ",&bStarDecayVtxZ);
+  tree_->Branch("bStarDecayVtxXE",&bStarDecayVtxXE);
+  tree_->Branch("bStarDecayVtxYE",&bStarDecayVtxYE);
+  tree_->Branch("bStarDecayVtxZE",&bStarDecayVtxZE);
+  tree_->Branch("bStarDecayVtxXYE",&bStarDecayVtxXYE);
+  tree_->Branch("bStarDecayVtxXZE",&bStarDecayVtxXZE);
+  tree_->Branch("bStarDecayVtxYZE",&bStarDecayVtxYZE);
 
-
-
-
+  tree_->Branch("Photon0DecayVtxX",&Photon0DecayVtxX);
+  tree_->Branch("Photon0DecayVtxY",&Photon0DecayVtxY);
+  tree_->Branch("Photon0DecayVtxZ",&Photon0DecayVtxZ);
+  tree_->Branch("Photon0DecayVtxXE",&Photon0DecayVtxXE);
+  tree_->Branch("Photon0DecayVtxYE",&Photon0DecayVtxYE);
+  tree_->Branch("Photon0DecayVtxZE",&Photon0DecayVtxZE);
+  tree_->Branch("Photon0DecayVtxXYE",&Photon0DecayVtxXYE);
+  tree_->Branch("Photon0DecayVtxXZE",&Photon0DecayVtxXZE);
+  tree_->Branch("Photon0DecayVtxYZE",&Photon0DecayVtxYZE);
 
 /////////////////////////////////////
 
@@ -1264,6 +1356,9 @@ JPsiphi::beginJob()
 
   tree_->Branch("k1InnerHits",&k1InnerHits);
   tree_->Branch("k2InnerHits",&k2InnerHits);
+
+  tree_->Branch("k1_pdgID",&k1_pdgID);
+  tree_->Branch("k2_pdgID",&k2_pdgID);
 
 }
 

@@ -137,6 +137,7 @@ private:
 
   std::vector<float>       *photon_mass, *photon_px, *photon_py, *photon_pz;
   std::vector<int>         *photon_flags;
+  std::vector<float>       *photon0_mass, *photon0_px, *photon0_py, *photon0_pz;
 
   // *************************************
 
@@ -161,6 +162,10 @@ private:
   // *************************************
 
   std::vector<float>       *B_mass, *B_px, *B_py, *B_pz;
+
+  // *************************************
+
+  std::vector<float>       *Bstar_mass0, *Bstar_mass, *Bstar_px, *Bstar_py, *Bstar_pz;
 
   // *************************************
 
@@ -193,7 +198,13 @@ private:
   std::vector<float>       *PV_bestBang_RF_XYE , *PV_bestBang_RF_XZE , *PV_bestBang_RF_YZE;
   std::vector<float>       *PV_bestBang_RF_CL;
 
+  std::vector<float>       *bStarDecayVtxX, *bStarDecayVtxY, *bStarDecayVtxZ;
+  std::vector<double>      *bStarDecayVtxXE, *bStarDecayVtxYE, *bStarDecayVtxZE;
+  std::vector<double>      *bStarDecayVtxXYE, *bStarDecayVtxXZE, *bStarDecayVtxYZE;
 
+  std::vector<float>       *Photon0DecayVtxX, *Photon0DecayVtxY, *Photon0DecayVtxZ;
+  std::vector<float>       *Photon0DecayVtxXE, *Photon0DecayVtxYE, *Photon0DecayVtxZE;
+  std::vector<float>       *Photon0DecayVtxXYE, *Photon0DecayVtxXZE, *Photon0DecayVtxYZE;
 
 ///////////////////////////////
 
@@ -208,6 +219,7 @@ private:
   std::vector<float>       *k1dxy, *k2dxy, *k1dz, *k2dz;
   std::vector<float>       *k1dxy_e, *k2dxy_e, *k1dz_e, *k2dz_e;
   std::vector<float>       *k1InnerHits, *k2InnerHits;
+  std::vector<int>         *k1_pdgID, *k2_pdgID;
 
   float                    priVtxX, priVtxY, priVtxZ, priVtxXE, priVtxYE, priVtxZE, priVtxCL;
   float                    priVtxXYE, priVtxXZE, priVtxYZE;
