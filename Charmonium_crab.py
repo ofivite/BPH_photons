@@ -9,7 +9,7 @@ config.General.transferLogs = True
 
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'test/Psiks0Rootupler.py'
+config.JobType.psetName = 'test/PsiphiRootupler.py'
 
 config.section_("Data")
 config.Data.inputDataset = '/MuOnia/Run2012B-22Jan2013-v1/AOD'
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     import sys
     from CRABAPI.RawCommand import crabCommand
     from httplib import HTTPException
-    task = '2017_jKF_v1_PV_and_vars'
+    task = '2017_BSG_v0'
     ####
     ## MY: b1 == Bc+ --> J/psi pi+
     ##      x1 = Xi-    -> Lambda pi
