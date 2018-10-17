@@ -172,7 +172,7 @@ JPsiphi::JPsiphi(const edm::ParameterSet& iConfig)
   // *******************************************************
 
   photon_chi2(0), J_chi2(0), B_chi2(0),
-  B_Prob(0), J_Prob(0), photon_Prob(0),
+  B_Prob(0), J_Prob(0), photon_Prob(0), Bstar_Prob(0),
 
   // ************************ ****************************************************
 
@@ -542,163 +542,163 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        p4phi = p4K1 + p4K2;
        if (p4phi.M() < 0.99|| p4phi.M() > 1.05) continue;
 
-
-/////////////////////
-////////************      PHOTON LOOP
-///////
-
-
-       if ( photonHandle->size()>0 && thePATMuonHandle->size()>=2 )
-  	   {
-
-  	   for ( View< pat::CompositeCandidate > ::const_iterator iPhoton = photonHandle->begin(); iPhoton != photonHandle->end(); ++iPhoton )
-  		 {
-
-         reco::TrackCollection convTracks;
-
-         const reco::Track *e1_track = iPhoton->userData<reco::Track>("track0");
-         const reco::Track *e2_track = iPhoton->userData<reco::Track>("track1");
-
-         reco::TransientTrack e1TT((*theB).build(*e1_track));
-         reco::TransientTrack e2TT((*theB).build(*e2_track));
-
-         if(!e1TT.isValid()) continue;
-         if(!e2TT.isValid()) continue;
-
-
- /////////////////////
- ////////************      PHOTON VERTEX FIT
- ///////
-
-
-         vector<RefCountedKinematicParticle> photonParticles;
-         try {
-           photonParticles.push_back(pFactory.particle(e1TT,electron_mass,chi,ndf,PM_sigma));
-           photonParticles.push_back(pFactory.particle(e2TT,electron_mass,chi,ndf,PM_sigma));
-         }
-         catch(...) {
-           std::cout<<" Exception caught ... continuing 3 "<<std::endl;
-           continue;
-         }
-
-         RefCountedKinematicTree photonVertexFitTree;
-         try{
-           photonVertexFitTree = fitter.fit(photonParticles);
-         }
-         catch(...) {
-           std::cout<<" Exception caught ... continuing 4 "<<std::endl;
-           continue;
-         }
-         if (!photonVertexFitTree->isValid()) continue;
-
-         photonVertexFitTree->movePointerToTheTop();
-         RefCountedKinematicParticle photon_vFit_noMC = photonVertexFitTree->currentParticle();
-         RefCountedKinematicVertex photon_vFit_vertex_noMC = photonVertexFitTree->currentDecayVertex();
-
-         if (!photon_vFit_vertex_noMC->vertexIsValid())  continue;
-         if (!photon_vFit_noMC->currentState().isValid()) continue;
-
-
-         if( photon_vFit_vertex_noMC->chiSquared() < 0 ) continue;
-
-         if(photon_vFit_vertex_noMC->chiSquared() > 50) continue;
-         double photon_Prob_tmp  = TMath::Prob(photon_vFit_vertex_noMC->chiSquared(),(int)photon_vFit_vertex_noMC->degreesOfFreedom());
-         if (photon_Prob_tmp < 0.05) continue;
-         // if(photon_vFit_noMC->currentState().mass()< 0.45 || photon_vFit_noMC->currentState().mass()>0.55) continue;
-
-         photonVertexFitTree->movePointerToTheFirstChild();
-         RefCountedKinematicParticle e1Cand = photonVertexFitTree->currentParticle();
-
-         photonVertexFitTree->movePointerToTheNextChild();
-         RefCountedKinematicParticle e2Cand = photonVertexFitTree->currentParticle();
-
-         if (!e1Cand->currentState().isValid()) continue;
-         if (!e2Cand->currentState().isValid()) continue;
-
-
-/////////////////////
-////////************      PHOTON ZERO CONSTRAINT FIT
-///////
-
-
-         KinematicParticleFitter csFitterPhoton;
-         KinematicConstraint * photon_c = new MassKinematicConstraint(photon_null_mass, PM_sigma);
-
-         try {
-           photonVertexFitTree = csFitterPhoton.fit(photon_c,photonVertexFitTree);
-         }
-         catch (...) {
-           std::cout<<" Exception caught csFitterPhoton ... continuing 2 "<<std::endl;
-           continue;
-         }
-
-         if (!photonVertexFitTree->isValid()){
-           //std::cout << "caught an exception in the ks mass constraint fit" << std::endl;
-           continue;
-         }
-
-         photonVertexFitTree->movePointerToTheTop();
-         RefCountedKinematicParticle photon_vFit_withMC = photonVertexFitTree->currentParticle();
-         RefCountedKinematicVertex photon_vFit_vertex_withMC = photonVertexFitTree->currentDecayVertex();
-         if (!photon_vFit_withMC->currentState().isValid()) continue;
-         if (!photon_vFit_vertex_withMC->vertexIsValid())  continue;
-
-         TLorentzVector p4photon, p4photon0, p4Bs;
-         p4Bs.SetXYZM(bCandMC->currentState().globalMomentum().x(),bCandMC->currentState().globalMomentum().y(),bCandMC->currentState().globalMomentum().z(), bCandMC->currentState().mass());
-         p4photon.SetXYZM(iPhoton->px(), iPhoton->py(), iPhoton->pz(), iPhoton->mass());
-         p4photon0.SetXYZM(photon_vFit_withMC->currentState().globalMomentum().x(), photon_vFit_withMC->currentState().globalMomentum().y(), photon_vFit_withMC->currentState().globalMomentum().z(), photon_vFit_withMC->currentState().mass());
-
-          if ((p4photon0 + p4Bs).M() > 7. ) continue;
-
-/////////////////////
-////////************      BS* VERTEX FIT
-///////
-
-
-        vector<RefCountedKinematicParticle> BstarParticles;
-        try {
-          BstarParticles.push_back(bCandMC);
-          BstarParticles.push_back(photon_vFit_withMC);
-        }
-        catch(...) {
-          std::cout<<" Exception caught in BstarParticles ... continuing 1 "<<std::endl;
-          continue;
-        }
-
-        KinematicParticleVertexFitter Bstarfitter;
-        RefCountedKinematicTree BstarVertexFitTree;
-        try {
-          BstarVertexFitTree = Bstarfitter.fit(BstarParticles);
-        }
-        catch (...) {
-          std::cout<<" Exception caught ... continuing 2 "<<std::endl;
-          continue;
-        }
-
-        if (!BstarVertexFitTree->isValid())   continue;
-
-        psiVertexFitTree->movePointerToTheTop();
-        RefCountedKinematicParticle Bstar_vFit = BstarVertexFitTree->currentParticle();
-        RefCountedKinematicVertex Bstar_vFit_vertex = BstarVertexFitTree->currentDecayVertex();
-
-        if (!Bstar_vFit_vertex->vertexIsValid())  continue;
-        if (!Bstar_vFit->currentState().isValid()) continue;
-
-
-         if(Bstar_vFit_vertex->chiSquared()>50.) continue;
-         if(Bstar_vFit->currentState().mass()<4. || Bstar_vFit->currentState().mass()>7.) continue;
-
-         double Bstar_Prob_tmp   = TMath::Prob(Bstar_vFit_vertex->chiSquared(),(int)Bstar_vFit_vertex->degreesOfFreedom());
-         if(Bstar_Prob_tmp<0.01) continue;
-
-
-        // get children from final B* fit
-
-        BstarVertexFitTree->movePointerToTheFirstChild();
-        RefCountedKinematicParticle Bs_starFit = BstarVertexFitTree->currentParticle();
-
-        BstarVertexFitTree->movePointerToTheNextChild();
-        RefCountedKinematicParticle photon_starFit = BstarVertexFitTree->currentParticle();
+//
+// /////////////////////
+// ////////************      PHOTON LOOP
+// ///////
+//
+//
+//        if ( photonHandle->size()>0 && thePATMuonHandle->size()>=2 )
+//   	   {
+//
+//   	   for ( View< pat::CompositeCandidate > ::const_iterator iPhoton = photonHandle->begin(); iPhoton != photonHandle->end(); ++iPhoton )
+//   		 {
+//
+//          reco::TrackCollection convTracks;
+//
+//          const reco::Track *e1_track = iPhoton->userData<reco::Track>("track0");
+//          const reco::Track *e2_track = iPhoton->userData<reco::Track>("track1");
+//
+//          reco::TransientTrack e1TT((*theB).build(*e1_track));
+//          reco::TransientTrack e2TT((*theB).build(*e2_track));
+//
+//          if(!e1TT.isValid()) continue;
+//          if(!e2TT.isValid()) continue;
+//
+//
+//  /////////////////////
+//  ////////************      PHOTON VERTEX FIT
+//  ///////
+//
+//
+//          vector<RefCountedKinematicParticle> photonParticles;
+//          try {
+//            photonParticles.push_back(pFactory.particle(e1TT,electron_mass,chi,ndf,PM_sigma));
+//            photonParticles.push_back(pFactory.particle(e2TT,electron_mass,chi,ndf,PM_sigma));
+//          }
+//          catch(...) {
+//            std::cout<<" Exception caught ... continuing 3 "<<std::endl;
+//            continue;
+//          }
+//
+//          RefCountedKinematicTree photonVertexFitTree;
+//          try{
+//            photonVertexFitTree = fitter.fit(photonParticles);
+//          }
+//          catch(...) {
+//            std::cout<<" Exception caught ... continuing 4 "<<std::endl;
+//            continue;
+//          }
+//          if (!photonVertexFitTree->isValid()) continue;
+//
+//          photonVertexFitTree->movePointerToTheTop();
+//          RefCountedKinematicParticle photon_vFit_noMC = photonVertexFitTree->currentParticle();
+//          RefCountedKinematicVertex photon_vFit_vertex_noMC = photonVertexFitTree->currentDecayVertex();
+//
+//          if (!photon_vFit_vertex_noMC->vertexIsValid())  continue;
+//          if (!photon_vFit_noMC->currentState().isValid()) continue;
+//
+//
+//          if( photon_vFit_vertex_noMC->chiSquared() < 0 ) continue;
+//
+//          if(photon_vFit_vertex_noMC->chiSquared() > 50) continue;
+//          double photon_Prob_tmp  = TMath::Prob(photon_vFit_vertex_noMC->chiSquared(),(int)photon_vFit_vertex_noMC->degreesOfFreedom());
+//          if (photon_Prob_tmp < 0.05) continue;
+//          // if(photon_vFit_noMC->currentState().mass()< 0.45 || photon_vFit_noMC->currentState().mass()>0.55) continue;
+//
+//          photonVertexFitTree->movePointerToTheFirstChild();
+//          RefCountedKinematicParticle e1Cand = photonVertexFitTree->currentParticle();
+//
+//          photonVertexFitTree->movePointerToTheNextChild();
+//          RefCountedKinematicParticle e2Cand = photonVertexFitTree->currentParticle();
+//
+//          if (!e1Cand->currentState().isValid()) continue;
+//          if (!e2Cand->currentState().isValid()) continue;
+//
+//
+// /////////////////////
+// ////////************      PHOTON ZERO CONSTRAINT FIT
+// ///////
+//
+//
+//          KinematicParticleFitter csFitterPhoton;
+//          KinematicConstraint * photon_c = new MassKinematicConstraint(photon_null_mass, PM_sigma);
+//
+//          try {
+//            photonVertexFitTree = csFitterPhoton.fit(photon_c,photonVertexFitTree);
+//          }
+//          catch (...) {
+//            std::cout<<" Exception caught csFitterPhoton ... continuing 2 "<<std::endl;
+//            continue;
+//          }
+//
+//          if (!photonVertexFitTree->isValid()){
+//            //std::cout << "caught an exception in the ks mass constraint fit" << std::endl;
+//            continue;
+//          }
+//
+//          photonVertexFitTree->movePointerToTheTop();
+//          RefCountedKinematicParticle photon_vFit_withMC = photonVertexFitTree->currentParticle();
+//          RefCountedKinematicVertex photon_vFit_vertex_withMC = photonVertexFitTree->currentDecayVertex();
+//          if (!photon_vFit_withMC->currentState().isValid()) continue;
+//          if (!photon_vFit_vertex_withMC->vertexIsValid())  continue;
+//
+//          TLorentzVector p4photon, p4photon0, p4Bs;
+//          p4Bs.SetXYZM(bCandMC->currentState().globalMomentum().x(),bCandMC->currentState().globalMomentum().y(),bCandMC->currentState().globalMomentum().z(), bCandMC->currentState().mass());
+//          p4photon.SetXYZM(iPhoton->px(), iPhoton->py(), iPhoton->pz(), iPhoton->mass());
+//          p4photon0.SetXYZM(photon_vFit_withMC->currentState().globalMomentum().x(), photon_vFit_withMC->currentState().globalMomentum().y(), photon_vFit_withMC->currentState().globalMomentum().z(), photon_vFit_withMC->currentState().mass());
+//
+//           if ((p4photon0 + p4Bs).M() > 7. ) continue;
+//
+// /////////////////////
+// ////////************      BS* VERTEX FIT
+// ///////
+//
+//
+//         vector<RefCountedKinematicParticle> BstarParticles;
+//         try {
+//           BstarParticles.push_back(bCandMC);
+//           BstarParticles.push_back(photon_vFit_withMC);
+//         }
+//         catch(...) {
+//           std::cout<<" Exception caught in BstarParticles ... continuing 1 "<<std::endl;
+//           continue;
+//         }
+//
+//         KinematicParticleVertexFitter Bstarfitter;
+//         RefCountedKinematicTree BstarVertexFitTree;
+//         try {
+//           BstarVertexFitTree = Bstarfitter.fit(BstarParticles);
+//         }
+//         catch (...) {
+//           std::cout<<" Exception caught ... continuing 2 "<<std::endl;
+//           continue;
+//         }
+//
+//         if (!BstarVertexFitTree->isValid())   continue;
+//
+//         psiVertexFitTree->movePointerToTheTop();
+//         RefCountedKinematicParticle Bstar_vFit = BstarVertexFitTree->currentParticle();
+//         RefCountedKinematicVertex Bstar_vFit_vertex = BstarVertexFitTree->currentDecayVertex();
+//
+//         if (!Bstar_vFit_vertex->vertexIsValid())  continue;
+//         if (!Bstar_vFit->currentState().isValid()) continue;
+//
+//
+//          if(Bstar_vFit_vertex->chiSquared()>50.) continue;
+//          if(Bstar_vFit->currentState().mass()<4. || Bstar_vFit->currentState().mass()>7.) continue;
+//
+//          double Bstar_Prob_tmp   = TMath::Prob(Bstar_vFit_vertex->chiSquared(),(int)Bstar_vFit_vertex->degreesOfFreedom());
+//          if(Bstar_Prob_tmp<0.01) continue;
+//
+//
+//         // get children from final B* fit
+//
+//         BstarVertexFitTree->movePointerToTheFirstChild();
+//         RefCountedKinematicParticle Bs_starFit = BstarVertexFitTree->currentParticle();
+//
+//         BstarVertexFitTree->movePointerToTheNextChild();
+//         RefCountedKinematicParticle photon_starFit = BstarVertexFitTree->currentParticle();
 
 
         GlobalVector Jp1vec(mu1CandMC->currentState().globalMomentum().x(),
@@ -709,16 +709,16 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                 mu2CandMC->currentState().globalMomentum().y(),
                 mu2CandMC->currentState().globalMomentum().z());
 
-        GlobalVector photon_p1_vec(e1Cand->currentState().globalMomentum().x(),
-                 e1Cand->currentState().globalMomentum().y(),
-                 e1Cand->currentState().globalMomentum().z());
-
-        GlobalVector photon_p2_vec(e2Cand->currentState().globalMomentum().x(),
-           e2Cand->currentState().globalMomentum().y(),
-           e2Cand->currentState().globalMomentum().z());
-
-        KinematicParameters photon_e1KP = e1Cand->currentState().kinematicParameters();
-        KinematicParameters photon_e2KP = e2Cand->currentState().kinematicParameters();
+        // GlobalVector photon_p1_vec(e1Cand->currentState().globalMomentum().x(),
+        //          e1Cand->currentState().globalMomentum().y(),
+        //          e1Cand->currentState().globalMomentum().z());
+        //
+        // GlobalVector photon_p2_vec(e2Cand->currentState().globalMomentum().x(),
+        //    e2Cand->currentState().globalMomentum().y(),
+        //    e2Cand->currentState().globalMomentum().z());
+        //
+        // KinematicParameters photon_e1KP = e1Cand->currentState().kinematicParameters();
+        // KinematicParameters photon_e2KP = e2Cand->currentState().kinematicParameters();
 
 
 
@@ -765,55 +765,55 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        B_py->push_back(bCandMC->currentState().globalMomentum().y());
        B_pz->push_back(bCandMC->currentState().globalMomentum().z());
 
-       Bstar_mass0->push_back((p4photon0 + p4Bs).M());
-       Bstar_mass->push_back(Bstar_vFit->currentState().mass());
-       Bstar_px->push_back(Bstar_vFit->currentState().globalMomentum().x());
-       Bstar_py->push_back(Bstar_vFit->currentState().globalMomentum().y());
-       Bstar_pz->push_back(Bstar_vFit->currentState().globalMomentum().z());
+      //  Bstar_mass0->push_back((p4photon0 + p4Bs).M());
+      //  Bstar_mass->push_back(Bstar_vFit->currentState().mass());
+      //  Bstar_px->push_back(Bstar_vFit->currentState().globalMomentum().x());
+      //  Bstar_py->push_back(Bstar_vFit->currentState().globalMomentum().y());
+      //  Bstar_pz->push_back(Bstar_vFit->currentState().globalMomentum().z());
 
-       photon_mass->push_back( photon_vFit_noMC->currentState().mass() );
-       photon_px->push_back( photon_vFit_noMC->currentState().globalMomentum().x() );
-       photon_py->push_back( photon_vFit_noMC->currentState().globalMomentum().y() );
-       photon_pz->push_back( photon_vFit_noMC->currentState().globalMomentum().z() );
-       photon_flags->push_back( iPhoton->userInt("flags") );
-
-       photon0_mass->push_back( photon_vFit_withMC->currentState().mass() );
-       photon0_px->push_back( photon_vFit_withMC->currentState().globalMomentum().x() );
-       photon0_py->push_back( photon_vFit_withMC->currentState().globalMomentum().y() );
-       photon0_pz->push_back( photon_vFit_withMC->currentState().globalMomentum().z() );
+      //  photon_mass->push_back( photon_vFit_noMC->currentState().mass() );
+      //  photon_px->push_back( photon_vFit_noMC->currentState().globalMomentum().x() );
+      //  photon_py->push_back( photon_vFit_noMC->currentState().globalMomentum().y() );
+      //  photon_pz->push_back( photon_vFit_noMC->currentState().globalMomentum().z() );
+      //  photon_flags->push_back( iPhoton->userInt("flags") );
+       //
+      //  photon0_mass->push_back( photon_vFit_withMC->currentState().mass() );
+      //  photon0_px->push_back( photon_vFit_withMC->currentState().globalMomentum().x() );
+      //  photon0_py->push_back( photon_vFit_withMC->currentState().globalMomentum().y() );
+      //  photon0_pz->push_back( photon_vFit_withMC->currentState().globalMomentum().z() );
 
        B_J_mass->push_back( psi_vFit_noMC->currentState().mass() );
        B_J_px->push_back( psi_vFit_noMC->currentState().globalMomentum().x() );
        B_J_py->push_back( psi_vFit_noMC->currentState().globalMomentum().y() );
        B_J_pz->push_back( psi_vFit_noMC->currentState().globalMomentum().z() );
 
-       photon_pt1->push_back(photon_p1_vec.perp());
-       photon_px1->push_back(photon_e1KP.momentum().x());
-       photon_py1->push_back(photon_e1KP.momentum().y());
-       photon_pz1->push_back(photon_e1KP.momentum().z());
-       photon_px1_track->push_back(e1_track->px());
-       photon_py1_track->push_back(e1_track->py());
-       photon_pz1_track->push_back(e1_track->pz());
-       photon_charge1->push_back(e1Cand->currentState().particleCharge());
-       photon1_track_normchi2  ->push_back(e1_track->normalizedChi2());
-       photon1_Hits       ->push_back(e1_track->numberOfValidHits() );
-       photon1_PHits      ->push_back(e1_track->hitPattern().numberOfValidPixelHits() );
-       photon1_NTrackerLayers->push_back ( e1_track->hitPattern().trackerLayersWithMeasurement() );
-       photon1_NPixelLayers->push_back ( e1_track->hitPattern().pixelLayersWithMeasurement() );
-
-       photon_pt2->push_back(photon_p2_vec.perp());
-       photon_px2->push_back(photon_e2KP.momentum().x());
-       photon_py2->push_back(photon_e2KP.momentum().y());
-       photon_pz2->push_back(photon_e2KP.momentum().z());
-       photon_px2_track->push_back(e2_track->px());
-       photon_py2_track->push_back(e2_track->py());
-       photon_pz2_track->push_back(e2_track->pz());
-       photon_charge2->push_back(e2Cand->currentState().particleCharge());
-       photon2_track_normchi2  ->push_back(e2_track->normalizedChi2());
-       photon2_Hits       ->push_back(e2_track->numberOfValidHits() );
-       photon2_PHits      ->push_back(e2_track->hitPattern().numberOfValidPixelHits() );
-       photon2_NTrackerLayers->push_back ( e2_track->hitPattern().trackerLayersWithMeasurement() );
-       photon2_NPixelLayers->push_back ( e2_track->hitPattern().pixelLayersWithMeasurement() );
+      //  photon_pt1->push_back(photon_p1_vec.perp());
+      //  photon_px1->push_back(photon_e1KP.momentum().x());
+      //  photon_py1->push_back(photon_e1KP.momentum().y());
+      //  photon_pz1->push_back(photon_e1KP.momentum().z());
+      //  photon_px1_track->push_back(e1_track->px());
+      //  photon_py1_track->push_back(e1_track->py());
+      //  photon_pz1_track->push_back(e1_track->pz());
+      //  photon_charge1->push_back(e1Cand->currentState().particleCharge());
+      //  photon1_track_normchi2  ->push_back(e1_track->normalizedChi2());
+      //  photon1_Hits       ->push_back(e1_track->numberOfValidHits() );
+      //  photon1_PHits      ->push_back(e1_track->hitPattern().numberOfValidPixelHits() );
+      //  photon1_NTrackerLayers->push_back ( e1_track->hitPattern().trackerLayersWithMeasurement() );
+      //  photon1_NPixelLayers->push_back ( e1_track->hitPattern().pixelLayersWithMeasurement() );
+       //
+      //  photon_pt2->push_back(photon_p2_vec.perp());
+      //  photon_px2->push_back(photon_e2KP.momentum().x());
+      //  photon_py2->push_back(photon_e2KP.momentum().y());
+      //  photon_pz2->push_back(photon_e2KP.momentum().z());
+      //  photon_px2_track->push_back(e2_track->px());
+      //  photon_py2_track->push_back(e2_track->py());
+      //  photon_pz2_track->push_back(e2_track->pz());
+      //  photon_charge2->push_back(e2Cand->currentState().particleCharge());
+      //  photon2_track_normchi2  ->push_back(e2_track->normalizedChi2());
+      //  photon2_Hits       ->push_back(e2_track->numberOfValidHits() );
+      //  photon2_PHits      ->push_back(e2_track->hitPattern().numberOfValidPixelHits() );
+      //  photon2_NTrackerLayers->push_back ( e2_track->hitPattern().trackerLayersWithMeasurement() );
+      //  photon2_NPixelLayers->push_back ( e2_track->hitPattern().pixelLayersWithMeasurement() );
 
        B_J_pt1->push_back(Jp1vec.perp());
        B_J_px1->push_back(psiMu1KP.momentum().x());
@@ -827,13 +827,14 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        B_J_pz2->push_back(psiMu2KP.momentum().z());
        B_J_charge2->push_back(mu2CandMC->currentState().particleCharge());
 
-       photon_chi2->push_back(photon_vFit_vertex_noMC->chiSquared());
+      //  photon_chi2->push_back(photon_vFit_vertex_noMC->chiSquared());
        J_chi2->push_back(psi_vFit_vertex_noMC->chiSquared());
        B_chi2->push_back(bDecayVertexMC->chiSquared());
 
        B_Prob    ->push_back(B_Prob_tmp);
        J_Prob  ->push_back(J_Prob_tmp);
-       photon_Prob ->push_back(photon_Prob_tmp);
+      //  photon_Prob ->push_back(photon_Prob_tmp);
+      //  Bstar_Prob -> push_back(Bstar_Prob_tmp);
 
      // ************
        bDecayVtxX->push_back((*bDecayVertexMC).position().x());
@@ -856,15 +857,15 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        psiDecayVtxXZE->push_back(psi_vFit_vertex_noMC->error().czx());
        psiDecayVtxYZE->push_back(psi_vFit_vertex_noMC->error().czy());
 
-       PhotonDecayVtxX->push_back( photon_vFit_vertex_noMC->position().x() );
-       PhotonDecayVtxY->push_back( photon_vFit_vertex_noMC->position().y() );
-       PhotonDecayVtxZ->push_back( photon_vFit_vertex_noMC->position().z() );
-       PhotonDecayVtxXE->push_back( photon_vFit_vertex_noMC->error().cxx() );
-       PhotonDecayVtxYE->push_back( photon_vFit_vertex_noMC->error().cyy() );
-       PhotonDecayVtxZE->push_back( photon_vFit_vertex_noMC->error().czz() );
-       PhotonDecayVtxXYE->push_back( photon_vFit_vertex_noMC->error().cyx() );
-       PhotonDecayVtxXZE->push_back( photon_vFit_vertex_noMC->error().czx() );
-       PhotonDecayVtxYZE->push_back( photon_vFit_vertex_noMC->error().czy() );
+      //  PhotonDecayVtxX->push_back( photon_vFit_vertex_noMC->position().x() );
+      //  PhotonDecayVtxY->push_back( photon_vFit_vertex_noMC->position().y() );
+      //  PhotonDecayVtxZ->push_back( photon_vFit_vertex_noMC->position().z() );
+      //  PhotonDecayVtxXE->push_back( photon_vFit_vertex_noMC->error().cxx() );
+      //  PhotonDecayVtxYE->push_back( photon_vFit_vertex_noMC->error().cyy() );
+      //  PhotonDecayVtxZE->push_back( photon_vFit_vertex_noMC->error().czz() );
+      //  PhotonDecayVtxXYE->push_back( photon_vFit_vertex_noMC->error().cyx() );
+      //  PhotonDecayVtxXZE->push_back( photon_vFit_vertex_noMC->error().czx() );
+      //  PhotonDecayVtxYZE->push_back( photon_vFit_vertex_noMC->error().czy() );
 
        PV_bestBang_RF_X ->push_back(    bestVtxRf.x() );
        PV_bestBang_RF_Y ->push_back(    bestVtxRf.y() );
@@ -877,25 +878,25 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        PV_bestBang_RF_YZE->push_back(   bestVtxRf.covariance(1, 2) );
        PV_bestBang_RF_CL->push_back(    ChiSquaredProbability((double)(bestVtxRf.chi2()),(double)(bestVtxRf.ndof())) );
 
-       bStarDecayVtxX->push_back((*Bstar_vFit_vertex).position().x());
-       bStarDecayVtxY->push_back((*Bstar_vFit_vertex).position().y());
-       bStarDecayVtxZ->push_back((*Bstar_vFit_vertex).position().z());
-       bStarDecayVtxXE->push_back(Bstar_vFit_vertex->error().cxx());
-       bStarDecayVtxYE->push_back(Bstar_vFit_vertex->error().cyy());
-       bStarDecayVtxZE->push_back(Bstar_vFit_vertex->error().czz());
-       bStarDecayVtxXYE->push_back(Bstar_vFit_vertex->error().cyx());
-       bStarDecayVtxXZE->push_back(Bstar_vFit_vertex->error().czx());
-       bStarDecayVtxYZE->push_back(Bstar_vFit_vertex->error().czy());
-
-       Photon0DecayVtxX->push_back( photon_vFit_vertex_withMC->position().x() );
-       Photon0DecayVtxY->push_back( photon_vFit_vertex_withMC->position().y() );
-       Photon0DecayVtxZ->push_back( photon_vFit_vertex_withMC->position().z() );
-       Photon0DecayVtxXE->push_back( photon_vFit_vertex_withMC->error().cxx() );
-       Photon0DecayVtxYE->push_back( photon_vFit_vertex_withMC->error().cyy() );
-       Photon0DecayVtxZE->push_back( photon_vFit_vertex_withMC->error().czz() );
-       Photon0DecayVtxXYE->push_back( photon_vFit_vertex_withMC->error().cyx() );
-       Photon0DecayVtxXZE->push_back( photon_vFit_vertex_withMC->error().czx() );
-       Photon0DecayVtxYZE->push_back( photon_vFit_vertex_withMC->error().czy() );
+      //  bStarDecayVtxX->push_back((*Bstar_vFit_vertex).position().x());
+      //  bStarDecayVtxY->push_back((*Bstar_vFit_vertex).position().y());
+      //  bStarDecayVtxZ->push_back((*Bstar_vFit_vertex).position().z());
+      //  bStarDecayVtxXE->push_back(Bstar_vFit_vertex->error().cxx());
+      //  bStarDecayVtxYE->push_back(Bstar_vFit_vertex->error().cyy());
+      //  bStarDecayVtxZE->push_back(Bstar_vFit_vertex->error().czz());
+      //  bStarDecayVtxXYE->push_back(Bstar_vFit_vertex->error().cyx());
+      //  bStarDecayVtxXZE->push_back(Bstar_vFit_vertex->error().czx());
+      //  bStarDecayVtxYZE->push_back(Bstar_vFit_vertex->error().czy());
+       //
+      //  Photon0DecayVtxX->push_back( photon_vFit_vertex_withMC->position().x() );
+      //  Photon0DecayVtxY->push_back( photon_vFit_vertex_withMC->position().y() );
+      //  Photon0DecayVtxZ->push_back( photon_vFit_vertex_withMC->position().z() );
+      //  Photon0DecayVtxXE->push_back( photon_vFit_vertex_withMC->error().cxx() );
+      //  Photon0DecayVtxYE->push_back( photon_vFit_vertex_withMC->error().cyy() );
+      //  Photon0DecayVtxZE->push_back( photon_vFit_vertex_withMC->error().czz() );
+      //  Photon0DecayVtxXYE->push_back( photon_vFit_vertex_withMC->error().cyx() );
+      //  Photon0DecayVtxXZE->push_back( photon_vFit_vertex_withMC->error().czx() );
+      //  Photon0DecayVtxYZE->push_back( photon_vFit_vertex_withMC->error().czy() );
 
   // ********************* muon-trigger-machint****************
 
@@ -988,11 +989,11 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   //pionParticles.clear();
 		   muonParticles.clear();
 		   vFitMCParticles.clear();
-       BstarParticles.clear();
-       photonParticles.clear();
+      //  BstarParticles.clear();
+      //  photonParticles.clear();
 
-		     }
-	     }
+		  //    }
+	    //  }
 	    }
     }
   }
@@ -1052,7 +1053,7 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    B_J_pt2->clear();  B_J_px2->clear();  B_J_py2->clear();  B_J_pz2->clear(), B_J_charge2->clear();
 
    photon_chi2->clear(); J_chi2->clear(); B_chi2->clear();
-   B_Prob->clear(); J_Prob->clear(); photon_Prob->clear();
+   B_Prob->clear(); J_Prob->clear(); photon_Prob->clear(); Bstar_Prob->clear();
 
    // *********
 
@@ -1244,8 +1245,9 @@ JPsiphi::beginJob()
   tree_->Branch("J_chi2", &J_chi2);
 
   tree_->Branch("B_Prob",    &B_Prob);
-  tree_->Branch("photon_Prob", &photon_Prob);
   tree_->Branch("J_Prob",  &J_Prob);
+  tree_->Branch("photon_Prob", &photon_Prob);
+  tree_->Branch("Bstar_Prob", &Bstar_Prob);
 
   // *************************
 

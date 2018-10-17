@@ -177,7 +177,7 @@ private:
   // *************************************
 
   std::vector<float>       *photon_chi2, *J_chi2, *B_chi2;
-  std::vector<float>       *B_Prob, *J_Prob, *photon_Prob;
+  std::vector<float>       *B_Prob, *J_Prob, *photon_Prob, *Bstar_Prob;
 
   // ********************************** ************************************************************************
 
