@@ -7,8 +7,7 @@ process.load('Configuration.StandardSequences.Reconstruction_cff')
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '94X_dataRun2_v6', '')
-#process.GlobalTag = GlobalTag(process.GlobalTag, '94X_dataRun2_ReReco_EOY17_v1', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '101X_dataRun2_Prompt_v9', '')  # they state on twiki that it is 'Stable Prompt GT for collisions 2018 '
 
 process.MessageLogger.cerr.FwkReport.reportEvery = 200
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
