@@ -137,7 +137,7 @@ private:
 
   std::vector<float>       *photon_mass, *photon_px, *photon_py, *photon_pz;
   std::vector<int>         *photon_flags;
-  std::vector<float>       *photon0_mass, *photon0_px, *photon0_py, *photon0_pz;
+  std::vector<float>       *photon0_mass, *photon0_px, *photon0_py, *photon0_pz, *photon0_cos2D_PV;
 
   // *************************************
 
@@ -161,7 +161,7 @@ private:
 
   // *************************************
 
-  std::vector<float>       *B_mass, *B_px, *B_py, *B_pz;
+  std::vector<float>       *B_mass, *B_px, *B_py, *B_pz, *B_cos2D_PV;
 
   // *************************************
 
@@ -177,7 +177,7 @@ private:
   // *************************************
 
   std::vector<float>       *photon_chi2, *J_chi2, *B_chi2;
-  std::vector<float>       *B_Prob, *J_Prob, *photon_Prob, *Bstar_Prob;
+  std::vector<float>       *B_Prob, *J_Prob, *photon_Prob, *photon0_Prob, *Bstar_Prob;
 
   // ********************************** ************************************************************************
 
