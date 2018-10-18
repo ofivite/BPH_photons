@@ -114,11 +114,11 @@ if __name__ == '__main__':
     lumi_mask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/PromptReco/Cert_314472-324209_13TeV_PromptReco_Collisions18_JSON_MuonPhys.txt'
     #
     split_modifier = 1;
-    if ('2017C' in dset) : split_modifier = 0.8
+    if ('2018A' in dset) : split_modifier = 0.1
     #
-    if ('2017E' in dset) : split_modifier = 0.5
+    if ('2018B' in dset) : split_modifier = 0.02
     #
-    if ('2017F' in dset) : split_modifier = 0.8
+    if ('2018C' in dset) : split_modifier = 0.2
     #
     config.Data.unitsPerJob = int(units_per_job * split_modifier)
     config.Data.lumiMask = lumi_mask
