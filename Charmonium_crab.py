@@ -22,15 +22,18 @@ config.Data.outputDatasetTag = 'CRAB3_Bfinder'
 config.Data.outLFNDirBase = '/store/user/'+getUsernameFromSiteDB()+'/Bfinder/'
 
 config.section_("Site")
-config.Site.storageSite = 'T2_RU_IHEP'
-# config.Site.storageSite = 'T2_RU_JINR'
+# config.Site.storageSite = 'T2_RU_IHEP'
+config.Site.storageSite = 'T2_RU_JINR'
 
 DS_names = [ '' , ## 5 items
-'/Charmonium/Run2017B-31Mar2018-v1/MINIAOD',
-'/Charmonium/Run2017C-31Mar2018-v1/MINIAOD',
-'/Charmonium/Run2017D-31Mar2018-v1/MINIAOD',
-'/Charmonium/Run2017E-31Mar2018-v1/MINIAOD',
-'/Charmonium/Run2017F-31Mar2018-v1/MINIAOD',
+'/Charmonium/Run2016B-17Jul2018_ver1-v1/MINIAOD',
+'/Charmonium/Run2016B-17Jul2018_ver2-v1/MINIAOD',
+'/Charmonium/Run2016C-17Jul2018-v1/MINIAOD',
+'/Charmonium/Run2016D-17Jul2018-v1/MINIAOD',
+'/Charmonium/Run2016E-17Jul2018-v1/MINIAOD',
+'/Charmonium/Run2016F-17Jul2018-v1/MINIAOD',
+'/Charmonium/Run2016G-17Jul2018-v1/MINIAOD',
+'/Charmonium/Run2016H-17Jul2018-v1/MINIAOD'
 ]
 
 
@@ -41,7 +44,7 @@ if __name__ == '__main__':
     import sys
     from CRABAPI.RawCommand import crabCommand
     from httplib import HTTPException
-    task = '2017_BSG_v2'
+    task = '2016_BSG_v2'
     ####
     ## MY: b1 == Bc+ --> J/psi pi+
     ##      x1 = Xi-    -> Lambda pi
@@ -111,14 +114,16 @@ if __name__ == '__main__':
     print config.General.workArea
     print dset, '\n'
     #
-    lumi_mask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_MuonPhys.txt'
-    #
+    # lumi_mask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_MuonPhys.txt'
+    # lumi_mask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/PromptReco/Cert_314472-324209_13TeV_PromptReco_Collisions18_JSON_MuonPhys.txt'
+    lumi_mask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON_MuonPhys.txt'
+#
     split_modifier = 1;
-    if ('2017C' in dset) : split_modifier = 0.8
+    if ('2018A' in dset) : split_modifier = 0.1
     #
-    if ('2017E' in dset) : split_modifier = 0.5
+    if ('2018B' in dset) : split_modifier = 0.02
     #
-    if ('2017F' in dset) : split_modifier = 0.8
+    if ('2018C' in dset) : split_modifier = 0.2
     #
     config.Data.unitsPerJob = int(units_per_job * split_modifier)
     config.Data.lumiMask = lumi_mask

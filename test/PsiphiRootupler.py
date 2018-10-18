@@ -7,7 +7,7 @@ process.load('Configuration.StandardSequences.Reconstruction_cff')
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '94X_dataRun2_v6', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '94X_dataRun2_v10', '')
 #process.GlobalTag = GlobalTag(process.GlobalTag, '94X_dataRun2_ReReco_EOY17_v1', '')
 
 process.MessageLogger.cerr.FwkReport.reportEvery = 200
