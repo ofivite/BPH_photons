@@ -649,54 +649,54 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
           if ((p4photon0 + p4Bs).M() > 7. ) continue;
 
-// /////////////////////
-// ////////************      BS* VERTEX FIT
-// ///////
-//
-//
-//         vector<RefCountedKinematicParticle> BstarParticles;
-//         try {
-//           BstarParticles.push_back(bCandMC);
-//           BstarParticles.push_back(photon_vFit_withMC);
-//         }
-//         catch(...) {
-//           std::cout<<" Exception caught in BstarParticles ... continuing 1 "<<std::endl;
-//           continue;
-//         }
-//
-//         KinematicParticleVertexFitter Bstarfitter;
-//         RefCountedKinematicTree BstarVertexFitTree;
-//         try {
-//           BstarVertexFitTree = Bstarfitter.fit(BstarParticles);
-//         }
-//         catch (...) {
-//           std::cout<<" Exception caught ... continuing 2 "<<std::endl;
-//           continue;
-//         }
-//
-//         if (!BstarVertexFitTree->isValid())   continue;
-//
-//         psiVertexFitTree->movePointerToTheTop();
-//         RefCountedKinematicParticle Bstar_vFit = BstarVertexFitTree->currentParticle();
-//         RefCountedKinematicVertex Bstar_vFit_vertex = BstarVertexFitTree->currentDecayVertex();
-//
-//         if (!Bstar_vFit_vertex->vertexIsValid())  continue;
-//         if (!Bstar_vFit->currentState().isValid()) continue;
-//
-//
-//          if(Bstar_vFit->currentState().mass()<4. || Bstar_vFit->currentState().mass()>7.) continue;
-//
-//          double Bstar_Prob_tmp   = TMath::Prob(Bstar_vFit_vertex->chiSquared(),(int)Bstar_vFit_vertex->degreesOfFreedom());
-//          if(Bstar_Prob_tmp<0.01) continue;
-//
-//
-//         // get children from final B* fit
-//
-//         BstarVertexFitTree->movePointerToTheFirstChild();
-//         RefCountedKinematicParticle Bs_starFit = BstarVertexFitTree->currentParticle();
-//
-//         BstarVertexFitTree->movePointerToTheNextChild();
-//         RefCountedKinematicParticle photon_starFit = BstarVertexFitTree->currentParticle();
+/////////////////////
+////////************      BS* VERTEX FIT
+///////
+
+
+        vector<RefCountedKinematicParticle> BstarParticles;
+        try {
+          BstarParticles.push_back(bCandMC);
+          BstarParticles.push_back(photon_vFit_withMC);
+        }
+        catch(...) {
+          std::cout<<" Exception caught in BstarParticles ... continuing 1 "<<std::endl;
+          continue;
+        }
+
+        KinematicParticleVertexFitter Bstarfitter;
+        RefCountedKinematicTree BstarVertexFitTree;
+        try {
+          BstarVertexFitTree = Bstarfitter.fit(BstarParticles);
+        }
+        catch (...) {
+          std::cout<<" Exception caught ... continuing 2 "<<std::endl;
+          continue;
+        }
+
+        if (!BstarVertexFitTree->isValid())   continue;
+
+        psiVertexFitTree->movePointerToTheTop();
+        RefCountedKinematicParticle Bstar_vFit = BstarVertexFitTree->currentParticle();
+        RefCountedKinematicVertex Bstar_vFit_vertex = BstarVertexFitTree->currentDecayVertex();
+
+        if (!Bstar_vFit_vertex->vertexIsValid())  continue;
+        if (!Bstar_vFit->currentState().isValid()) continue;
+
+
+         if(Bstar_vFit->currentState().mass()<4. || Bstar_vFit->currentState().mass()>7.) continue;
+
+         double Bstar_Prob_tmp   = TMath::Prob(Bstar_vFit_vertex->chiSquared(),(int)Bstar_vFit_vertex->degreesOfFreedom());
+        //  if(Bstar_Prob_tmp<0.01) continue;
+
+
+        // get children from final B* fit
+
+        BstarVertexFitTree->movePointerToTheFirstChild();
+        RefCountedKinematicParticle Bs_starFit = BstarVertexFitTree->currentParticle();
+
+        BstarVertexFitTree->movePointerToTheNextChild();
+        RefCountedKinematicParticle photon_starFit = BstarVertexFitTree->currentParticle();
 
 
         GlobalVector Jp1vec(mu1CandMC->currentState().globalMomentum().x(),
@@ -772,10 +772,10 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        B_cos2D_PV->push_back(cos2D_Bs_PV);
 
        Bstar_mass0->push_back((p4photon0 + p4Bs).M());
-      //  Bstar_mass->push_back(Bstar_vFit->currentState().mass());
-      //  Bstar_px->push_back(Bstar_vFit->currentState().globalMomentum().x());
-      //  Bstar_py->push_back(Bstar_vFit->currentState().globalMomentum().y());
-      //  Bstar_pz->push_back(Bstar_vFit->currentState().globalMomentum().z());
+       Bstar_mass->push_back(Bstar_vFit->currentState().mass());
+       Bstar_px->push_back(Bstar_vFit->currentState().globalMomentum().x());
+       Bstar_py->push_back(Bstar_vFit->currentState().globalMomentum().y());
+       Bstar_pz->push_back(Bstar_vFit->currentState().globalMomentum().z());
 
        photon_mass->push_back( photon_vFit_noMC->currentState().mass() );
        photon_px->push_back( photon_vFit_noMC->currentState().globalMomentum().x() );
@@ -842,7 +842,7 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        J_Prob  ->push_back(J_Prob_tmp);
        photon_Prob ->push_back(photon_Prob_tmp);
        photon0_Prob ->push_back(TMath::Prob(photon_vFit_vertex_withMC->chiSquared(),(int)photon_vFit_vertex_withMC->degreesOfFreedom()));
-      //  Bstar_Prob -> push_back(Bstar_Prob_tmp);
+       Bstar_Prob -> push_back(Bstar_Prob_tmp);
 
      // ************
        bDecayVtxX->push_back((*bDecayVertexMC).position().x());
@@ -886,15 +886,15 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        PV_bestBang_RF_YZE->push_back(   bestVtxRf.covariance(1, 2) );
        PV_bestBang_RF_CL->push_back(    ChiSquaredProbability((double)(bestVtxRf.chi2()),(double)(bestVtxRf.ndof())) );
 
-      //  bStarDecayVtxX->push_back((*Bstar_vFit_vertex).position().x());
-      //  bStarDecayVtxY->push_back((*Bstar_vFit_vertex).position().y());
-      //  bStarDecayVtxZ->push_back((*Bstar_vFit_vertex).position().z());
-      //  bStarDecayVtxXE->push_back(Bstar_vFit_vertex->error().cxx());
-      //  bStarDecayVtxYE->push_back(Bstar_vFit_vertex->error().cyy());
-      //  bStarDecayVtxZE->push_back(Bstar_vFit_vertex->error().czz());
-      //  bStarDecayVtxXYE->push_back(Bstar_vFit_vertex->error().cyx());
-      //  bStarDecayVtxXZE->push_back(Bstar_vFit_vertex->error().czx());
-      //  bStarDecayVtxYZE->push_back(Bstar_vFit_vertex->error().czy());
+       bStarDecayVtxX->push_back((*Bstar_vFit_vertex).position().x());
+       bStarDecayVtxY->push_back((*Bstar_vFit_vertex).position().y());
+       bStarDecayVtxZ->push_back((*Bstar_vFit_vertex).position().z());
+       bStarDecayVtxXE->push_back(Bstar_vFit_vertex->error().cxx());
+       bStarDecayVtxYE->push_back(Bstar_vFit_vertex->error().cyy());
+       bStarDecayVtxZE->push_back(Bstar_vFit_vertex->error().czz());
+       bStarDecayVtxXYE->push_back(Bstar_vFit_vertex->error().cyx());
+       bStarDecayVtxXZE->push_back(Bstar_vFit_vertex->error().czx());
+       bStarDecayVtxYZE->push_back(Bstar_vFit_vertex->error().czy());
 
        Photon0DecayVtxX->push_back( photon_vFit_vertex_withMC->position().x() );
        Photon0DecayVtxY->push_back( photon_vFit_vertex_withMC->position().y() );
@@ -996,7 +996,7 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 		   muonParticles.clear();
 		   vFitMCParticles.clear();
-      //  BstarParticles.clear();
+       BstarParticles.clear();
        photonParticles.clear();
 
 		     }
