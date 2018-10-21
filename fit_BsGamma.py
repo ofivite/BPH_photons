@@ -3,11 +3,12 @@ from ROOT import RooFit as RF
 
 file_name = {'16': 'Bstar16_1063_of_1067_', '17': 'Bstar17_1254_of_1271_', '18': 'Bstar18_1488_of_1504_', 'all': 'RunII_cac5b262_3805of3842'}
 ###
-cuts = 'Bs_mass_Cjp > 5.346 && Bs_mass_Cjp < 5.386 && Bstar_pt > 30 && photon0_pt > 0. && Bstar_vtxprob > 0.01 && photon0_VtxProb > 0.01'
-
+cuts = ('Bs_mass_Cjp > 5.346 && Bs_mass_Cjp < 5.386 && Bstar_pt > 30 && photon0_pt > 0. && Bstar_vtxprob > 0.01 && Bs_vtxprob_Cjp > 0.01 && photon0_VtxProb > 0.01 &&' +
+        'Bs_DS2_PV > 3. && photon0_DS2_PV > 3.'
+)
 ### -----------------------------------------------------------------------------------------------------------------------
 
-# for year in ['17']:
+# for year in ['all']:
 for year in sorted(file_name.keys()):
     file_data = ROOT.TFile(file_name[year] + '.root')
 
@@ -21,9 +22,21 @@ for year in sorted(file_name.keys()):
     Bs_mass_Cjp = ROOT.RooRealVar('Bs_mass_Cjp', '', 5., 6.)
     Bstar_pt = ROOT.RooRealVar('Bstar_pt', '', 0., 10000)
     photon0_pt = ROOT.RooRealVar('photon0_pt', '', 0., 10000)
+    #
     Bstar_vtxprob = ROOT.RooRealVar('Bstar_vtxprob', '', 0., 1.)
+    Bs_vtxprob_Cjp = ROOT.RooRealVar('Bs_vtxprob_Cjp', '', 0., 1.)
     photon0_VtxProb = ROOT.RooRealVar('photon0_VtxProb', '', 0., 1.)
+    #
+    Bs_DS2_PV = ROOT.RooRealVar('Bs_DS2_PV', '', 0., 10000.)
+    photon0_DS2_PV = ROOT.RooRealVar('photon0_DS2_PV', '', 0., 10000.)
+    photon_DS2_PV = ROOT.RooRealVar('photon_DS2_PV', '', 0., 10000.)
+    #
+    photon0_cos2D_PV_Bfinder = ROOT.RooRealVar('photon0_cos2D_PV_Bfinder', '', -1., 1.)
+    photon_cos2D_PV = ROOT.RooRealVar('photon_cos2D_PV', '', -1., 1.)
+    Bs_cos2D_PV_Bfinder = ROOT.RooRealVar('Bs_cos2D_PV_Bfinder', '', -1., 1.)
 
+    vars_set = ROOT.RooArgSet(ROOT.RooArgSet(var_mass, Bs_mass_Cjp, Bstar_pt, photon0_pt, Bstar_vtxprob, photon0_VtxProb, Bs_DS2_PV, photon0_DS2_PV, Bs_cos2D_PV_Bfinder),
+                              ROOT.RooArgSet(photon0_cos2D_PV_Bfinder, photon_cos2D_PV, photon_DS2_PV, Bs_vtxprob_Cjp))
     ### -----------------------------------------------------------------------------------------------------------------------
 
     mean_Bstar = ROOT.RooRealVar("mean_Bstar", "", 5.41, left_mass, 5.5)
@@ -63,7 +76,7 @@ for year in sorted(file_name.keys()):
     ### -----------------------------------------------------------------------------------------------------------------------
     ### -----------------------------------------------------------------------------------------------------------------------
 
-    data = ROOT.RooDataSet('data', '', file_data.Get('mytree'), ROOT.RooArgSet(var_mass, Bs_mass_Cjp, Bstar_pt, photon0_pt, Bstar_vtxprob, photon0_VtxProb),
+    data = ROOT.RooDataSet('data', '', file_data.Get('mytree'), vars_set,
                             var_mass_name + ' > ' + str(left_mass) + ' && ' + var_mass_name + ' < ' + str(right_mass) + ' && ' + cuts)
     # hist = data.createHistogram(var_mass, Bs_mass_Cjp)
     # hist.GetXaxis().GetXmin()

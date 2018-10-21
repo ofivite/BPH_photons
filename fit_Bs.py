@@ -3,7 +3,10 @@ from ROOT import RooFit as RF
 
 file_name = {'16': 'Bstar16_1063_of_1067_', '17': 'Bstar17_1254_of_1271_', '18': 'Bstar18_1488_of_1504_', 'all': 'RunII_cac5b262_3805of3842'}
 left_mass = 5.25; right_mass = 5.5; nbins_mass = 50
-cuts = 'Bstar_pt > 30 && photon0_pt > 0. && Bstar_vtxprob > 0.01 && photon0_VtxProb > 0.01'
+cuts = ('Bstar_pt > 30 && photon0_pt > 0. &&' +
+        'Bstar_vtxprob > 0.01 && Bs_vtxprob_Cjp > 0.01 && photon0_VtxProb > 0.01 &&' +
+        'Bs_DS2_PV > 3. && photon0_DS2_PV > 3.'
+)
 
 ### -----------------------------------------------------------------------------------------------------------------------
 
@@ -12,8 +15,21 @@ var_mass_name = var_mass.GetName()
 
 Bstar_pt = ROOT.RooRealVar('Bstar_pt', '', 0., 10000)
 photon0_pt = ROOT.RooRealVar('photon0_pt', '', 0., 10000)
+#
 Bstar_vtxprob = ROOT.RooRealVar('Bstar_vtxprob', '', 0., 1.)
+Bs_vtxprob_Cjp = ROOT.RooRealVar('Bs_vtxprob_Cjp', '', 0., 1.)
 photon0_VtxProb = ROOT.RooRealVar('photon0_VtxProb', '', 0., 1.)
+#
+Bs_DS2_PV = ROOT.RooRealVar('Bs_DS2_PV', '', 0., 10000.)
+photon0_DS2_PV = ROOT.RooRealVar('photon0_DS2_PV', '', 0., 10000.)
+photon_DS2_PV = ROOT.RooRealVar('photon_DS2_PV', '', 0., 10000.)
+#
+photon0_cos2D_PV_Bfinder = ROOT.RooRealVar('photon0_cos2D_PV_Bfinder', '', -1., 1.)
+photon_cos2D_PV = ROOT.RooRealVar('photon_cos2D_PV', '', -1., 1.)
+Bs_cos2D_PV_Bfinder = ROOT.RooRealVar('Bs_cos2D_PV_Bfinder', '', -1., 1.)
+
+vars_set = ROOT.RooArgSet(ROOT.RooArgSet(var_mass, Bstar_pt, photon0_pt, Bstar_vtxprob, photon0_VtxProb, Bs_DS2_PV, photon0_DS2_PV, Bs_cos2D_PV_Bfinder),
+                          ROOT.RooArgSet(photon0_cos2D_PV_Bfinder, photon_cos2D_PV, photon_DS2_PV, Bs_vtxprob_Cjp))
 
 ### -----------------------------------------------------------------------------------------------------------------------
 
@@ -51,7 +67,7 @@ sigma_Bs.setPlotLabel('#sigma[B_{s}^{0}]')
 for year in sorted(file_name.keys()):
 
     file_data = ROOT.TFile(file_name[year] + '.root')
-    data = ROOT.RooDataSet('data', '', file_data.Get('mytree'), ROOT.RooArgSet(var_mass, Bstar_pt, photon0_pt, Bstar_vtxprob, photon0_VtxProb),
+    data = ROOT.RooDataSet('data', '', file_data.Get('mytree'), vars_set,
                             var_mass_name + ' > ' + str(left_mass) + ' && ' + var_mass_name + ' < ' + str(right_mass) + ' && ' + cuts)
 
     # hist = data.createHistogram(var_mass, Bs_mass_Cjp)
