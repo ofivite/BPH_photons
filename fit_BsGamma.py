@@ -1,15 +1,17 @@
 import ROOT
 from ROOT import RooFit as RF
 
-# year = 'all'
 file_name = {'16': 'Bstar16_1063_of_1067_', '17': 'Bstar17_1254_of_1271_', '18': 'Bstar18_1488_of_1504_', 'all': 'RunII_cac5b262_3805of3842'}
+###
 cuts = 'Bs_mass_Cjp > 5.346 && Bs_mass_Cjp < 5.386 && Bstar_pt > 30 && photon0_pt > 0. && Bstar_vtxprob > 0.01 && photon0_VtxProb > 0.01'
 
+### -----------------------------------------------------------------------------------------------------------------------
+
+# for year in ['17']:
 for year in sorted(file_name.keys()):
     file_data = ROOT.TFile(file_name[year] + '.root')
 
-    left_mass = file_data.Get('mytree').GetMinimum('deltaM_0');
-    # left_mass = 5.4
+    left_mass = file_data.Get('mytree').GetMinimum('deltaM_0');  ## this is the value before cuts!
     right_mass = left_mass + 0.15; nbins_mass = 75
     var_mass = ROOT.RooRealVar('deltaM_0', 'm(B_{s}^{0}#gamma) - m(B_{s}^{0}) + m_{PDG}(B_{s}^{0}) [GeV]', left_mass, right_mass)
     var_mass_name = var_mass.GetName()
@@ -22,20 +24,11 @@ for year in sorted(file_name.keys()):
     Bstar_vtxprob = ROOT.RooRealVar('Bstar_vtxprob', '', 0., 1.)
     photon0_VtxProb = ROOT.RooRealVar('photon0_VtxProb', '', 0., 1.)
 
-    # var_mass = ROOT.RooRealVar('deltaM_0', 'm(B_{s}^{0}#gamma) - m(B_{s}^{0}) + m_{PDG}(B_{s}^{0}) [GeV]', left_mass, right_mass)
-    # var_mass = ROOT.RooRealVar('deltaM_0', 'm(B_{s}^{0}#gamma) - m(B_{s}^{0}) + m_{PDG}(B_{s}^{0}) [GeV]', left_mass, right_mass)
-
-    data = ROOT.RooDataSet('data', '', file_data.Get('mytree'), ROOT.RooArgSet(var_mass, Bs_mass_Cjp, Bstar_pt, photon0_pt, Bstar_vtxprob, photon0_VtxProb), var_mass_name + ' > ' + str(left_mass) + ' && ' + var_mass_name + ' < ' + str(right_mass) + ' && ' + cuts)
-
-    # hist = data.createHistogram(var_mass, Bs_mass_Cjp)
-    # hist.GetXaxis().GetXmin()
-
     ### -----------------------------------------------------------------------------------------------------------------------
 
     mean_Bstar = ROOT.RooRealVar("mean_Bstar", "", 5.41, left_mass, 5.5)
-    sigma_Bstar = ROOT.RooRealVar("sigma_X", "", 0.015, 0., 0.03)
+    sigma_Bstar = ROOT.RooRealVar("sigma_Bstar", "", 0.015, 0., 0.03)
     signal = ROOT.RooGaussian("signal", "", var_mass, mean_Bstar, sigma_Bstar)
-
 
     ### -----------------------------------------------------------------------------------------------------------------------
 
@@ -61,49 +54,40 @@ for year in sorted(file_name.keys()):
     N_sig_Bstar = ROOT.RooRealVar('N_sig_Bstar', '', 20., 0., 90)
     model = ROOT.RooAddPdf('model', 'model', ROOT.RooArgList(signal, bkgr), ROOT.RooArgList(N_sig_Bstar, N_bkgr))
 
+    N_sig_Bstar.setPlotLabel("N_{B_{s}^{*0}}");
+    N_bkgr.setPlotLabel('N_{bkgr}')
+    mean_Bstar.setPlotLabel('m[B_{s}^{*0}]')
+    sigma_Bstar.setPlotLabel('#sigma[B_{s}^{*0}]')
 
     ### -----------------------------------------------------------------------------------------------------------------------
     ### -----------------------------------------------------------------------------------------------------------------------
     ### -----------------------------------------------------------------------------------------------------------------------
+
+    data = ROOT.RooDataSet('data', '', file_data.Get('mytree'), ROOT.RooArgSet(var_mass, Bs_mass_Cjp, Bstar_pt, photon0_pt, Bstar_vtxprob, photon0_VtxProb),
+                            var_mass_name + ' > ' + str(left_mass) + ' && ' + var_mass_name + ' < ' + str(right_mass) + ' && ' + cuts)
+    # hist = data.createHistogram(var_mass, Bs_mass_Cjp)
+    # hist.GetXaxis().GetXmin()
 
     mean_Bstar.setConstant(1); P_m0.setConstant(1)
-
     model.fitTo(data, RF.Extended(ROOT.kTRUE), RF.NumCPU(15))
     mean_Bstar.setConstant(0);
     model.fitTo(data, RF.Extended(ROOT.kTRUE), RF.NumCPU(15))
     model.fitTo(data, RF.Extended(ROOT.kTRUE), RF.NumCPU(15))
 
+### -----------------------------------------------------------------------------------------------------------------------
 
     c = ROOT.TCanvas("c", "c", 800, 600)
-
     frame = ROOT.RooPlot(" ", ' ', var_mass, left_mass, right_mass, nbins_mass);
 
     data.plotOn(frame, RF.DataError(ROOT.RooAbsData.Auto))
-    # model.paramOn(frame, RF.Layout(0.55, 0.96, 0.9), RF.Parameters(plot_par))
-    # frame.getAttText().SetTextSize(0.053)
     model.plotOn(frame, RF.LineColor(ROOT.kRed-6), RF.LineWidth(4)) #, RF.NormRange("full"), RF.Range('full')
 
     floatPars = model.getParameters(data).selectByAttrib('Constant', ROOT.kFALSE)
     print ('\n\n' + 30*'<' + '\n\n         ndf = ' + str(floatPars.getSize()) + ';    chi2/ndf = ' + str(frame.chiSquare(floatPars.getSize())) + ' for ' + str(model.GetName()) + ' and ' + str(data.GetName()) + '         \n\n' + 30*'>' + '\n\n')
 
-    # model.plotOn(frame, RF.Components(signal.GetName()), RF.LineStyle(ROOT.kDashed), RF.LineColor(ROOT.kGreen-6), RF.LineWidth(4),
-    #                     RF.Range(mean_Bstar.getValV() - 3 * sigma_Bstar.getValV(), mean_Bstar.getValV() - 3 * sigma_Bstar.getValV() ));
-
-    # model.plotOn(frame, RF.Components("model_ss_2D"), RF.LineStyle(ROOT.kDashed), RF.LineColor(ROOT.kOrange+7), RF.LineWidth(4) );
-    # # , RF.Range(mean_phi.getValV() - 15 * gamma_BW_phi.getValV(), mean_phi.getValV() + 15 * gamma_BW_phi.getValV())
-    # model.plotOn(frame, RF.Components("sig_Bs_1"), RF.LineStyle(ROOT.kDashed), RF.LineColor(47), RF.LineWidth(4));
-    # model.plotOn(frame, RF.Components("sig_Bs_2"), RF.LineStyle(ROOT.kDashed), RF.LineColor(47), RF.LineWidth(4));
-    # model.plotOn(frame, RF.Components('sig_' + str(mode) + '_1'), RF.LineStyle(ROOT.kDashed), RF.LineColor(47), RF.LineWidth(4));
-    # model.plotOn(frame, RF.Components('sig_' + str(mode) + '_2'), RF.LineStyle(ROOT.kDashed), RF.LineColor(47), RF.LineWidth(4));
-    # # model.plotOn(frame_control, RF.Components("signal_X"), RF.LineStyle(ROOT.kDashed), RF.LineColor(47), RF.LineWidth(4));
-
+    # model.plotOn(frame, RF.Components(signal.GetName()), RF.LineStyle(ROOT.kDashed), RF.LineColor(ROOT.kRed-5), RF.LineWidth(4));
     model.plotOn(frame, RF.Components(bkgr.GetName()), RF.LineStyle(ROOT.kDashed), RF.LineColor(ROOT.kBlue-8), RF.LineWidth(4) );
-    # model.plotOn(frame, RF.Components("bkgr_phi"), RF.LineStyle(ROOT.kDashed), RF.LineColor(ROOT.kBlue-8), RF.LineWidth(4) );
-    # model.plotOn(frame, RF.Components("bkgr_Bs"), RF.LineStyle(ROOT.kDashed), RF.LineColor(ROOT.kBlue-8), RF.LineWidth(4) );
-    # # model.plotOn(frame, RF.Components("signal_Bs"), RF.LineStyle(ROOT.kDashed), RF.LineColor(47), RF.LineWidth(4), RF.Range(mean_Bs.getValV() - 15 * sigma_Bs.getValV(), mean_Bs.getValV() + 15 * sigma_Bs.getValV()));
-    # model.plotOn(frame, RF.Components("signal_phi"), RF.LineStyle(ROOT.kDashed), RF.LineColor(47), RF.LineWidth(4));
-
-    # data.plotOn(frame, RF.DataError(ROOT.RooAbsData.Auto))
+    data.plotOn(frame, RF.DataError(ROOT.RooAbsData.Auto))
 
     frame.GetYaxis().SetTitle('Candidates / ' + str(int(round((right_mass - left_mass) / nbins_mass * 1000.))) + ' MeV')
     frame.GetXaxis().SetTitleSize(0.04)
@@ -112,6 +96,11 @@ for year in sorted(file_name.keys()):
     frame.GetYaxis().SetLabelSize(0.033)
     frame.GetXaxis().SetTitleOffset(1.05)
     frame.GetYaxis().SetTitleOffset(1.)
+
+    plot_param = ROOT.RooArgSet(mean_Bstar, sigma_Bstar, N_sig_Bstar, N_bkgr)
+    model.paramOn(frame, RF.Layout(0.5, 0.85, 0.8), RF.Parameters(plot_param))
+    frame.getAttText().SetTextSize(0.035)
+
     frame.Draw()
     c.SaveAs('plots/Bstar_' + year + '.pdf')
 
@@ -129,8 +118,8 @@ for year in sorted(file_name.keys()):
     m.minos(ROOT.RooArgSet(N_sig_Bstar))
     N_sig_Bstar.Print()
 
-
     pll = nll.createProfile(ROOT.RooArgSet(N_sig_Bstar))
+    #
     frame_ll = ROOT.RooPlot(" ", ' ', N_sig_Bstar, N_sig_Bstar.getVal() - 10., N_sig_Bstar.getVal() + 10., 20);
 
     nll.plotOn(frame_ll, RF.LineColor(ROOT.kBlue), RF.ShiftToZero())
@@ -138,7 +127,6 @@ for year in sorted(file_name.keys()):
 
     frame_ll.SetMaximum(2.)
     frame_ll.SetMinimum(0.)
-
     c_ll = ROOT.TCanvas()
     frame_ll.Draw()
     c_ll.SaveAs('plots/nll_pll_' + year + '.pdf')
