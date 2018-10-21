@@ -7,8 +7,8 @@ from math import sqrt
 isMC = 0
 
 MyFileNamesMC = glob.glob( MCpath(1) + "*.root")
-# MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_10_2_5_patch1/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2018_BSG_v2_*/results/*.root")
-MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_9_4_10/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2017_BSG_v2_unified_*/results/*.root")
+MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_10_2_5_patch1/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2018_BSG_v2_*/results/*.root")
+# MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_9_4_10/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2017_BSG_v2_unified_*/results/*.root")
 # MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_9_4_9/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2016_BSG_v2_*/results/*.root")
 
 # __aa = 0;    __bb = 5
@@ -20,7 +20,7 @@ for fName in  MyFileNames:
 
 print 'get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created'
 
-_fileOUT = 'Bstar17_' + str(len(MyFileNames)) + '_of_1271_.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
+_fileOUT = 'Bstar18_' + str(len(MyFileNames)) + '_of_1504_.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
 fileOUT  = TFile (_fileOUT, "recreate");    mytree = TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print "entries: from", 0, 'to', nEvt-1;
