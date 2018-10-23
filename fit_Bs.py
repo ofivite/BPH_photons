@@ -44,7 +44,7 @@ a2 = ROOT.RooRealVar('a2', 'a2', 0.01, 0., 1.)
 a3 = ROOT.RooRealVar('a3', 'a3', 0.01, 0., 1.)
 a4 = ROOT.RooRealVar('a4', 'a4', 0.01, 0., 1.)
 
-bkgr = ROOT.RooBernstein('bkgr', '', var_mass, ROOT.RooArgList(a1, a2, a3))
+bkgr = ROOT.RooBernstein('bkgr', '', var_mass, ROOT.RooArgList(a1, a2))
 
 ### -----------------------------------------------------------------------------------------------------------------------
 

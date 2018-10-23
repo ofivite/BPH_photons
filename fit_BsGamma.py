@@ -128,10 +128,11 @@ for year in sorted(file_name.keys()):
     m.setVerbose(ROOT.kTRUE)
     #
     m.migrad()
-    m.minos(ROOT.RooArgSet(N_sig_Bstar))
+    m.minos(ROOT.RooArgSet(N_sig_Bstar, mean_Bstar))
     N_sig_Bstar.Print()
-
-    pll = nll.createProfile(ROOT.RooArgSet(N_sig_Bstar))
+    mean_Bstar.Print()
+    
+    pll = nll.createProfile(ROOT.RooArgSet(N_sig_Bstar, mean_Bstar))
     #
     frame_ll = ROOT.RooPlot(" ", ' ', N_sig_Bstar, N_sig_Bstar.getVal() - 10., N_sig_Bstar.getVal() + 10., 20);
 
