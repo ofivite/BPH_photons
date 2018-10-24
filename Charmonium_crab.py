@@ -22,8 +22,8 @@ config.Data.outputDatasetTag = 'CRAB3_Bfinder'
 config.Data.outLFNDirBase = '/store/user/'+getUsernameFromSiteDB()+'/Bfinder/'
 
 config.section_("Site")
-config.Site.storageSite = 'T2_RU_IHEP'
-# config.Site.storageSite = 'T2_RU_JINR'
+# config.Site.storageSite = 'T2_RU_IHEP'
+config.Site.storageSite = 'T2_RU_JINR'
 
 DS_names = [ '' , ## 5 items
 '/Charmonium/Run2017B-31Mar2018-v1/MINIAOD',
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     import sys
     from CRABAPI.RawCommand import crabCommand
     from httplib import HTTPException
-    task = '2017_BSG_v2_unified'
+    task = '2017_cascade_v0'
     ####
     ## MY: b1 == Bc+ --> J/psi pi+
     ##      x1 = Xi-    -> Lambda pi

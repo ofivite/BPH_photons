@@ -111,6 +111,7 @@ private:
   unsigned int             nB;
   unsigned int             nMu;
   unsigned int             nVtx;
+  unsigned int             nConv;
 
   // *************************************
 
@@ -129,32 +130,61 @@ private:
 
   // *************************************
 
-  std::vector<float>       *photon_mass, *photon_px, *photon_py, *photon_pz;
-  std::vector<int>         *photon_flags;
+  std::vector<float>       *photon_mass_1, *photon_px_1, *photon_py_1, *photon_pz_1;
+  std::vector<int>         *photon_flags_1;
+  std::vector<float>       *photon0_cos2D_common_1;
 
   // *************************************
 
-  std::vector<float>       *photon_pt1, *photon_px1, *photon_py1, *photon_pz1;
-  std::vector<float>       *photon_pt2, *photon_px2, *photon_py2, *photon_pz2;
+  std::vector<float>       *photon_mass_2, *photon_px_2, *photon_py_2, *photon_pz_2;
+  std::vector<int>         *photon_flags_2;
+  std::vector<float>       *photon0_cos2D_common_2;
 
-  std::vector<float>       *photon_px1_track, *photon_py1_track, *photon_pz1_track;
-  std::vector<float>       *photon_px2_track, *photon_py2_track, *photon_pz2_track;
+  // *************************************
+
+  std::vector<float>       *photon_pt1_1, *photon_px1_1, *photon_py1_1, *photon_pz1_1;
+  std::vector<float>       *photon_pt2_1, *photon_px2_1, *photon_py2_1, *photon_pz2_1;
+
+  std::vector<float>       *photon_px1_track_1, *photon_py1_track_1, *photon_pz1_track_1;
+  std::vector<float>       *photon_px2_track_1, *photon_py2_track_1, *photon_pz2_track_1;
 
   // std::vector<float>       *e1dxy, *e2dxy, *e1dz, *e2dz;
   // std::vector<float>       *e1dxy_e, *e2dxy_e, *e1dz_e, *e2dz_e;
-  std::vector<int>         *photon_charge1, *photon_charge2;
+  std::vector<int>         *photon_charge1_1, *photon_charge2_1;
 
-  std::vector<float>       *photon1_track_normchi2;
-  std::vector<int>         *photon1_Hits,  *photon1_PHits;
-  std::vector<int>         *photon1_NTrackerLayers,  *photon1_NPixelLayers;
+  std::vector<float>       *photon1_track_normchi2_1;
+  std::vector<int>         *photon1_Hits_1,  *photon1_PHits_1;
+  std::vector<int>         *photon1_NTrackerLayers_1,  *photon1_NPixelLayers_1;
 
-  std::vector<float>       *photon2_track_normchi2;
-  std::vector<int>         *photon2_Hits,  *photon2_PHits;
-  std::vector<int>         *photon2_NTrackerLayers,  *photon2_NPixelLayers;
+  std::vector<float>       *photon2_track_normchi2_1;
+  std::vector<int>         *photon2_Hits_1,  *photon2_PHits_1;
+  std::vector<int>         *photon2_NTrackerLayers_1,  *photon2_NPixelLayers_1;
+
 
   // *************************************
 
-  std::vector<float>       *B_mass, *B_px, *B_py, *B_pz;
+  std::vector<float>       *photon_pt1_2, *photon_px1_2, *photon_py1_2, *photon_pz1_2;
+  std::vector<float>       *photon_pt2_2, *photon_px2_2, *photon_py2_2, *photon_pz2_2;
+
+  std::vector<float>       *photon_px1_track_2, *photon_py1_track_2, *photon_pz1_track_2;
+  std::vector<float>       *photon_px2_track_2, *photon_py2_track_2, *photon_pz2_track_2;
+
+  // std::vector<float>       *e1dxy, *e2dxy, *e1dz, *e2dz;
+  // std::vector<float>       *e1dxy_e, *e2dxy_e, *e1dz_e, *e2dz_e;
+  std::vector<int>         *photon_charge1_2, *photon_charge2_2;
+
+  std::vector<float>       *photon1_track_normchi2_2;
+  std::vector<int>         *photon1_Hits_2,  *photon1_PHits_2;
+  std::vector<int>         *photon1_NTrackerLayers_2,  *photon1_NPixelLayers_2;
+
+  std::vector<float>       *photon2_track_normchi2_2;
+  std::vector<int>         *photon2_Hits_2,  *photon2_PHits_2;
+  std::vector<int>         *photon2_NTrackerLayers_2,  *photon2_NPixelLayers_2;
+
+
+  // *************************************
+
+  std::vector<float>       *B_mass, *B_px, *B_py, *B_pz, *B_cos2D_PV;
 
   // *************************************
 
@@ -165,8 +195,8 @@ private:
 
   // *************************************
 
-  std::vector<float>       *photon_chi2, *J_chi2, *B_chi2;
-  std::vector<float>       *B_Prob, *J_Prob, *photon_Prob;
+  std::vector<float>       *photon1_chi2, *photon2_chi2, *J_chi2, *B_chi2;
+  std::vector<float>       *B_Prob, *J_Prob, *photon1_Prob, *photon2_Prob;
 
   // ********************************** ************************************************************************
 
@@ -178,9 +208,13 @@ private:
   std::vector<double>      *psiDecayVtxXE, *psiDecayVtxYE, *psiDecayVtxZE;
   std::vector<double>      *psiDecayVtxXYE, *psiDecayVtxXZE, *psiDecayVtxYZE;
 
-  std::vector<float>       *PhotonDecayVtxX, *PhotonDecayVtxY, *PhotonDecayVtxZ;
-  std::vector<float>       *PhotonDecayVtxXE, *PhotonDecayVtxYE, *PhotonDecayVtxZE;
-  std::vector<float>       *PhotonDecayVtxXYE, *PhotonDecayVtxXZE, *PhotonDecayVtxYZE;
+  std::vector<float>       *PhotonDecayVtxX_1, *PhotonDecayVtxY_1, *PhotonDecayVtxZ_1;
+  std::vector<float>       *PhotonDecayVtxXE_1, *PhotonDecayVtxYE_1, *PhotonDecayVtxZE_1;
+  std::vector<float>       *PhotonDecayVtxXYE_1, *PhotonDecayVtxXZE_1, *PhotonDecayVtxYZE_1;
+
+  std::vector<float>       *PhotonDecayVtxX_2, *PhotonDecayVtxY_2, *PhotonDecayVtxZ_2;
+  std::vector<float>       *PhotonDecayVtxXE_2, *PhotonDecayVtxYE_2, *PhotonDecayVtxZE_2;
+  std::vector<float>       *PhotonDecayVtxXYE_2, *PhotonDecayVtxXZE_2, *PhotonDecayVtxYZE_2;
 
   std::vector<float>       *PV_bestBang_RF_X   , *PV_bestBang_RF_Y , *PV_bestBang_RF_Z;
   std::vector<float>       *PV_bestBang_RF_XE  , *PV_bestBang_RF_YE, *PV_bestBang_RF_ZE;
