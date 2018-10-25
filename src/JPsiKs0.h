@@ -184,7 +184,11 @@ private:
 
   // *************************************
 
-  std::vector<float>       *B_mass, *B_px, *B_py, *B_pz, *B_cos2D_PV;
+  std::vector<float>       *B_mass, *B_mass_woChiCnstr, *B_px, *B_py, *B_pz, *B_cos2D_PV;
+
+  // *************************************
+
+  std::vector<float>       *chi_mass, *chi_mass_c0, *chi_mass_FF, *chi_px, *chi_py, *chi_pz;
 
   // *************************************
 
@@ -196,7 +200,7 @@ private:
   // *************************************
 
   std::vector<float>       *photon1_chi2, *photon2_chi2, *J_chi2, *B_chi2;
-  std::vector<float>       *B_Prob, *J_Prob, *photon1_Prob, *photon2_Prob;
+  std::vector<float>       *B_Prob, *J_Prob, *photon1_Prob, *photon0_Prob_1, *photon2_Prob, *photon0_Prob_2;
 
   // ********************************** ************************************************************************
 

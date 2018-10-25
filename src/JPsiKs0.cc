@@ -171,9 +171,13 @@ JPsiKs0::JPsiKs0(const edm::ParameterSet& iConfig)
 
   // *******************************************************
 
-  B_mass(0), B_px(0), B_py(0), B_pz(0), B_cos2D_PV(0),
+  B_mass(0), B_mass_woChiCnstr(0), B_px(0), B_py(0), B_pz(0), B_cos2D_PV(0),
 
   // *******************************************************
+
+  chi_mass(0), chi_mass_c0(0), chi_mass_FF(0), chi_px(0), chi_py(0), chi_pz(0),
+
+// *******************************************************
 
   B_J_mass(0), B_J_px(0), B_J_py(0), B_J_pz(0),
   B_J_pt1(0), B_J_px1(0), B_J_py1(0), B_J_pz1(0),
@@ -183,7 +187,7 @@ JPsiKs0::JPsiKs0(const edm::ParameterSet& iConfig)
   // *******************************************************
 
   photon1_chi2(0), photon2_chi2(0), J_chi2(0), B_chi2(0),
-  B_Prob(0), J_Prob(0), photon1_Prob(0), photon2_Prob(0),
+  B_Prob(0), J_Prob(0), photon1_Prob(0), photon0_Prob_1(0), photon2_Prob(0), photon0_Prob_2(0),
 
   // ************************ ****************************************************
 
@@ -337,11 +341,12 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     ParticleMass muon_mass = 0.10565837; //pdg mass
 	  ParticleMass psi_mass = 3.096916;
+    ParticleMass chic1_mass = 3.51067;
 	  ParticleMass electron_mass = 0.0005109989461;
     ParticleMass photon_null_mass = 0.;
 
 	  float muon_sigma = muon_mass*1.e-6;
-	  float psi_sigma = psi_mass*1.e-6;
+	  float chic1_sigma = chic1_mass*1.e-6;
     float PM_sigma = 1.e-7;
     float photon_null_sigma = 1.e-7;
 
@@ -390,12 +395,6 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     if (!psi_vFit_vertex_noMC->vertexIsValid())  continue;
     if (!psi_vFit_noMC->currentState().isValid()) continue;
 
-	  if( psi_vFit_vertex_noMC->chiSquared() < 0 )
-	    {
-	      //std::cout << "negative chisq from psi fit" << endl;
-	      continue;
-	    }
-
 	  double J_Prob_tmp   = TMath::Prob(psi_vFit_vertex_noMC->chiSquared(),(int)psi_vFit_vertex_noMC->degreesOfFreedom());
 	  if(J_Prob_tmp<0.01)
 	    {
@@ -418,13 +417,11 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	   for ( View< pat::CompositeCandidate > ::const_iterator iPhoton1 = photonHandle->begin(); iPhoton1 != photonHandle->end(); ++iPhoton1 )
 		 {
-       TLorentzVector p4photon1, p4photon2, p4_jpsi, p4chi, p4casc;
+       TLorentzVector p4photon1, p4photon2, p4photon2_0, p4_jpsi, p4chi0, p4chi, p4casc;
        p4_jpsi.SetXYZM(psi_vFit_noMC->currentState().globalMomentum().x(),psi_vFit_noMC->currentState().globalMomentum().y(),psi_vFit_noMC->currentState().globalMomentum().z(),psi_vFit_noMC->currentState().mass());
        p4photon1.SetXYZM(iPhoton1->px(), iPhoton1->py(), iPhoton1->pz(), iPhoton1->mass());
-       p4chi = p4_jpsi + p4photon1;
-       if (p4chi.M() < 2.5 || p4chi.M() > 4.5) continue;
-
-       reco::TrackCollection convTracks;
+       p4chi0 = p4_jpsi + p4photon1;
+       if (p4chi0.M() < 2.5 || p4chi0.M() > 4.5) continue;
 
       const reco::Track *e1_track1 = iPhoton1->userData<reco::Track>("track0");
       const reco::Track *e2_track1 = iPhoton1->userData<reco::Track>("track1");
@@ -506,6 +503,68 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          if (!photon_vFit_vertex_withMC_1->vertexIsValid())  continue;
          if (!photon_vFit_withMC_1->currentState().isValid()) continue;
 
+   /////////////////////
+   ////////************      CHI VTX FIT
+   ///////
+
+         vector<RefCountedKinematicParticle> chiParticles;
+         chiParticles.push_back(pFactory.particle(muon1TT,muon_mass,chi,ndf,muon_sigma));
+         chiParticles.push_back(pFactory.particle(muon2TT,muon_mass,chi,ndf,muon_sigma));
+         chiParticles.push_back(photon_vFit_withMC_1);
+
+         MultiTrackKinematicConstraint *  j_psi_c = new  TwoTrackMassKinematicConstraint(psi_mass);
+         KinematicConstrainedVertexFitter kcvFitter;
+         RefCountedKinematicTree chiFitTree = kcvFitter.fit(chiParticles, j_psi_c);
+         if (!chiFitTree->isValid()) {
+           //std::cout << "caught an exception in the B vertex fit with MC" << std::endl;
+           continue;
+         }
+
+         chiFitTree->movePointerToTheTop();
+
+         RefCountedKinematicParticle chiCandMC = chiFitTree->currentParticle();
+         RefCountedKinematicVertex chiDecayVertexMC = chiFitTree->currentDecayVertex();
+         if (!chiDecayVertexMC->vertexIsValid()) continue;
+         if (!chiCandMC->currentState().isValid()) continue;
+
+         if(chiCandMC->currentState().mass() < 3.3 || chiCandMC->currentState().mass() > 3.7) continue;
+
+         if(chiDecayVertexMC->chiSquared() < 0.)
+           {
+       //std::cout << " continue from negative chi2 = " << bDecayVertexMC->chiSquared() << endl;
+       continue;
+           }
+
+         double chi_Prob_tmp       = TMath::Prob(chiDecayVertexMC->chiSquared(),(int)chiDecayVertexMC->degreesOfFreedom());
+         if(chi_Prob_tmp < 0.01) continue;
+
+         // get children from final B fit
+         chiFitTree->movePointerToTheFirstChild();
+         RefCountedKinematicParticle mu1CandMC = chiFitTree->currentParticle();
+         chiFitTree->movePointerToTheNextChild();
+         RefCountedKinematicParticle mu2CandMC = chiFitTree->currentParticle();
+         if (!mu1CandMC->currentState().isValid()) continue;
+         if (!mu2CandMC->currentState().isValid()) continue;
+
+
+         /////////////////////
+         ////////************      CHI CONSTRAINT FIT
+         ///////
+
+         KinematicParticleFitter csFitterChi;
+         KinematicConstraint * chic1_c = new MassKinematicConstraint(chic1_mass, chic1_sigma);
+
+         chiFitTree = csFitterChi.fit(chic1_c, chiFitTree);
+         if (!chiFitTree->isValid()){
+           //std::cout << "caught an exception in the ks mass constraint fit" << std::endl;
+           continue;
+         }
+
+         chiFitTree->movePointerToTheTop();
+         RefCountedKinematicParticle chi_vFit_withMC = chiFitTree->currentParticle();
+         RefCountedKinematicVertex chi_vFit_vertex_withMC = chiFitTree->currentDecayVertex();
+         if (!chi_vFit_vertex_withMC->vertexIsValid())  continue;
+         if (!chi_vFit_withMC->currentState().isValid()) continue;
 
    /////////////////////
    ////////************      PHOTON_2 LOOP
@@ -517,10 +576,10 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
            if (iPhoton1 == iPhoton2) continue;
 
            p4photon2.SetXYZM(iPhoton2->px(), iPhoton2->py(), iPhoton2->pz(), iPhoton2->mass());
-           p4casc = p4chi + p4photon2;
-           if (p4casc.M() < 2.5 || p4casc.M() > 4.5) continue;
+           p4chi.SetXYZM(chiCandMC->currentState().globalMomentum().x(), chiCandMC->currentState().globalMomentum().y(), chiCandMC->currentState().globalMomentum().z(), chiCandMC->currentState().mass());
 
-           reco::TrackCollection convTracks;
+           p4casc = p4chi + p4photon2;
+           if (p4casc.M() < 3. || p4casc.M() > 5.5) continue;
 
           const reco::Track *e1_track2 = iPhoton2->userData<reco::Track>("track0");
           const reco::Track *e2_track2 = iPhoton2->userData<reco::Track>("track1");
@@ -601,6 +660,7 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
              if (!photon_vFit_vertex_withMC_2->vertexIsValid())  continue;
              if (!photon_vFit_withMC_2->currentState().isValid()) continue;
 
+             p4photon2_0.SetXYZM(photon_vFit_withMC_2->currentState().globalMomentum().x(), photon_vFit_withMC_2->currentState().globalMomentum().y(), photon_vFit_withMC_2->currentState().globalMomentum().z(), photon_vFit_withMC_2->currentState().mass());
 
      /////////////////////////////////////////////////////////////////////////////////
      //Now we are ready to combine!
@@ -608,18 +668,18 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      /////////////////////////////////////////////////////////////////////////////////
 
          vector<RefCountedKinematicParticle> vFitMCParticles;
-         vFitMCParticles.push_back(pFactory.particle(muon1TT,muon_mass,chi,ndf,muon_sigma));
-         vFitMCParticles.push_back(pFactory.particle(muon2TT,muon_mass,chi,ndf,muon_sigma));
-         vFitMCParticles.push_back(photon_vFit_withMC_1);
+         vFitMCParticles.push_back(chi_vFit_withMC);
          vFitMCParticles.push_back(photon_vFit_withMC_2);
 
-         MultiTrackKinematicConstraint *  j_psi_c = new  TwoTrackMassKinematicConstraint(psi_mass);
-         KinematicConstrainedVertexFitter kcvFitter;
-         RefCountedKinematicTree vertexFitTree = kcvFitter.fit(vFitMCParticles, j_psi_c);
-         if (!vertexFitTree->isValid()) {
-           //std::cout << "caught an exception in the B vertex fit with MC" << std::endl;
-           continue;
-         }
+        RefCountedKinematicTree vertexFitTree;
+        try{
+          vertexFitTree = fitter.fit(vFitMCParticles);
+        }
+        catch(...) {
+          std::cout<<" Exception caught ... continuing 4 "<<std::endl;
+          continue;
+        }
+        if (!vertexFitTree->isValid()) continue;
 
          vertexFitTree->movePointerToTheTop();
 
@@ -628,7 +688,7 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          if (!bDecayVertexMC->vertexIsValid()) continue;
          if (!bCandMC->currentState().isValid()) continue;
 
-         if(bCandMC->currentState().mass() < 3.3 || bCandMC->currentState().mass() > 4.3) continue;
+         if(bCandMC->currentState().mass() < 3.3 || bCandMC->currentState().mass() > 5.) continue;
 
          if(bDecayVertexMC->chiSquared() < 0.)
            {
@@ -638,6 +698,10 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
          double B_Prob_tmp       = TMath::Prob(bDecayVertexMC->chiSquared(),(int)bDecayVertexMC->degreesOfFreedom());
          if(B_Prob_tmp < 0.01) continue;
+
+         vertexFitTree->movePointerToTheFirstChild();
+         RefCountedKinematicParticle chic1_FF = vertexFitTree->currentParticle();
+
 
 
          // {{{ GET THE BEST PV BY CHOSING THE BEST POINTING ANGLE AND REMOVE BS TRACKS FROM ITS FIT
@@ -667,8 +731,8 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             Double_t dy_gamma_1 = (*photon_vFit_vertex_withMC_1).position().y() - (*bDecayVertexMC).position().y();
             Double_t dx_gamma_2 = (*photon_vFit_vertex_withMC_2).position().x() - (*bDecayVertexMC).position().x();
             Double_t dy_gamma_2 = (*photon_vFit_vertex_withMC_2).position().y() - (*bDecayVertexMC).position().y();
-            Double_t cos2D_gamma_common_1 = ( photon_vFit_withMC_1->currentState().globalMomentum().x() * dx_gamma_1 + photon_vFit_withMC_1->currentState().globalMomentum().y()*dy_gamma_1 ) / ( sqrt(dx_gamma_1*dx_gamma_1 + dy_gamma_1*dy_gamma_1) * photon_vFit_withMC_1->currentState().globalMomentum().mag() );
-            Double_t cos2D_gamma_common_2 = ( photon_vFit_withMC_2->currentState().globalMomentum().x() * dx_gamma_2 + photon_vFit_withMC_2->currentState().globalMomentum().y()*dy_gamma_2 ) / ( sqrt(dx_gamma_2*dx_gamma_2 + dy_gamma_2*dy_gamma_2) * photon_vFit_withMC_2->currentState().globalMomentum().mag() );
+            Double_t cos2D_gamma0_common_1 = ( photon_vFit_withMC_1->currentState().globalMomentum().x() * dx_gamma_1 + photon_vFit_withMC_1->currentState().globalMomentum().y()*dy_gamma_1 ) / ( sqrt(dx_gamma_1*dx_gamma_1 + dy_gamma_1*dy_gamma_1) * photon_vFit_withMC_1->currentState().globalMomentum().mag() );
+            Double_t cos2D_gamma0_common_2 = ( photon_vFit_withMC_2->currentState().globalMomentum().x() * dx_gamma_2 + photon_vFit_withMC_2->currentState().globalMomentum().y()*dy_gamma_2 ) / ( sqrt(dx_gamma_2*dx_gamma_2 + dy_gamma_2*dy_gamma_2) * photon_vFit_withMC_2->currentState().globalMomentum().mag() );
             Double_t cos2D_B_PV = lip;
 
       //  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -723,14 +787,6 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       //            }
 
 
-       // get children from final B fit
-       vertexFitTree->movePointerToTheFirstChild();
-       RefCountedKinematicParticle mu1CandMC = vertexFitTree->currentParticle();
-       vertexFitTree->movePointerToTheNextChild();
-       RefCountedKinematicParticle mu2CandMC = vertexFitTree->currentParticle();
-       if (!mu1CandMC->currentState().isValid()) continue;
-       if (!mu2CandMC->currentState().isValid()) continue;
-
 
        KinematicParameters psiMu1KP = mu1CandMC->currentState().kinematicParameters();
        KinematicParameters psiMu2KP = mu2CandMC->currentState().kinematicParameters();
@@ -772,24 +828,32 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
      B_mass->push_back(bCandMC->currentState().mass());
+     B_mass_woChiCnstr->push_back((p4chi + p4photon2_0).M());
      B_px->push_back(bCandMC->currentState().globalMomentum().x());
      B_py->push_back(bCandMC->currentState().globalMomentum().y());
      B_pz->push_back(bCandMC->currentState().globalMomentum().z());
      B_cos2D_PV->push_back(cos2D_B_PV);
+
+     chi_mass->push_back(chiCandMC->currentState().mass());
+     chi_mass_c0->push_back(chi_vFit_withMC->currentState().mass());
+     chi_mass_FF->push_back(chic1_FF->currentState().mass());
+     chi_px->push_back(chiCandMC->currentState().globalMomentum().x());
+     chi_py->push_back(chiCandMC->currentState().globalMomentum().y());
+     chi_pz->push_back(chiCandMC->currentState().globalMomentum().z());
 
      photon_mass_1->push_back( photon_vFit_noMC_1->currentState().mass() );
      photon_px_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().x() );
      photon_py_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().y() );
      photon_pz_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().z() );
      photon_flags_1->push_back( iPhoton1->userInt("flags") );
-     photon0_cos2D_common_1->push_back( cos2D_gamma_common_1 );
+     photon0_cos2D_common_1->push_back( cos2D_gamma0_common_1 );
 
      photon_mass_2->push_back( photon_vFit_noMC_2->currentState().mass() );
      photon_px_2->push_back( photon_vFit_withMC_2->currentState().globalMomentum().x() );
      photon_py_2->push_back( photon_vFit_withMC_2->currentState().globalMomentum().y() );
      photon_pz_2->push_back( photon_vFit_withMC_2->currentState().globalMomentum().z() );
      photon_flags_2->push_back( iPhoton2->userInt("flags") );
-     photon0_cos2D_common_2->push_back( cos2D_gamma_common_2 );
+     photon0_cos2D_common_2->push_back( cos2D_gamma0_common_2 );
 
      B_J_mass->push_back( psi_vFit_noMC->currentState().mass() );
      B_J_px->push_back( psi_vFit_noMC->currentState().globalMomentum().x() );
@@ -873,7 +937,9 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      B_Prob    ->push_back(B_Prob_tmp);
      J_Prob  ->push_back(J_Prob_tmp);
      photon1_Prob ->push_back(photon_Prob_tmp_1);
+     photon0_Prob_1 ->push_back(TMath::Prob(photon_vFit_vertex_withMC_1->chiSquared(),(int)photon_vFit_vertex_withMC_1->degreesOfFreedom()));
      photon2_Prob ->push_back(photon_Prob_tmp_2);
+     photon0_Prob_2 ->push_back(TMath::Prob(photon_vFit_vertex_withMC_2->chiSquared(),(int)photon_vFit_vertex_withMC_2->degreesOfFreedom()));
 
    // ************
      bDecayVtxX->push_back((*bDecayVertexMC).position().x());
@@ -968,7 +1034,7 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      mupC2->push_back( glbTrackP->normalizedChi2() );
      mupNHits->push_back( glbTrackP->numberOfValidHits() );
      mupNPHits->push_back( glbTrackP->hitPattern().numberOfValidPixelHits() );
-                 mumdxy->push_back(glbTrackM->dxy(bestVtx.position()) );
+     mumdxy->push_back(glbTrackM->dxy(bestVtx.position()) );
      mupdxy->push_back(glbTrackP->dxy(bestVtx.position()) );
      mumdz->push_back(glbTrackM->dz(bestVtx.position()) );
      mupdz->push_back(glbTrackP->dz(bestVtx.position()) );
@@ -992,6 +1058,7 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        photonParticles_2.clear();
 		   muonParticles.clear();
 		   vFitMCParticles.clear();
+       chiParticles.clear();
 
 
 		      }
@@ -1054,14 +1121,15 @@ void JPsiKs0::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    photon2_NTrackerLayers_2->clear();  photon2_NPixelLayers_2->clear();
 
    ///
-   B_mass->clear();    B_px->clear();    B_py->clear();    B_pz->clear(); B_cos2D_PV->clear();
+   B_mass->clear();    B_mass_woChiCnstr->clear();    B_px->clear();    B_py->clear();    B_pz->clear(); B_cos2D_PV->clear();
+   chi_mass->clear();    chi_mass_c0->clear();    chi_mass_FF->clear();    chi_px->clear();    chi_py->clear();    chi_pz->clear();
 
    B_J_mass->clear();  B_J_px->clear();  B_J_py->clear();  B_J_pz->clear();
    B_J_pt1->clear();  B_J_px1->clear();  B_J_py1->clear();  B_J_pz1->clear(), B_J_charge1->clear();
    B_J_pt2->clear();  B_J_px2->clear();  B_J_py2->clear();  B_J_pz2->clear(), B_J_charge2->clear();
 
    photon1_chi2->clear(); photon2_chi2->clear(); J_chi2->clear(); B_chi2->clear();
-   B_Prob->clear(); J_Prob->clear(); photon1_Prob->clear(); photon2_Prob->clear();
+   B_Prob->clear(); J_Prob->clear(); photon1_Prob->clear(); photon0_Prob_1->clear(); photon2_Prob->clear(); photon0_Prob_2->clear();
 
    // *********
 
@@ -1236,6 +1304,7 @@ JPsiKs0::beginJob()
   // *************************
 
   tree_->Branch("B_mass", &B_mass);
+  tree_->Branch("B_mass_woChiCnstr", &B_mass_woChiCnstr);
   tree_->Branch("B_px", &B_px);
   tree_->Branch("B_py", &B_py);
   tree_->Branch("B_pz", &B_pz);
@@ -1244,6 +1313,14 @@ JPsiKs0::beginJob()
 
   // *************************
 
+  tree_->Branch("chi_mass", &chi_mass);
+  tree_->Branch("chi_mass_c0", &chi_mass_c0);
+  tree_->Branch("chi_mass_FF", &chi_mass_FF);
+  tree_->Branch("chi_px", &chi_px);
+  tree_->Branch("chi_py", &chi_py);
+  tree_->Branch("chi_pz", &chi_pz);
+
+  // *************************
   tree_->Branch("B_J_mass", &B_J_mass);
   tree_->Branch("B_J_px", &B_J_px);
   tree_->Branch("B_J_py", &B_J_py);
@@ -1271,7 +1348,9 @@ JPsiKs0::beginJob()
 
   tree_->Branch("B_Prob",    &B_Prob);
   tree_->Branch("photon1_Prob", &photon1_Prob);
+  tree_->Branch("photon0_Prob_1", &photon0_Prob_1);
   tree_->Branch("photon2_Prob", &photon2_Prob);
+  tree_->Branch("photon0_Prob_2", &photon0_Prob_2);
   tree_->Branch("J_Prob",  &J_Prob);
 
   // *************************
@@ -1326,16 +1405,6 @@ JPsiKs0::beginJob()
   tree_->Branch("PV_bestBang_RF_XZE", &PV_bestBang_RF_XZE   );
   tree_->Branch("PV_bestBang_RF_YZE", &PV_bestBang_RF_YZE   );
   tree_->Branch("PV_bestBang_RF_CL" , &PV_bestBang_RF_CL    );
-
-  // tree_->Branch("e1dxy",&e1dxy);
-  // tree_->Branch("e2dxy",&e2dxy);
-  // tree_->Branch("e1dz",&e1dz);
-  // tree_->Branch("e2dz",&e2dz);
-  //
-  // tree_->Branch("e1dxy_e",&e1dxy_e);
-  // tree_->Branch("e2dxy_e",&e2dxy_e);
-  // tree_->Branch("e1dz_e",&e1dz_e);
-  // tree_->Branch("e2dz_e",&e2dz_e);
 
 
 }
