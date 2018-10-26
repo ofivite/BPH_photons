@@ -74,6 +74,7 @@ _MY_VARS_ = [
 # 'photon0_DS2_PV_2', 'photon0_cos2D_common_MySel_2',
 'photon0_cos2D_common_Bfinder_2',
 
+'deltaR_photons',
 
 #-----~-----
 # 'areSoft', 'areTight_def', 'areTight_HM', 'areMyGlobal',
@@ -101,7 +102,7 @@ _MY_VARS_ = [
 
 
 #-----~-----
-"chi_mass_Cjp",
+"chi_mass_Cjp", 'chi_mass_2',
 "chi_pt_Cjp", "chi_Eta_cjp", "chi_Phi_cjp",
 
 #-----~-----
@@ -317,6 +318,7 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~ Bs ~~~~~~~~~~###
 
         chi_mass_Cjp[0]          = ch.chi_mass[ibs]
+        chi_mass_2[0]          = (MUMUP4_cjp + photon_P4_0c_2).M()
         chi_pt_Cjp[0]            = chiP4_Cjp.Pt()
         chi_Phi_cjp[0]            = chiP4_Cjp.Phi()
         chi_Eta_cjp[0]            = chiP4_Cjp.Eta()
@@ -377,6 +379,7 @@ for evt in range(0, nEvt):
         photon0_cos2D_common_Bfinder_2[0] = ch.photon0_cos2D_common_2[ibs]
         # photon0_cos2D_common_MySel_2[0]  = DirectionCos2 ( photon0V_2 - PV, photon0_P3_2 )
 
+        deltaR_photons[0] = photon_P4_0c_2.DeltaR(photon_P4_0c_1)
 
         ###~~~~~~~~~~ ELECTRONS ~~~~~~~~~~###
 
