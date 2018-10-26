@@ -8,7 +8,7 @@ isMC = 0
 
 MyFileNamesMC = glob.glob( MCpath(1) + "*.root")
 # MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_10_2_5_patch1/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2018_BSG_v2_*/results/*.root")
-MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_9_4_10/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2017_cascade_v0_*/results/*.root")
+MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_9_4_10/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2017_cascade_v1_chiCnstr_*/results/*.root")
 # MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_9_4_9/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2016_BSG_v2_*/results/*.root")
 #MyFileNamesDA = glob.glob('cascade_v1_.root')
 # __aa = 0;    __bb = 5
@@ -20,7 +20,7 @@ for fName in  MyFileNames:
 
 print ('get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created')
 
-_fileOUT = 'cascade17_' + str(len(MyFileNames)) + '_of_1271_v0.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
+_fileOUT = 'cascade17_' + str(len(MyFileNames)) + '_of_1271_.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
 fileOUT  = ROOT.TFile (_fileOUT, "recreate");    mytree = ROOT.TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print ("entries: from", 0, 'to', nEvt-1);
@@ -101,7 +101,7 @@ _MY_VARS_ = [
 
 
 #-----~-----
-"chi_mass_Cjp_1", "chi_mass_Cjp_2",
+"chi_mass_Cjp",
 "chi_pt_Cjp", "chi_Eta_cjp", "chi_Phi_cjp",
 
 #-----~-----
@@ -264,10 +264,7 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~Chi~~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~#####
 
-        photon0_P4_1.SetXYZM(ch.photon_px_1[ibs], ch.photon_py_1[ibs], ch.photon_pz_1[ibs], 0. )
-        photon0_P4_2.SetXYZM(ch.photon_px_2[ibs], ch.photon_py_2[ibs], ch.photon_pz_2[ibs], 0. )
-
-        chiP4_Cjp = MUMUP4_cjp + photon0_P4_1
+        chiP4_Cjp    .SetXYZM  ( ch.chi_px[ibs], ch.chi_py[ibs], ch.chi_pz[ibs], ch.chi_mass[ibs])
 
         # if DetachSignificance2( chiV_Cjp - PV, PVE, chiVE_Cjp) < 3. :continue
 
@@ -307,7 +304,7 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~ Bs* ~~~~~~~~~~###
 
         casc_mass[0]          = ch.B_mass[ibs]
-        # casc_mass_0[0]        = ch.B_mass_woChiCnstr[ibs]
+        casc_mass_0[0]        = ch.B_mass_woChiCnstr[ibs]
         casc_pt[0]            = casc_P4.Pt()
         casc_Phi[0]            = casc_P4.Phi()
         casc_Eta[0]            = casc_P4.Eta()
@@ -319,12 +316,10 @@ for evt in range(0, nEvt):
 
         ###~~~~~~~~~~ Bs ~~~~~~~~~~###
 
-        # chi_mass_Cjp[0]          = ch.chi_mass[ibs]
-        chi_mass_Cjp_1[0]        = chiP4_Cjp.M()
-        chi_mass_Cjp_2[0]        = (MUMUP4_cjp + photon0_P4_2).M()
-        chi_pt_Cjp[0]          = chiP4_Cjp.Pt()
-        chi_Phi_cjp[0]         = chiP4_Cjp.Phi()
-        chi_Eta_cjp[0]         = chiP4_Cjp.Eta()
+        chi_mass_Cjp[0]          = ch.chi_mass[ibs]
+        chi_pt_Cjp[0]            = chiP4_Cjp.Pt()
+        chi_Phi_cjp[0]            = chiP4_Cjp.Phi()
+        chi_Eta_cjp[0]            = chiP4_Cjp.Eta()
 
 
         ###~~~~~~~~~~ PHOTON 1 ~~~~~~~~~~###
@@ -348,7 +343,7 @@ for evt in range(0, nEvt):
 
         ###~~~~~~~~~~ PHOTON 1 zero-mass constraint ~~~~~~~~~~###
 
-        # photon0_VtxProb_1[0] = ch.photon0_Prob_1[ibs]
+        photon0_VtxProb_1[0] = ch.photon0_Prob_1[ibs]
         # photon0_pt_1[0] = photon0_P4_1.Pt()
         # photon0_eta_1[0] = photon0_P4_1.Eta()
 
@@ -374,7 +369,7 @@ for evt in range(0, nEvt):
 
         ###~~~~~~~~~~ PHOTON 2 zero-mass constraint ~~~~~~~~~~###
 
-        # photon0_VtxProb_2[0] = ch.photon0_Prob_2[ibs]
+        photon0_VtxProb_2[0] = ch.photon0_Prob_2[ibs]
         # photon0_pt_2[0] = photon0_P4_2.Pt()
         # photon0_eta_2[0] = photon0_P4_2.Eta()
 
