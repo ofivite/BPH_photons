@@ -8,7 +8,7 @@ isMC = 0
 
 MyFileNamesMC = glob.glob( MCpath(1) + "*.root")
 # MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_10_2_5_patch1/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2018_BSG_v2_*/results/*.root")
-MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_9_4_10/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2017_BcK_v1_*/results/*.root")
+MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_9_4_10/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2017_BCK_v2_*/results/*.root")
 # MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_9_4_9/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2016_BSG_v2_*/results/*.root")
 #MyFileNamesDA = glob.glob('cascade_v1_.root')
 # __aa = 0;    __bb = 5
@@ -20,7 +20,7 @@ for fName in  MyFileNames:
 
 print ('get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created')
 
-_fileOUT = 'BcK_2017_' + str(len(MyFileNames)) + '_of_1271_v1_.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
+_fileOUT = 'BCK_2017_' + str(len(MyFileNames)) + '_of_1271_v2_.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
 fileOUT  = ROOT.TFile (_fileOUT, "recreate");    mytree = ROOT.TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print ("entries: from", 0, 'to', nEvt-1);
@@ -28,8 +28,8 @@ H_cuts = ROOT.TH1F("H_cuts", "H_cuts", 40, 0, 20)
 
 ###  declaration and connecting to the branches of my new variables {{{1
 NOUT, NOUT_evt, BBB, ibs = [int(0) for i in range(4)];
-PV, PVE, JPV, JPVE, JPP3, photonV_c0_1, photonVE_c0_1, B_V, B_VE, B_P3, photon0_P3_1 = [ROOT.TVector3() for i in range(11)]
-chiP4_Cjp, MU1P4_cjp, MU2P4_cjp, K_P4_cjp, photon_semi0_P4_1, photon_c0_P4_1, B_P4 = [ROOT.TLorentzVector() for i in range(7)];
+PV, PVE, JPV, JPVE, photonV_c0_1, photonVE_c0_1, B_V, B_VE, B_P3, photon0_P3_1, photon_cjp_P3_1, JPP3 = [ROOT.TVector3() for i in range(12)]
+chiP4_Cjp, MU1P4_cjp, MU2P4_cjp, K_P4_cjp, photon0_P4_1, photon_cjp_P4_1, B_P4 = [ROOT.TLorentzVector() for i in range(7)];
 # _TV3zero  = TVector3(0,0,0)
 
 _MY_VARS_ = [
@@ -50,15 +50,15 @@ _MY_VARS_ = [
 #-----~-----
 # 'phi_Bsdecay_weight',
 
-'photon_c0_VtxProb_1', 'photon_c0_mass_1', 'photon_c0_pt_1', 'photon_c0_eta_1',
-'photon_c0_DS2_common_1', 'photon_c0_DS2_PV_1', 'photon_flags_1', 'photon_c0_cos2D_common_1', 'photon_c0_cos2D_PV_1',
+'photon_c0_mass_1', 'photon_c0_VtxProb_1',
+
+'photon0_VtxProb_1', 'photon0_pt_1', 'photon0_eta_1',
+'photon_c0_DS2_common_1', 'photon_c0_DS2_PV_1', 'photon_flags_1', 'photon0_cos2D_common_1', 'photon0_cos2D_common_Bfinder_1', 'photon0_cos2D_PV_1',
 
 #-----~-----
 
-'photon0_VtxProb_1', 'photon_semi0_pt_1', 'photon_semi0_eta_1',
-# 'photon0_DS2_PV_1',
-'photon0_cos2D_common_Bfinder_1',
-# 'photon0_cos2D_common_MySel_1',
+'photon_cjp_mass_1', 'photon_cjp_pt_1', 'photon_cjp_eta_1',
+'photon_cjp_cos2D_PV_1', 'photon_cjp_cos2D_common_1',
 
 #-----~-----
 
@@ -89,8 +89,8 @@ _MY_VARS_ = [
 
 
 #-----~-----
-"chi_mass_Cjp_semi0",
-"chi_pt_Cjp_semi0", "chi_Eta_cjp_semi0", "chi_Phi_cjp_semi0",
+"chi_mass_cjp",
+"chi_pt_cjp", "chi_eta_cjp", "chi_phi_cjp",
 
 #-----~-----
 "B_mass", "B_mass_0",
@@ -200,31 +200,32 @@ for evt in range(0, nEvt):
         # e_P4_0c = e1_P4_track if ch.photon_charge1[ibs] < 0 else e2_P4_track
 
 
-        #####~~~~~~~~~~~~~~~~~~~~~~~~#####
-        ###~~~~~~~~~~Photon 1~~~~~~~~~~###
-        #####~~~~~~~~~~~~~~~~~~~~~~~~#####
+        #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
+        ###~~~~~~~~~~Photon 1 CJP~~~~~~~~~~###
+        #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
 
         photonV_c0_1     = ROOT.TVector3(ch.PhotonDecayVtxX_1[ibs],  ch.PhotonDecayVtxY_1[ibs],  ch.PhotonDecayVtxZ_1[ibs]   )
         photonVE_c0_1    = ROOT.TVector3( 0 if ch.PhotonDecayVtxXE_1[ibs] <= 0 else sqrt(ch.PhotonDecayVtxXE_1[ibs]),
                                 0 if ch.PhotonDecayVtxYE_1[ibs] <= 0 else sqrt(ch.PhotonDecayVtxYE_1[ibs]),
                                 0 if ch.PhotonDecayVtxZE_1[ibs] <= 0 else sqrt(ch.PhotonDecayVtxZE_1[ibs])  )
 
-        photon_c0_P4_1.SetXYZM(ch.photon_px_1[ibs], ch.photon_py_1[ibs], ch.photon_pz_1[ibs], ch.photon_mass_1[ibs] )
+        photon_cjp_P4_1.SetXYZM(ch.photon_px_1[ibs], ch.photon_py_1[ibs], ch.photon_pz_1[ibs], ch.photon_mass_1[ibs] )
+        photon_cjp_P3_1 = photon_cjp_P4_1.Vect()
 
 
         #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
         ###~~~~~~~~~~Photon 1 with zero-mass constraint~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
 
-        photon_semi0_P4_1.SetXYZM(ch.photon_px_1[ibs], ch.photon_py_1[ibs], ch.photon_pz_1[ibs], 0. )
-        photon0_P3_1 = photon_semi0_P4_1.Vect()
+        photon0_P4_1.SetXYZM(ch.photon0_px_1[ibs], ch.photon0_py_1[ibs], ch.photon0_pz_1[ibs], 0. )
+        photon0_P3_1 = photon0_P4_1.Vect()
 
 
         #####~~~~~~~~~~~~~~~~~~~~#####
         ###~~~~~~~~~~Chi~~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~#####
 
-        chiP4_Cjp = MUMUP4_cjp + photon_semi0_P4_1
+        chiP4_Cjp = MUMUP4_cjp + photon_cjp_P4_1
 
         # if DetachSignificance2( chiV_Cjp - PV, PVE, chiVE_Cjp) < 3. :continue
 
@@ -281,43 +282,44 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~ chi ~~~~~~~~~~###
 
         # chi_mass_Cjp[0]          = ch.chi_mass[ibs]
-        chi_mass_Cjp_semi0[0]        = chiP4_Cjp.M()
-        chi_pt_Cjp_semi0[0]          = chiP4_Cjp.Pt()
-        chi_Phi_cjp_semi0[0]         = chiP4_Cjp.Phi()
-        chi_Eta_cjp_semi0[0]         = chiP4_Cjp.Eta()
+        chi_mass_cjp[0]        = chiP4_Cjp.M()
+        chi_pt_cjp[0]          = chiP4_Cjp.Pt()
+        chi_phi_cjp[0]         = chiP4_Cjp.Phi()
+        chi_eta_cjp[0]         = chiP4_Cjp.Eta()
 
 
-        ###~~~~~~~~~~ PHOTON 1 ~~~~~~~~~~###
+        ###~~~~~~~~~~ PHOTON ~~~~~~~~~~###
 
         photon_c0_VtxProb_1[0] = ch.photon1_Prob[ibs]
-        photon_c0_mass_1[0] = ch.photon_mass_1[ibs]
-        photon_c0_pt_1[0] = photon_c0_P4_1.Pt()
-        photon_c0_eta_1[0] = photon_c0_P4_1.Eta()
+        photon_c0_mass_1[0] = ch.photon_c0_mass_1[ibs]
 
-        photon_c0_DS2_PV_1[0] = DetachSignificance2(photonV_c0_1 - PV, PVE, photonVE_c0_1)
+        #-----~-----
+        photon_cjp_mass_1[0] = ch.photon_mass_1[ibs]
+        photon_cjp_pt_1[0] = photon_cjp_P4_1.Pt()
+        photon_cjp_eta_1[0] = photon_cjp_P4_1.Eta()
+
+        photon_cjp_cos2D_common_1[0]    = DirectionCos2 ( photonV_c0_1 - B_V, photon_cjp_P3_1 )
+        photon_cjp_cos2D_PV_1[0]        = DirectionCos2 ( photonV_c0_1 - PV, photon_cjp_P3_1 )
+
+        #-----~-----
+
+        photon0_VtxProb_1[0] = ch.photon0_Prob_1[ibs]
+        photon0_pt_1[0] = photon0_P4_1.Pt()
+        photon0_eta_1[0] = photon0_P4_1.Eta()
+
+        photon0_cos2D_common_Bfinder_1[0] = ch.photon0_cos2D_common_1[ibs]
+        photon0_cos2D_common_1[0]    = DirectionCos2 ( photonV_c0_1 - B_V, photon0_P3_1 )
+        photon0_cos2D_PV_1[0]        = DirectionCos2 ( photonV_c0_1 - PV, photon0_P3_1 )
+
         photon_c0_DS2_common_1[0] = DetachSignificance2(photonV_c0_1 - B_V, B_VE, photonVE_c0_1)
+        photon_c0_DS2_PV_1[0] = DetachSignificance2(photonV_c0_1 - PV, PVE, photonVE_c0_1)
 
         photon_flags_1[0] = int("{0:b}".format(ch.photon_flags_1[ibs]))
-        # phi_Bsdecay_weight[0] = ch.phi_Bsdecay_weight[ibs]
-        photon_c0_cos2D_common_1[0]    = DirectionCos2 ( photonV_c0_1 - B_V, photon0_P3_1 )
-        photon_c0_cos2D_PV_1[0]        = DirectionCos2 ( photonV_c0_1 - PV, photon0_P3_1 )
-
 
         ###~~~~~~~~~~ KAON ~~~~~~~~~~###
 
         K_pt_cjp[0] = K_P4_cjp.Pt()
         K_eta_cjp[0] = K_P4_cjp.Eta()
-
-
-        ###~~~~~~~~~~ PHOTON 1 zero-mass constraint ~~~~~~~~~~###
-
-        photon0_VtxProb_1[0] = ch.photon0_Prob_1[ibs]
-
-        # photon0_DS2_PV_1[0] = DetachSignificance2(photon0V_1 - PV, PVE, photon0VE_1)
-        photon0_cos2D_common_Bfinder_1[0] = ch.photon0_cos2D_common_1[ibs]
-        # photon0_cos2D_common_MySel_1[0]  = DirectionCos2 ( photon0V_1 - PV, photon0_P3_1 )
-        photon_semi0_pt_1[0]  =  photon_semi0_P4_1.Pt()
-        photon_semi0_eta_1[0] =  photon_semi0_P4_1.Eta()
 
 
         ###~~~~~~~~~~ ELECTRONS ~~~~~~~~~~###
