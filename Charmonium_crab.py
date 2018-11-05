@@ -41,7 +41,7 @@ if __name__ == '__main__':
     import sys
     from CRABAPI.RawCommand import crabCommand
     from httplib import HTTPException
-    task = '2017_BcK_v1'
+    task = '2017_BCK_v2'
     ####
     ## MY: b1 == Bc+ --> J/psi pi+
     ##      x1 = Xi-    -> Lambda pi

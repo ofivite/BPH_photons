@@ -114,6 +114,7 @@ JPsiKaon::JPsiKaon(const edm::ParameterSet& iConfig)
 
   // *******************************************************
 
+  photon_c0_mass_1(0), photon0_px_1(0), photon0_py_1(0), photon0_pz_1(0),
   photon_mass_1(0), photon_px_1(0), photon_py_1(0), photon_pz_1(0),
   photon_flags_1(0), photon0_cos2D_common_1(0),
 
@@ -323,22 +324,16 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    continue;
 	  }
 
-	  if (!psiVertexFitTree->isValid())
-	    {
-	      //std::cout << "caught an exception in the psi vertex fit" << std::endl;
-	      continue;
-	    }
+	  if (!psiVertexFitTree->isValid())  continue;
 
 	  psiVertexFitTree->movePointerToTheTop();
 
 	  RefCountedKinematicParticle psi_vFit_noMC = psiVertexFitTree->currentParticle();
 	  RefCountedKinematicVertex psi_vFit_vertex_noMC = psiVertexFitTree->currentDecayVertex();
 
-	  if( psi_vFit_vertex_noMC->chiSquared() < 0 )
-	    {
-	      //std::cout << "negative chisq from psi fit" << endl;
-	      continue;
-	    }
+    if (!psi_vFit_noMC->currentState().isValid()) continue;
+    if (!psi_vFit_vertex_noMC->vertexIsValid())  continue;
+	  if( psi_vFit_vertex_noMC->chiSquared() < 0 ) continue;
 
 	  //some loose cuts go here
 
@@ -502,10 +497,8 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 		    RefCountedKinematicParticle bCandMC = vertexFitTree->currentParticle();
 		    RefCountedKinematicVertex bDecayVertexMC = vertexFitTree->currentDecayVertex();
-		    if (!bDecayVertexMC->vertexIsValid()){
-		      // cout << "B MC fit vertex is not valid" << endl;
-		      continue;
-		    }
+        if (!bCandMC->currentState().isValid()) continue;
+        if (!bDecayVertexMC->vertexIsValid())  continue;
 
 		    if ( (bCandMC->currentState().mass() < 5.0) || (bCandMC->currentState().mass() > 5.6) ) {
 		      continue;
@@ -559,13 +552,20 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 		    vertexFitTree->movePointerToTheFirstChild();
 		    RefCountedKinematicParticle mu1CandMC = vertexFitTree->currentParticle();
+        if (!mu1CandMC->currentState().isValid()) continue;
 
 		    vertexFitTree->movePointerToTheNextChild();
 		    RefCountedKinematicParticle mu2CandMC = vertexFitTree->currentParticle();
+        if (!mu2CandMC->currentState().isValid()) continue;
 
 
-		   vertexFitTree->movePointerToTheNextChild();
-		   RefCountedKinematicParticle kCandMC = vertexFitTree->currentParticle();
+		    vertexFitTree->movePointerToTheNextChild();
+		    RefCountedKinematicParticle kCandMC = vertexFitTree->currentParticle();
+        if (!kCandMC->currentState().isValid()) continue;
+
+        vertexFitTree->movePointerToTheNextChild();
+		    RefCountedKinematicParticle photonCandMC = vertexFitTree->currentParticle();
+        if (!photonCandMC->currentState().isValid()) continue;
 
 		   KinematicParameters psiMu1KP = mu1CandMC->currentState().kinematicParameters();
 		   KinematicParameters psiMu2KP = mu2CandMC->currentState().kinematicParameters();
@@ -587,6 +587,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
  				       mu2CandMC->currentState().globalMomentum().z());
 
 		   KinematicParameters VCandKP = kCandMC->currentState().kinematicParameters();
+       KinematicParameters photonCandKP = photonCandMC->currentState().kinematicParameters();
 
        ///
        GlobalVector photon_p1_vec_1(T1CandMC_1->currentState().globalMomentum().x(),
@@ -641,10 +642,16 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   B_J_pz2->push_back(psiMu2KP.momentum().z());
 		   B_J_charge2->push_back(mu2CandMC->currentState().particleCharge());
 
-       photon_mass_1->push_back( photon_vFit_noMC_1->currentState().mass() );
-       photon_px_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().x() );
-       photon_py_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().y() );
-       photon_pz_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().z() );
+       photon_c0_mass_1->push_back( photon_vFit_noMC_1->currentState().mass() );
+
+       photon0_px_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().x() );
+       photon0_py_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().y() );
+       photon0_pz_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().z() );
+
+       photon_mass_1->push_back( photonCandMC->currentState().mass() );
+       photon_px_1->push_back( photonCandKP.momentum().x() );
+       photon_py_1->push_back( photonCandKP.momentum().y() );
+       photon_pz_1->push_back( photonCandKP.momentum().z() );
        photon_flags_1->push_back( iPhoton1->userInt("flags") );
        photon0_cos2D_common_1->push_back( cos2D_gamma0_common_1 );
 
@@ -805,6 +812,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    B_J_pt1->clear();  B_J_px1->clear();  B_J_py1->clear();  B_J_pz1->clear(), B_J_charge1->clear();
    B_J_pt2->clear();  B_J_px2->clear();  B_J_py2->clear();  B_J_pz2->clear(), B_J_charge2->clear();
 
+   photon_c0_mass_1->clear(); photon0_px_1->clear(); photon0_py_1->clear(); photon0_pz_1->clear();
    photon_mass_1->clear(); photon_px_1->clear(); photon_py_1->clear(); photon_pz_1->clear();
    photon_flags_1->clear(); photon0_cos2D_common_1->clear();
 
@@ -912,6 +920,10 @@ JPsiKaon::beginJob()
   tree_->Branch("B_J_charge2", &B_J_charge2);
 
   // *************************
+  tree_->Branch("photon_c0_mass_1", &photon_c0_mass_1);
+  tree_->Branch("photon0_px_1", &photon0_px_1);
+  tree_->Branch("photon0_py_1", &photon0_py_1);
+  tree_->Branch("photon0_pz_1", &photon0_pz_1);
 
   tree_->Branch("photon_mass_1", &photon_mass_1);
   tree_->Branch("photon_px_1", &photon_px_1);
