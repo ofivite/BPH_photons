@@ -732,8 +732,8 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
            e2Cand->currentState().globalMomentum().y(),
            e2Cand->currentState().globalMomentum().z());
 
-        KinematicParameters photon_e1KP = e1Cand->currentState().kinematicParameters();
-        KinematicParameters photon_e2KP = e2Cand->currentState().kinematicParameters();
+        // KinematicParameters photon_e1KP = e1Cand->currentState().kinematicParameters();
+        // KinematicParameters photon_e2KP = e2Cand->currentState().kinematicParameters();
 
 
 
@@ -775,227 +775,227 @@ void JPsiphi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   } // end nB==0
 
 
-       B_mass->push_back(p4chi.M());
-       B_px->push_back(p4chi.Px());
-       B_py->push_back(p4chi.Py());
-       B_pz->push_back(p4chi.Pz());
-      //  B_cos2D_PV->push_back(cos2D_Bs_PV);
-
-       Bstar_mass->push_back(Bstar_vFit->currentState().mass());
-       Bstar_px->push_back(Bstar_vFit->currentState().globalMomentum().x());
-       Bstar_py->push_back(Bstar_vFit->currentState().globalMomentum().y());
-       Bstar_pz->push_back(Bstar_vFit->currentState().globalMomentum().z());
-
-       photon_mass->push_back( photon_vFit_noMC->currentState().mass() );
-       photon_px->push_back( photon_vFit_noMC->currentState().globalMomentum().x() );
-       photon_py->push_back( photon_vFit_noMC->currentState().globalMomentum().y() );
-       photon_pz->push_back( photon_vFit_noMC->currentState().globalMomentum().z() );
-       photon_flags->push_back( iPhoton->userInt("flags") );
-
-       photon0_mass->push_back( photonCandMC->currentState().mass() );
-       photon0_px->push_back( photonCandMC->currentState().globalMomentum().x() );
-       photon0_py->push_back( photonCandMC->currentState().globalMomentum().y() );
-       photon0_pz->push_back( photonCandMC->currentState().globalMomentum().z() );
-      //  photon0_cos2D_PV->push_back( cos2D_gamma_PV );
-
-       B_J_mass->push_back( psi_vFit_noMC->currentState().mass() );
-       B_J_px->push_back( psi_vFit_noMC->currentState().globalMomentum().x() );
-       B_J_py->push_back( psi_vFit_noMC->currentState().globalMomentum().y() );
-       B_J_pz->push_back( psi_vFit_noMC->currentState().globalMomentum().z() );
-
-       photon_pt1->push_back(photon_p1_vec.perp());
-       photon_px1->push_back(photon_e1KP.momentum().x());
-       photon_py1->push_back(photon_e1KP.momentum().y());
-       photon_pz1->push_back(photon_e1KP.momentum().z());
-       photon_px1_track->push_back(e1_track->px());
-       photon_py1_track->push_back(e1_track->py());
-       photon_pz1_track->push_back(e1_track->pz());
-       photon_charge1->push_back(e1Cand->currentState().particleCharge());
-       photon1_track_normchi2  ->push_back(e1_track->normalizedChi2());
-       photon1_Hits       ->push_back(e1_track->numberOfValidHits() );
-       photon1_PHits      ->push_back(e1_track->hitPattern().numberOfValidPixelHits() );
-       photon1_NTrackerLayers->push_back ( e1_track->hitPattern().trackerLayersWithMeasurement() );
-       photon1_NPixelLayers->push_back ( e1_track->hitPattern().pixelLayersWithMeasurement() );
-
-       photon_pt2->push_back(photon_p2_vec.perp());
-       photon_px2->push_back(photon_e2KP.momentum().x());
-       photon_py2->push_back(photon_e2KP.momentum().y());
-       photon_pz2->push_back(photon_e2KP.momentum().z());
-       photon_px2_track->push_back(e2_track->px());
-       photon_py2_track->push_back(e2_track->py());
-       photon_pz2_track->push_back(e2_track->pz());
-       photon_charge2->push_back(e2Cand->currentState().particleCharge());
-       photon2_track_normchi2  ->push_back(e2_track->normalizedChi2());
-       photon2_Hits       ->push_back(e2_track->numberOfValidHits() );
-       photon2_PHits      ->push_back(e2_track->hitPattern().numberOfValidPixelHits() );
-       photon2_NTrackerLayers->push_back ( e2_track->hitPattern().trackerLayersWithMeasurement() );
-       photon2_NPixelLayers->push_back ( e2_track->hitPattern().pixelLayersWithMeasurement() );
-
-       B_J_pt1->push_back(Jp1vec.perp());
-       B_J_px1->push_back(psiMu1KP_CF.momentum().x());
-       B_J_py1->push_back(psiMu1KP_CF.momentum().y());
-       B_J_pz1->push_back(psiMu1KP_CF.momentum().z());
-       B_J_charge1->push_back(mu1CandMC->currentState().particleCharge());
-
-       B_J_pt2->push_back(Jp2vec.perp());
-       B_J_px2->push_back(psiMu2KP_CF.momentum().x());
-       B_J_py2->push_back(psiMu2KP_CF.momentum().y());
-       B_J_pz2->push_back(psiMu2KP_CF.momentum().z());
-       B_J_charge2->push_back(mu2CandMC->currentState().particleCharge());
-
-       photon_chi2->push_back(photon_vFit_vertex_noMC->chiSquared());
-       J_chi2->push_back(psi_vFit_vertex_noMC->chiSquared());
-      //  B_chi2->push_back(bDecayVertexMC->chiSquared());
-
-      //  B_Prob    ->push_back(B_Prob_tmp);
-       J_Prob  ->push_back(J_Prob_tmp);
-       photon_Prob ->push_back(photon_Prob_tmp);
-       photon0_Prob ->push_back(TMath::Prob(photon_vFit_vertex_withMC->chiSquared(),(int)photon_vFit_vertex_withMC->degreesOfFreedom()));
-       Bstar_Prob -> push_back(Bstar_Prob_tmp);
-
-     // ************
-      //  bDecayVtxX->push_back((*bDecayVertexMC).position().x());
-      //  bDecayVtxY->push_back((*bDecayVertexMC).position().y());
-      //  bDecayVtxZ->push_back((*bDecayVertexMC).position().z());
-      //  bDecayVtxXE->push_back(bDecayVertexMC->error().cxx());
-      //  bDecayVtxYE->push_back(bDecayVertexMC->error().cyy());
-      //  bDecayVtxZE->push_back(bDecayVertexMC->error().czz());
-      //  bDecayVtxXYE->push_back(bDecayVertexMC->error().cyx());
-      //  bDecayVtxXZE->push_back(bDecayVertexMC->error().czx());
-      //  bDecayVtxYZE->push_back(bDecayVertexMC->error().czy());
-
-       psiDecayVtxX->push_back((*psi_vFit_vertex_noMC).position().x());
-       psiDecayVtxY->push_back((*psi_vFit_vertex_noMC).position().y());
-       psiDecayVtxZ->push_back((*psi_vFit_vertex_noMC).position().z());
-       psiDecayVtxXE->push_back(psi_vFit_vertex_noMC->error().cxx());
-       psiDecayVtxYE->push_back(psi_vFit_vertex_noMC->error().cyy());
-       psiDecayVtxZE->push_back(psi_vFit_vertex_noMC->error().czz());
-       psiDecayVtxXYE->push_back(psi_vFit_vertex_noMC->error().cyx());
-       psiDecayVtxXZE->push_back(psi_vFit_vertex_noMC->error().czx());
-       psiDecayVtxYZE->push_back(psi_vFit_vertex_noMC->error().czy());
-
-       PhotonDecayVtxX->push_back( photon_vFit_vertex_noMC->position().x() );
-       PhotonDecayVtxY->push_back( photon_vFit_vertex_noMC->position().y() );
-       PhotonDecayVtxZ->push_back( photon_vFit_vertex_noMC->position().z() );
-       PhotonDecayVtxXE->push_back( photon_vFit_vertex_noMC->error().cxx() );
-       PhotonDecayVtxYE->push_back( photon_vFit_vertex_noMC->error().cyy() );
-       PhotonDecayVtxZE->push_back( photon_vFit_vertex_noMC->error().czz() );
-       PhotonDecayVtxXYE->push_back( photon_vFit_vertex_noMC->error().cyx() );
-       PhotonDecayVtxXZE->push_back( photon_vFit_vertex_noMC->error().czx() );
-       PhotonDecayVtxYZE->push_back( photon_vFit_vertex_noMC->error().czy() );
-
-       PV_bestBang_RF_X ->push_back(    bestVtxRf.x() );
-       PV_bestBang_RF_Y ->push_back(    bestVtxRf.y() );
-       PV_bestBang_RF_Z ->push_back(    bestVtxRf.z() );
-       PV_bestBang_RF_XE->push_back(    bestVtxRf.covariance(0, 0) );
-       PV_bestBang_RF_YE->push_back(    bestVtxRf.covariance(1, 1) );
-       PV_bestBang_RF_ZE->push_back(    bestVtxRf.covariance(2, 2) );
-       PV_bestBang_RF_XYE->push_back(   bestVtxRf.covariance(0, 1) );
-       PV_bestBang_RF_XZE->push_back(   bestVtxRf.covariance(0, 2) );
-       PV_bestBang_RF_YZE->push_back(   bestVtxRf.covariance(1, 2) );
-       PV_bestBang_RF_CL->push_back(    ChiSquaredProbability((double)(bestVtxRf.chi2()),(double)(bestVtxRf.ndof())) );
-
-       bStarDecayVtxX->push_back((*Bstar_vFit_vertex).position().x());
-       bStarDecayVtxY->push_back((*Bstar_vFit_vertex).position().y());
-       bStarDecayVtxZ->push_back((*Bstar_vFit_vertex).position().z());
-       bStarDecayVtxXE->push_back(Bstar_vFit_vertex->error().cxx());
-       bStarDecayVtxYE->push_back(Bstar_vFit_vertex->error().cyy());
-       bStarDecayVtxZE->push_back(Bstar_vFit_vertex->error().czz());
-       bStarDecayVtxXYE->push_back(Bstar_vFit_vertex->error().cyx());
-       bStarDecayVtxXZE->push_back(Bstar_vFit_vertex->error().czx());
-       bStarDecayVtxYZE->push_back(Bstar_vFit_vertex->error().czy());
-
-       Photon0DecayVtxX->push_back( photon_vFit_vertex_withMC->position().x() );
-       Photon0DecayVtxY->push_back( photon_vFit_vertex_withMC->position().y() );
-       Photon0DecayVtxZ->push_back( photon_vFit_vertex_withMC->position().z() );
-       Photon0DecayVtxXE->push_back( photon_vFit_vertex_withMC->error().cxx() );
-       Photon0DecayVtxYE->push_back( photon_vFit_vertex_withMC->error().cyy() );
-       Photon0DecayVtxZE->push_back( photon_vFit_vertex_withMC->error().czz() );
-       Photon0DecayVtxXYE->push_back( photon_vFit_vertex_withMC->error().cyx() );
-       Photon0DecayVtxXZE->push_back( photon_vFit_vertex_withMC->error().czx() );
-       Photon0DecayVtxYZE->push_back( photon_vFit_vertex_withMC->error().czy() );
-
-  // ********************* muon-trigger-machint****************
-
-//       const pat::TriggerObjectStandAloneCollection muHLTMatches1_t1 = iMuon1->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
-//       const pat::TriggerObjectStandAloneCollection muHLTMatches2_t1 = iMuon2->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
+//        B_mass->push_back(p4chi.M());
+//        B_px->push_back(p4chi.Px());
+//        B_py->push_back(p4chi.Py());
+//        B_pz->push_back(p4chi.Pz());
+//       //  B_cos2D_PV->push_back(cos2D_Bs_PV);
 //
-//       const pat::TriggerObjectStandAloneCollection muHLTMatches1_t2 = iMuon1->triggerObjectMatchesByFilter("hltJpsiTkVertexFilter");
-//       const pat::TriggerObjectStandAloneCollection muHLTMatches2_t2 = iMuon2->triggerObjectMatchesByFilter("hltJpsiTkVertexFilter");
+//        Bstar_mass->push_back(Bstar_vFit->currentState().mass());
+//        Bstar_px->push_back(Bstar_vFit->currentState().globalMomentum().x());
+//        Bstar_py->push_back(Bstar_vFit->currentState().globalMomentum().y());
+//        Bstar_pz->push_back(Bstar_vFit->currentState().globalMomentum().z());
 //
-//       const pat::TriggerObjectStandAloneCollection muHLTMatches1_t4 = iMuon1->triggerObjectMatchesByFilter("hltJpsiTkTkVertexFilterPhiKstar");
-//       const pat::TriggerObjectStandAloneCollection muHLTMatches2_t4 = iMuon2->triggerObjectMatchesByFilter("hltJpsiTkTkVertexFilterPhiKstar");
-
-       int tri_Dim25_tmp = 0, tri_JpsiTk_tmp = 0,  tri_JpsiTkTk_tmp = 0;
-
-//       if (muHLTMatches1_t1.size() > 0 && muHLTMatches2_t1.size() > 0) tri_Dim25_tmp = 1;
-//       if (muHLTMatches1_t2.size() > 0 && muHLTMatches2_t2.size() > 0) tri_JpsiTk_tmp = 1;
-//       if (muHLTMatches1_t4.size() > 0 && muHLTMatches2_t4.size() > 0) tri_JpsiTkTk_tmp = 1;
-
-       tri_Dim25->push_back( tri_Dim25_tmp );
-       tri_JpsiTk->push_back( tri_JpsiTk_tmp );
-       tri_JpsiTkTk->push_back( tri_JpsiTkTk_tmp );
-
-     // ************
-
-       mu1soft->push_back(iMuon1->isSoftMuon(bestVtx) );
-       mu2soft->push_back(iMuon2->isSoftMuon(bestVtx) );
-       mu1tight->push_back(iMuon1->isTightMuon(bestVtx) );
-       mu2tight->push_back(iMuon2->isTightMuon(bestVtx) );
-       mu1PF->push_back(iMuon1->isPFMuon());
-       mu2PF->push_back(iMuon2->isPFMuon());
-       mu1loose->push_back(muon::isLooseMuon(*iMuon1));
-       mu2loose->push_back(muon::isLooseMuon(*iMuon2));
-       mu1_mvaValue->push_back(iMuon1->mvaValue());
-       mu2_mvaValue->push_back(iMuon2->mvaValue());
-
-       mumC2->push_back( glbTrackM->normalizedChi2() );
-       mumNHits->push_back( glbTrackM->numberOfValidHits() );
-       mumNPHits->push_back( glbTrackM->hitPattern().numberOfValidPixelHits() );
-       mupC2->push_back( glbTrackP->normalizedChi2() );
-       mupNHits->push_back( glbTrackP->numberOfValidHits() );
-       mupNPHits->push_back( glbTrackP->hitPattern().numberOfValidPixelHits() );
-       mumdxy->push_back(glbTrackM->dxy(bestVtx.position()) );
-       mupdxy->push_back(glbTrackP->dxy(bestVtx.position()) );
-       mumdz->push_back(glbTrackM->dz(bestVtx.position()) );
-       mupdz->push_back(glbTrackP->dz(bestVtx.position()) );
-
-
-
-/////////////////////////////////////////
-
-	           // You can get the momentum components (for muons and kaon) from the final B childrens or of the original Tracks. Here, a example for the kaons:
-		   B_phi_px1->push_back(phiPi1KP_CF.momentum().x());
-		   B_phi_py1->push_back(phiPi1KP_CF.momentum().y());
-		   B_phi_pz1->push_back(phiPi1KP_CF.momentum().z());
-		   B_phi_px1_track->push_back(iTrack1->px());
-		   B_phi_py1_track->push_back(iTrack1->py());
-		   B_phi_pz1_track->push_back(iTrack1->pz());
-		   B_phi_charge1->push_back(T1CandMC->currentState().particleCharge());
-
-		   B_phi_px2->push_back(phiPi2KP_CF.momentum().x());
-		   B_phi_py2->push_back(phiPi2KP_CF.momentum().y());
-		   B_phi_pz2->push_back(phiPi2KP_CF.momentum().z());
-		   B_phi_px2_track->push_back(iTrack2->px());
-		   B_phi_py2_track->push_back(iTrack2->py());
-		   B_phi_pz2_track->push_back(iTrack2->pz());
-		   B_phi_charge2->push_back(T2CandMC->currentState().particleCharge());
-
-		   k1dxy->push_back(iTrack1->dxy());
-		   k2dxy->push_back(iTrack2->dxy());
-		   k1dz->push_back(iTrack1->dz());
-		   k2dz->push_back(iTrack2->dz());
-
-		   k1dxy_e->push_back(iTrack1->dxyError());
-		   k2dxy_e->push_back(iTrack2->dxyError());
-		   k1dz_e->push_back(iTrack1->dzError());
-		   k2dz_e->push_back(iTrack2->dzError());
-
-		   k1InnerHits->push_back(iTrack1->lostInnerHits());
-		   k2InnerHits->push_back(iTrack2->lostInnerHits());
-
-       k1_pdgID->push_back(iTrack1->pdgId());
-		   k2_pdgID->push_back(iTrack2->pdgId());
+//        photon_mass->push_back( photon_vFit_noMC->currentState().mass() );
+//        photon_px->push_back( photon_vFit_noMC->currentState().globalMomentum().x() );
+//        photon_py->push_back( photon_vFit_noMC->currentState().globalMomentum().y() );
+//        photon_pz->push_back( photon_vFit_noMC->currentState().globalMomentum().z() );
+//        photon_flags->push_back( iPhoton->userInt("flags") );
+//
+//        photon0_mass->push_back( photonCandMC->currentState().mass() );
+//        photon0_px->push_back( photonCandMC->currentState().globalMomentum().x() );
+//        photon0_py->push_back( photonCandMC->currentState().globalMomentum().y() );
+//        photon0_pz->push_back( photonCandMC->currentState().globalMomentum().z() );
+//       //  photon0_cos2D_PV->push_back( cos2D_gamma_PV );
+//
+//        B_J_mass->push_back( psi_vFit_noMC->currentState().mass() );
+//        B_J_px->push_back( psi_vFit_noMC->currentState().globalMomentum().x() );
+//        B_J_py->push_back( psi_vFit_noMC->currentState().globalMomentum().y() );
+//        B_J_pz->push_back( psi_vFit_noMC->currentState().globalMomentum().z() );
+//
+//        photon_pt1->push_back(photon_p1_vec.perp());
+//        photon_px1->push_back(photon_e1KP.momentum().x());
+//        photon_py1->push_back(photon_e1KP.momentum().y());
+//        photon_pz1->push_back(photon_e1KP.momentum().z());
+//        photon_px1_track->push_back(e1_track->px());
+//        photon_py1_track->push_back(e1_track->py());
+//        photon_pz1_track->push_back(e1_track->pz());
+//        photon_charge1->push_back(e1Cand->currentState().particleCharge());
+//        photon1_track_normchi2  ->push_back(e1_track->normalizedChi2());
+//        photon1_Hits       ->push_back(e1_track->numberOfValidHits() );
+//        photon1_PHits      ->push_back(e1_track->hitPattern().numberOfValidPixelHits() );
+//        photon1_NTrackerLayers->push_back ( e1_track->hitPattern().trackerLayersWithMeasurement() );
+//        photon1_NPixelLayers->push_back ( e1_track->hitPattern().pixelLayersWithMeasurement() );
+//
+//        photon_pt2->push_back(photon_p2_vec.perp());
+//        photon_px2->push_back(photon_e2KP.momentum().x());
+//        photon_py2->push_back(photon_e2KP.momentum().y());
+//        photon_pz2->push_back(photon_e2KP.momentum().z());
+//        photon_px2_track->push_back(e2_track->px());
+//        photon_py2_track->push_back(e2_track->py());
+//        photon_pz2_track->push_back(e2_track->pz());
+//        photon_charge2->push_back(e2Cand->currentState().particleCharge());
+//        photon2_track_normchi2  ->push_back(e2_track->normalizedChi2());
+//        photon2_Hits       ->push_back(e2_track->numberOfValidHits() );
+//        photon2_PHits      ->push_back(e2_track->hitPattern().numberOfValidPixelHits() );
+//        photon2_NTrackerLayers->push_back ( e2_track->hitPattern().trackerLayersWithMeasurement() );
+//        photon2_NPixelLayers->push_back ( e2_track->hitPattern().pixelLayersWithMeasurement() );
+//
+//        B_J_pt1->push_back(Jp1vec.perp());
+//        B_J_px1->push_back(psiMu1KP_CF.momentum().x());
+//        B_J_py1->push_back(psiMu1KP_CF.momentum().y());
+//        B_J_pz1->push_back(psiMu1KP_CF.momentum().z());
+//        B_J_charge1->push_back(mu1CandMC->currentState().particleCharge());
+//
+//        B_J_pt2->push_back(Jp2vec.perp());
+//        B_J_px2->push_back(psiMu2KP_CF.momentum().x());
+//        B_J_py2->push_back(psiMu2KP_CF.momentum().y());
+//        B_J_pz2->push_back(psiMu2KP_CF.momentum().z());
+//        B_J_charge2->push_back(mu2CandMC->currentState().particleCharge());
+//
+//        photon_chi2->push_back(photon_vFit_vertex_noMC->chiSquared());
+//        J_chi2->push_back(psi_vFit_vertex_noMC->chiSquared());
+//       //  B_chi2->push_back(bDecayVertexMC->chiSquared());
+//
+//       //  B_Prob    ->push_back(B_Prob_tmp);
+//        J_Prob  ->push_back(J_Prob_tmp);
+//        photon_Prob ->push_back(photon_Prob_tmp);
+//        photon0_Prob ->push_back(TMath::Prob(photon_vFit_vertex_withMC->chiSquared(),(int)photon_vFit_vertex_withMC->degreesOfFreedom()));
+//        Bstar_Prob -> push_back(Bstar_Prob_tmp);
+//
+//      // ************
+//       //  bDecayVtxX->push_back((*bDecayVertexMC).position().x());
+//       //  bDecayVtxY->push_back((*bDecayVertexMC).position().y());
+//       //  bDecayVtxZ->push_back((*bDecayVertexMC).position().z());
+//       //  bDecayVtxXE->push_back(bDecayVertexMC->error().cxx());
+//       //  bDecayVtxYE->push_back(bDecayVertexMC->error().cyy());
+//       //  bDecayVtxZE->push_back(bDecayVertexMC->error().czz());
+//       //  bDecayVtxXYE->push_back(bDecayVertexMC->error().cyx());
+//       //  bDecayVtxXZE->push_back(bDecayVertexMC->error().czx());
+//       //  bDecayVtxYZE->push_back(bDecayVertexMC->error().czy());
+//
+//        psiDecayVtxX->push_back((*psi_vFit_vertex_noMC).position().x());
+//        psiDecayVtxY->push_back((*psi_vFit_vertex_noMC).position().y());
+//        psiDecayVtxZ->push_back((*psi_vFit_vertex_noMC).position().z());
+//        psiDecayVtxXE->push_back(psi_vFit_vertex_noMC->error().cxx());
+//        psiDecayVtxYE->push_back(psi_vFit_vertex_noMC->error().cyy());
+//        psiDecayVtxZE->push_back(psi_vFit_vertex_noMC->error().czz());
+//        psiDecayVtxXYE->push_back(psi_vFit_vertex_noMC->error().cyx());
+//        psiDecayVtxXZE->push_back(psi_vFit_vertex_noMC->error().czx());
+//        psiDecayVtxYZE->push_back(psi_vFit_vertex_noMC->error().czy());
+//
+//        PhotonDecayVtxX->push_back( photon_vFit_vertex_noMC->position().x() );
+//        PhotonDecayVtxY->push_back( photon_vFit_vertex_noMC->position().y() );
+//        PhotonDecayVtxZ->push_back( photon_vFit_vertex_noMC->position().z() );
+//        PhotonDecayVtxXE->push_back( photon_vFit_vertex_noMC->error().cxx() );
+//        PhotonDecayVtxYE->push_back( photon_vFit_vertex_noMC->error().cyy() );
+//        PhotonDecayVtxZE->push_back( photon_vFit_vertex_noMC->error().czz() );
+//        PhotonDecayVtxXYE->push_back( photon_vFit_vertex_noMC->error().cyx() );
+//        PhotonDecayVtxXZE->push_back( photon_vFit_vertex_noMC->error().czx() );
+//        PhotonDecayVtxYZE->push_back( photon_vFit_vertex_noMC->error().czy() );
+//
+//        PV_bestBang_RF_X ->push_back(    bestVtxRf.x() );
+//        PV_bestBang_RF_Y ->push_back(    bestVtxRf.y() );
+//        PV_bestBang_RF_Z ->push_back(    bestVtxRf.z() );
+//        PV_bestBang_RF_XE->push_back(    bestVtxRf.covariance(0, 0) );
+//        PV_bestBang_RF_YE->push_back(    bestVtxRf.covariance(1, 1) );
+//        PV_bestBang_RF_ZE->push_back(    bestVtxRf.covariance(2, 2) );
+//        PV_bestBang_RF_XYE->push_back(   bestVtxRf.covariance(0, 1) );
+//        PV_bestBang_RF_XZE->push_back(   bestVtxRf.covariance(0, 2) );
+//        PV_bestBang_RF_YZE->push_back(   bestVtxRf.covariance(1, 2) );
+//        PV_bestBang_RF_CL->push_back(    ChiSquaredProbability((double)(bestVtxRf.chi2()),(double)(bestVtxRf.ndof())) );
+//
+//        bStarDecayVtxX->push_back((*Bstar_vFit_vertex).position().x());
+//        bStarDecayVtxY->push_back((*Bstar_vFit_vertex).position().y());
+//        bStarDecayVtxZ->push_back((*Bstar_vFit_vertex).position().z());
+//        bStarDecayVtxXE->push_back(Bstar_vFit_vertex->error().cxx());
+//        bStarDecayVtxYE->push_back(Bstar_vFit_vertex->error().cyy());
+//        bStarDecayVtxZE->push_back(Bstar_vFit_vertex->error().czz());
+//        bStarDecayVtxXYE->push_back(Bstar_vFit_vertex->error().cyx());
+//        bStarDecayVtxXZE->push_back(Bstar_vFit_vertex->error().czx());
+//        bStarDecayVtxYZE->push_back(Bstar_vFit_vertex->error().czy());
+//
+//        Photon0DecayVtxX->push_back( photon_vFit_vertex_withMC->position().x() );
+//        Photon0DecayVtxY->push_back( photon_vFit_vertex_withMC->position().y() );
+//        Photon0DecayVtxZ->push_back( photon_vFit_vertex_withMC->position().z() );
+//        Photon0DecayVtxXE->push_back( photon_vFit_vertex_withMC->error().cxx() );
+//        Photon0DecayVtxYE->push_back( photon_vFit_vertex_withMC->error().cyy() );
+//        Photon0DecayVtxZE->push_back( photon_vFit_vertex_withMC->error().czz() );
+//        Photon0DecayVtxXYE->push_back( photon_vFit_vertex_withMC->error().cyx() );
+//        Photon0DecayVtxXZE->push_back( photon_vFit_vertex_withMC->error().czx() );
+//        Photon0DecayVtxYZE->push_back( photon_vFit_vertex_withMC->error().czy() );
+//
+//   // ********************* muon-trigger-machint****************
+//
+// //       const pat::TriggerObjectStandAloneCollection muHLTMatches1_t1 = iMuon1->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
+// //       const pat::TriggerObjectStandAloneCollection muHLTMatches2_t1 = iMuon2->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
+// //
+// //       const pat::TriggerObjectStandAloneCollection muHLTMatches1_t2 = iMuon1->triggerObjectMatchesByFilter("hltJpsiTkVertexFilter");
+// //       const pat::TriggerObjectStandAloneCollection muHLTMatches2_t2 = iMuon2->triggerObjectMatchesByFilter("hltJpsiTkVertexFilter");
+// //
+// //       const pat::TriggerObjectStandAloneCollection muHLTMatches1_t4 = iMuon1->triggerObjectMatchesByFilter("hltJpsiTkTkVertexFilterPhiKstar");
+// //       const pat::TriggerObjectStandAloneCollection muHLTMatches2_t4 = iMuon2->triggerObjectMatchesByFilter("hltJpsiTkTkVertexFilterPhiKstar");
+//
+//        int tri_Dim25_tmp = 0, tri_JpsiTk_tmp = 0,  tri_JpsiTkTk_tmp = 0;
+//
+// //       if (muHLTMatches1_t1.size() > 0 && muHLTMatches2_t1.size() > 0) tri_Dim25_tmp = 1;
+// //       if (muHLTMatches1_t2.size() > 0 && muHLTMatches2_t2.size() > 0) tri_JpsiTk_tmp = 1;
+// //       if (muHLTMatches1_t4.size() > 0 && muHLTMatches2_t4.size() > 0) tri_JpsiTkTk_tmp = 1;
+//
+//        tri_Dim25->push_back( tri_Dim25_tmp );
+//        tri_JpsiTk->push_back( tri_JpsiTk_tmp );
+//        tri_JpsiTkTk->push_back( tri_JpsiTkTk_tmp );
+//
+//      // ************
+//
+//        mu1soft->push_back(iMuon1->isSoftMuon(bestVtx) );
+//        mu2soft->push_back(iMuon2->isSoftMuon(bestVtx) );
+//        mu1tight->push_back(iMuon1->isTightMuon(bestVtx) );
+//        mu2tight->push_back(iMuon2->isTightMuon(bestVtx) );
+//        mu1PF->push_back(iMuon1->isPFMuon());
+//        mu2PF->push_back(iMuon2->isPFMuon());
+//        mu1loose->push_back(muon::isLooseMuon(*iMuon1));
+//        mu2loose->push_back(muon::isLooseMuon(*iMuon2));
+//        mu1_mvaValue->push_back(iMuon1->mvaValue());
+//        mu2_mvaValue->push_back(iMuon2->mvaValue());
+//
+//        mumC2->push_back( glbTrackM->normalizedChi2() );
+//        mumNHits->push_back( glbTrackM->numberOfValidHits() );
+//        mumNPHits->push_back( glbTrackM->hitPattern().numberOfValidPixelHits() );
+//        mupC2->push_back( glbTrackP->normalizedChi2() );
+//        mupNHits->push_back( glbTrackP->numberOfValidHits() );
+//        mupNPHits->push_back( glbTrackP->hitPattern().numberOfValidPixelHits() );
+//        mumdxy->push_back(glbTrackM->dxy(bestVtx.position()) );
+//        mupdxy->push_back(glbTrackP->dxy(bestVtx.position()) );
+//        mumdz->push_back(glbTrackM->dz(bestVtx.position()) );
+//        mupdz->push_back(glbTrackP->dz(bestVtx.position()) );
+//
+//
+//
+// /////////////////////////////////////////
+//
+// 	           // You can get the momentum components (for muons and kaon) from the final B childrens or of the original Tracks. Here, a example for the kaons:
+// 		   B_phi_px1->push_back(phiPi1KP_CF.momentum().x());
+// 		   B_phi_py1->push_back(phiPi1KP_CF.momentum().y());
+// 		   B_phi_pz1->push_back(phiPi1KP_CF.momentum().z());
+// 		   B_phi_px1_track->push_back(iTrack1->px());
+// 		   B_phi_py1_track->push_back(iTrack1->py());
+// 		   B_phi_pz1_track->push_back(iTrack1->pz());
+// 		   B_phi_charge1->push_back(T1CandMC->currentState().particleCharge());
+//
+// 		   B_phi_px2->push_back(phiPi2KP_CF.momentum().x());
+// 		   B_phi_py2->push_back(phiPi2KP_CF.momentum().y());
+// 		   B_phi_pz2->push_back(phiPi2KP_CF.momentum().z());
+// 		   B_phi_px2_track->push_back(iTrack2->px());
+// 		   B_phi_py2_track->push_back(iTrack2->py());
+// 		   B_phi_pz2_track->push_back(iTrack2->pz());
+// 		   B_phi_charge2->push_back(T2CandMC->currentState().particleCharge());
+//
+// 		   k1dxy->push_back(iTrack1->dxy());
+// 		   k2dxy->push_back(iTrack2->dxy());
+// 		   k1dz->push_back(iTrack1->dz());
+// 		   k2dz->push_back(iTrack2->dz());
+//
+// 		   k1dxy_e->push_back(iTrack1->dxyError());
+// 		   k2dxy_e->push_back(iTrack2->dxyError());
+// 		   k1dz_e->push_back(iTrack1->dzError());
+// 		   k2dz_e->push_back(iTrack2->dzError());
+//
+// 		   k1InnerHits->push_back(iTrack1->lostInnerHits());
+// 		   k2InnerHits->push_back(iTrack2->lostInnerHits());
+//
+//        k1_pdgID->push_back(iTrack1->pdgId());
+// 		   k2_pdgID->push_back(iTrack2->pdgId());
 
 		   nB++;
 
