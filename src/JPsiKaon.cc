@@ -103,7 +103,7 @@ JPsiKaon::JPsiKaon(const edm::ParameterSet& iConfig)
   // *******************************************************
 
   nB(0), nMu(0),
-  B_mass(0), B_px(0), B_py(0), B_pz(0), B_charge(0), B_cos3D_PV(0),
+  B_mass(0), B_px(0), B_py(0), B_pz(0), B_charge(0), B_cos3D_PV(0), B_cos2D_PV(0);
   B_k_px(0), B_k_py(0), B_k_pz(0), B_k_charge1(0),
   B_k_px_track(0), B_k_py_track(0), B_k_pz_track(0),
   B_J_mass(0), B_J_px(0), B_J_py(0), B_J_pz(0),
@@ -531,11 +531,11 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                                 Double_t dy = (*bDecayVertexMC).position().y() - PVtxBeSp.y();
                                 Double_t dz = (*bDecayVertexMC).position().z() - PVtxBeSp.z();
                                 Double_t cosAlphaXYZ = ( bCandMC->currentState().globalMomentum().x() * dx + bCandMC->currentState().globalMomentum().y()*dy + bCandMC->currentState().globalMomentum().z()*dz  )/( sqrt(dx*dx+dy*dy+dz*dz)* bCandMC->currentState().globalMomentum().mag() );
-
                                 if(cosAlphaXYZ>lip)
                                 {
                                     lip = cosAlphaXYZ ;
                                     bestPV_Bang = PVtxBeSp;
+				    Double_t cos2D_B_PV = (bCandMC->currentState().globalMomentum().x() * dx + bCandMC->currentState().globalMomentum().y()*dy)/(sqrt(dx*dx+dy*dy+dz*dz)*sqrt(bCandMC->currentState().globalMomentum().x()*bCandMC->currentState().globalMomentum().x()+bCandMC->currentState().globalMomentum().y()bCandMC->currentState().globalMomentum().y()));
                                 }
                            }
                       reco::Vertex bestVtxRf = bestPV_Bang;
@@ -614,7 +614,9 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   B_py->push_back(bCandMC->currentState().globalMomentum().y());
 		   B_pz->push_back(bCandMC->currentState().globalMomentum().z());
 		   B_charge->push_back(bCandMC->currentState().particleCharge());
-       B_cos3D_PV->push_back(cos3D_B_PV);
+       		   B_cos3D_PV->push_back(cos3D_B_PV);
+       		   B_cos2D_PV->push_back(cos2D_B_PV);
+
 
 		   // You can get the momentum components (for muons and kaon) from the final B childrens or of the original Tracks. Here, a example for the kaon:
 		   B_k_px->push_back(VCandKP.momentum().x() );
@@ -803,7 +805,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //trigger = 0;
 
    B_charge->clear();
-   B_mass->clear();    B_px->clear();    B_py->clear();    B_pz->clear(); B_cos3D_PV->clear();
+   B_mass->clear();    B_px->clear();    B_py->clear();    B_pz->clear(); B_cos3D_PV->clear(); B_cso2D_PV->clear();
    B_k_px->clear(); B_k_py->clear(); B_k_pz->clear();  B_k_charge1->clear();
    B_k_px_track->clear(); B_k_py_track->clear(); B_k_pz_track->clear();
 
@@ -893,6 +895,9 @@ JPsiKaon::beginJob()
   tree_->Branch("B_py", &B_py);
   tree_->Branch("B_pz", &B_pz);
   tree_->Branch("B_cos3D_PV", &B_cos3D_PV);
+  tree_->Branch("B_cos2D_PV", &B_cos2D_PV);
+ 
+
 
   tree_->Branch("B_k_charge1", &B_k_charge1);
   tree_->Branch("B_k_px", &B_k_px);
