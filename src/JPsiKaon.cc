@@ -535,7 +535,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                                 {
                                     lip = cosAlphaXYZ ;
                                     bestPV_Bang = PVtxBeSp;
-				    Double_t cos2D_B_PV = (bCandMC->currentState().globalMomentum().x() * dx + bCandMC->currentState().globalMomentum().y()*dy)/(sqrt(dx*dx+dy*dy+dz*dz)*sqrt(bCandMC->currentState().globalMomentum().x()*bCandMC->currentState().globalMomentum().x()+bCandMC->currentState().globalMomentum().y()bCandMC->currentState().globalMomentum().y()));
+				    Double_t cos2D_B_PV = (bCandMC->currentState().globalMomentum().x() * dx + bCandMC->currentState().globalMomentum().y()*dy)/(sqrt(dx*dx+dy*dy)*sqrt(bCandMC->currentState().globalMomentum().x()*bCandMC->currentState().globalMomentum().x()+bCandMC->currentState().globalMomentum().y()bCandMC->currentState().globalMomentum().y()));
                                 }
                            }
                       reco::Vertex bestVtxRf = bestPV_Bang;
@@ -805,7 +805,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //trigger = 0;
 
    B_charge->clear();
-   B_mass->clear();    B_px->clear();    B_py->clear();    B_pz->clear(); B_cos3D_PV->clear(); B_cso2D_PV->clear();
+   B_mass->clear();    B_px->clear();    B_py->clear();    B_pz->clear(); B_cos3D_PV->clear(); B_cos2D_PV->clear();
    B_k_px->clear(); B_k_py->clear(); B_k_pz->clear();  B_k_charge1->clear();
    B_k_px_track->clear(); B_k_py_track->clear(); B_k_pz_track->clear();
 
