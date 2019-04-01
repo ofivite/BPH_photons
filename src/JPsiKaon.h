@@ -132,7 +132,7 @@ private:
   unsigned int             nB;
   unsigned int             nMu;
 
-  std::vector<float>       *B_mass, *B_px, *B_py, *B_pz, *B_charge, *B_cos3D_PV; *B_cos2D_PV;
+  std::vector<float>       *B_mass, *B_px, *B_py, *B_pz, *B_charge, *B_cos3D_PV, *B_cos2D_PV;
   std::vector<float>       *B_k_px, *B_k_py, *B_k_pz,  *B_k_charge1;
   std::vector<float>       *B_k_px_track, *B_k_py_track, *B_k_pz_track;
 
