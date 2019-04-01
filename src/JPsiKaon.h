@@ -144,7 +144,7 @@ private:
 
   // *************************************
 
-  std::vector<float>       *photon_c0_mass_1, *photon0_px_1, *photon0_py_1, *photon0_pz_1, *photon0_mass_photonMC, *photon_mass_FromColl;
+  std::vector<float>       *photon_c0_mass_1, *photon0_mass_photonMC, *photon_mass_FromColl, *photon0_px_1, *photon0_py_1, *photon0_pz_1;
   std::vector<float>       *photon_mass_1, *photon_px_1, *photon_py_1, *photon_pz_1;
   std::vector<int>         *photon_flags_1;
   std::vector<float>       *photon0_cos2D_common_1;

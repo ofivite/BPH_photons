@@ -114,9 +114,9 @@ JPsiKaon::JPsiKaon(const edm::ParameterSet& iConfig)
 
   // *******************************************************
 
-  photon_c0_mass_1(0), photon0_px_1(0), photon0_py_1(0), photon0_pz_1(0),
+  photon_c0_mass_1(0), photon0_mass_photonMC(0), photon_mass_FromColl(0), photon0_px_1(0), photon0_py_1(0), photon0_pz_1(0),
   photon_mass_1(0), photon_px_1(0), photon_py_1(0), photon_pz_1(0),
-  photon_flags_1(0), photon0_cos2D_common_1(0), photon0_mass_photonMC(0), photon_mass_FromColl(0), 
+  photon_flags_1(0), photon0_cos2D_common_1(0),
 
   // *******************************************************
 
@@ -522,6 +522,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
                            reco::Vertex bestPV_Bang;
                            Double_t lip = -100000.0;
+                           Double_t cos2D_B_PV = -999.;
 
                            for(size_t i = 0; i < primaryVertices_handle->size(); ++i)
                            {
@@ -535,7 +536,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                                 {
                                     lip = cosAlphaXYZ ;
                                     bestPV_Bang = PVtxBeSp;
-				    Double_t cos2D_B_PV = (bCandMC->currentState().globalMomentum().x() * dx + bCandMC->currentState().globalMomentum().y()*dy)/(sqrt(dx*dx+dy*dy)*sqrt(bCandMC->currentState().globalMomentum().x()*bCandMC->currentState().globalMomentum().x()+bCandMC->currentState().globalMomentum().y()*bCandMC->currentState().globalMomentum().y()));
+				                            cos2D_B_PV = (bCandMC->currentState().globalMomentum().x() * dx + bCandMC->currentState().globalMomentum().y()*dy)/(sqrt(dx*dx+dy*dy)*sqrt(bCandMC->currentState().globalMomentum().x()*bCandMC->currentState().globalMomentum().x()+bCandMC->currentState().globalMomentum().y()*bCandMC->currentState().globalMomentum().y()));
                                 }
                            }
                       reco::Vertex bestVtxRf = bestPV_Bang;
@@ -646,8 +647,8 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
        photon_c0_mass_1->push_back( photon_vFit_noMC_1->currentState().mass() );
 
-       photon_mass_FromColl->pushback( p4photon1->M() );
-       photon0_mass_photonMC->pushback ( photon_vFit_withMC_1->currentState().mass() );
+       photon_mass_FromColl->push_back( p4photon1.M() );
+       photon0_mass_photonMC->push_back ( photon_vFit_withMC_1->currentState().mass() );
        photon0_px_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().x() );
        photon0_py_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().y() );
        photon0_pz_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().z() );
@@ -816,8 +817,9 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    B_J_pt1->clear();  B_J_px1->clear();  B_J_py1->clear();  B_J_pz1->clear(), B_J_charge1->clear();
    B_J_pt2->clear();  B_J_px2->clear();  B_J_py2->clear();  B_J_pz2->clear(), B_J_charge2->clear();
 
-   photon_c0_mass_1->clear(); photon0_px_1->clear(); photon0_py_1->clear(); photon0_pz_1->clear(); photon0_mass_photonMC->clear();
-   photon_mass_FromColl->clear(); photon_mass_1->clear(); photon_px_1->clear(); photon_py_1->clear(); photon_pz_1->clear();
+   photon_c0_mass_1->clear(); photon0_mass_photonMC->clear();   photon_mass_FromColl->clear();
+   photon0_px_1->clear(); photon0_py_1->clear(); photon0_pz_1->clear();
+   photon_mass_1->clear(); photon_px_1->clear(); photon_py_1->clear(); photon_pz_1->clear();
    photon_flags_1->clear(); photon0_cos2D_common_1->clear();
 
    photon_pt1_1->clear(); photon_px1_1->clear(); photon_py1_1->clear(); photon_pz1_1->clear();
@@ -898,7 +900,7 @@ JPsiKaon::beginJob()
   tree_->Branch("B_pz", &B_pz);
   tree_->Branch("B_cos3D_PV", &B_cos3D_PV);
   tree_->Branch("B_cos2D_PV", &B_cos2D_PV);
- 
+
 
 
   tree_->Branch("B_k_charge1", &B_k_charge1);
@@ -928,8 +930,8 @@ JPsiKaon::beginJob()
 
   // *************************
   tree_->Branch("photon_c0_mass_1", &photon_c0_mass_1);
-  tree_->Branch("photon_mass_FromColl", &photon_mass_FromColl);
   tree_->Branch("photon0_mass_photonMC", &photon0_mass_photonMC);
+  tree_->Branch("photon_mass_FromColl", &photon_mass_FromColl);
   tree_->Branch("photon0_px_1", &photon0_px_1);
   tree_->Branch("photon0_py_1", &photon0_py_1);
   tree_->Branch("photon0_pz_1", &photon0_pz_1);
