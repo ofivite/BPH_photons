@@ -535,7 +535,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                                 {
                                     lip = cosAlphaXYZ ;
                                     bestPV_Bang = PVtxBeSp;
-				    Double_t cos2D_B_PV = (bCandMC->currentState().globalMomentum().x() * dx + bCandMC->currentState().globalMomentum().y()*dy)/(sqrt(dx*dx+dy*dy)*sqrt(bCandMC->currentState().globalMomentum().x()*bCandMC->currentState().globalMomentum().x()+bCandMC->currentState().globalMomentum().y()bCandMC->currentState().globalMomentum().y()));
+				    Double_t cos2D_B_PV = (bCandMC->currentState().globalMomentum().x() * dx + bCandMC->currentState().globalMomentum().y()*dy)/(sqrt(dx*dx+dy*dy)*sqrt(bCandMC->currentState().globalMomentum().x()*bCandMC->currentState().globalMomentum().x()+bCandMC->currentState().globalMomentum().y()*bCandMC->currentState().globalMomentum().y()));
                                 }
                            }
                       reco::Vertex bestVtxRf = bestPV_Bang;
@@ -646,7 +646,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
        photon_c0_mass_1->push_back( photon_vFit_noMC_1->currentState().mass() );
 
-       photon_mass_FromColl->pushbach( p4photon1->M() );
+       photon_mass_FromColl->pushback( p4photon1->M() );
        photon0_mass_photonMC->pushback ( photon_vFit_withMC_1->currentState().mass() );
        photon0_px_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().x() );
        photon0_py_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().y() );
