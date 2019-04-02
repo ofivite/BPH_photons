@@ -4,23 +4,17 @@ from variables import *
 import ROOT
 from math import sqrt
 
-isMC = 0
+__aa = 0;    __bb = 50
+# __aa = 0;  __bb =  len(MyFileNamesDA);
 
-MyFileNamesMC = glob.glob( MCpath(1) + "*.root")
-# MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_10_2_5_patch1/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2018_BSG_v2_*/results/*.root")
-MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_9_4_10/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2017_BCK_v2_*/results/*.root")
-# MyFileNamesDA = glob.glob("/afs/cern.ch/work/o/ofilatov/CMSSW_9_4_9/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2016_BSG_v2_*/results/*.root")
-#MyFileNamesDA = glob.glob('cascade_v1_.root')
-# __aa = 0;    __bb = 5
-__aa = 0;  __bb =  len(MyFileNamesDA);
-MyFileNames = (MyFileNamesMC if isMC else MyFileNamesDA[__aa: __bb]); ch = ROOT.TChain('rootuple/ntuple');
+MyFileNames = glob.glob("/eos/user/o/ofilatov/2017_Igorek_v0/crab_Bfinder_2017_Igorek_v0_*/results/*.root")[__aa: __bb]
+ch = ROOT.TChain('rootuple/ntuple');
 
 for fName in  MyFileNames:
     ii = ch.Add(fName);
-
 print ('get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created')
 
-_fileOUT = 'BCK_2017_' + str(len(MyFileNames)) + '_of_1271_v2_.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
+_fileOUT = '2017_Igorek_v0_' + str(len(MyFileNames)) + '_of_1271.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
 fileOUT  = ROOT.TFile (_fileOUT, "recreate");    mytree = ROOT.TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print ("entries: from", 0, 'to', nEvt-1);
@@ -28,9 +22,8 @@ H_cuts = ROOT.TH1F("H_cuts", "H_cuts", 40, 0, 20)
 
 ###  declaration and connecting to the branches of my new variables {{{1
 NOUT, NOUT_evt, BBB, ibs = [int(0) for i in range(4)];
-PV, PVE, JPV, JPVE, photonV_c0_1, photonVE_c0_1, B_V, B_VE, B_P3, photon0_P3_1, photon_cjp_P3_1, JPP3 = [ROOT.TVector3() for i in range(12)]
-chiP4_Cjp, MU1P4_cjp, MU2P4_cjp, K_P4_cjp, photon0_P4_1, photon_cjp_P4_1, B_P4 = [ROOT.TLorentzVector() for i in range(7)];
-# _TV3zero  = TVector3(0,0,0)
+MU1P4_cjp, MU2P4_cjp, K_P4_cjp, photon0_P4_1, photon_cjp_P4_1, B_P4 = [ROOT.TLorentzVector() for i in range(6)];
+
 
 _MY_VARS_ = [
 
@@ -101,14 +94,10 @@ _MY_VARS_ = [
 'PV_refit_prob',
 "SAMEEVENT"]
 
-_MC_VARS = ["MC_mu", "MC_k1"];
-if isMC: _MY_VARS_ += _MC_VARS
-
 for _var_ in _MY_VARS_:
     exec(_var_ + ' = np.zeros(1, dtype=float)')
 
 for _var_ in _MY_VARS_:
-    #print 'executing ' + 'mytree.Branch("' + _var_ + '"' + ' '*(25-len(_var_)) + ',' + _var_ + ' '*(25-len(_var_)) + ', "'+ _var_ + '/D")'
     exec('mytree.Branch("' + _var_ + '"' + ' '*(25-len(_var_)) + ',' + _var_ + ' '*(25-len(_var_)) + ', "'+ _var_ + '/D")')
 
 ###  declaration and connecting to the branches of my new variables }}}1
@@ -118,7 +107,7 @@ for evt in range(0, nEvt):
     if (ch.GetEntry(evt) <= 0) : break;
     BInfo_size  = ch.nB
     if len(ch.B_J_pz) != BInfo_size:
-    ##        print 'Sizes do not match!', 'array len = ', len(ch.mum_dxy_Bsdecay), ' nB = ', BInfo_size
+        print 'Sizes do not match!', 'array len = ', len(ch.B_J_pz), ' nB = ', BInfo_size
         continue
 
     for Bj in range(BInfo_size):
@@ -169,16 +158,6 @@ for evt in range(0, nEvt):
         if ch.B_J_mass[ibs]   <   PDG_JPSI_MASS - 0.05    :continue
         if ch.B_J_mass[ibs]   >   PDG_JPSI_MASS + 0.05    :continue
 
-        # if DirectionCos2 ( JPV - PV, JPP3 ) < 0.9:
-        #     H_cuts.Fill(14)
-            # continue
-
-        # if DetachSignificance2( JPV - PV, PVE, JPVE) < 3.0:
-        #     H_cuts.Fill(15)
-            # continue
-
-        # if abs(MUMUP4_cjp.Eta()) > 2.2  :continue
-
 
         #####~~~~~~~~~~~~~~~~~~~~~#####
         ###~~~~~~~~~~Kaon~~~~~~~~~~~###
@@ -227,28 +206,13 @@ for evt in range(0, nEvt):
 
         chiP4_Cjp = MUMUP4_cjp + photon_cjp_P4_1
 
-        # if DetachSignificance2( chiV_Cjp - PV, PVE, chiVE_Cjp) < 3. :continue
 
-        # if DirectionCos2 ( BsV_Cjp - PV, BsP3_Cjp ) < 0.9 :
-        #     H_cuts.Fill(9)
-            # continue
-
-        # if ch.B_Prob[ibs] < 0.05 :
-        #     H_cuts.Fill(10)
-            # continue
-
-        # if abs(chiP4_Cjp.Eta())  > 2.5   :continue
-
-
-        #####~~~~~~~~~~~~~~~~~~~~#####
-        ###~~~~~~~~~~Bs*~~~~~~~~~~~###
-        #####~~~~~~~~~~~~~~~~~~~~#####
+        #####~~~~~~~~~~~~~~~~~~#####
+        ###~~~~~~~~~~B~~~~~~~~~~~###
+        #####~~~~~~~~~~~~~~~~~~#####
 
         B_P4    .SetXYZM  ( ch.B_px[ibs], ch.B_py[ibs], ch.B_pz[ibs], ch.B_mass[ibs])
         B_P3 = B_P4.Vect()
-        # Bstar0_P4  = chiP4_Cjp + photon0_P4
-        # Bstar_P4_wo_cnstr  = chiP4_Cjp + photon_P4_0c
-
         B_V     = ROOT.TVector3(ch.bDecayVtxX[ibs],  ch.bDecayVtxY[ibs],  ch.bDecayVtxZ[ibs]   )
         B_VE    = ROOT.TVector3( 0 if ch.bDecayVtxXE[ibs] <= 0 else sqrt(ch.bDecayVtxXE[ibs]),
                                  0 if ch.bDecayVtxYE[ibs] <= 0 else sqrt(ch.bDecayVtxYE[ibs]),
@@ -258,9 +222,9 @@ for evt in range(0, nEvt):
 ###########################################################
 
 
-        #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
-        ###~~~~~~~~~~ Writing vars to the tree~~~~~~~~~~###
-        #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
+        #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
+        ###~~~~~~~~~~ Writing vars to the tree ~~~~~~~~~~###
+        #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
 
 
         ###~~~~~~~~~~ B ~~~~~~~~~~###
@@ -372,48 +336,6 @@ for evt in range(0, nEvt):
         mu1loose[0] = float(ch.mu1loose[ibs].__bool__());           mu2loose[0] = float(ch.mu2loose[ibs].__bool__());
         # mu1_mvaValue[0] = ch.mu1_mvaValue[ibs];   mu2_mvaValue[0] = ch.mu2_mvaValue[ibs];
 
-        # # Soft J/psi muons #
-        # areSoft[0] = 0   if (  ch.mum_NTrackerLayers[ibs] <= 5 or ch.mup_NTrackerLayers[ibs] <= 5 or
-        # ch.mum_NPixelLayers[ibs] <= 0 or ch.mup_NPixelLayers[ibs] <= 0 or
-        # abs(ch.mum_dxy_Bsdecay[ibs]) >= 0.3 or abs(ch.mup_dxy_Bsdecay[ibs]) >= 0.3 or
-        # abs(ch.mum_dz_Bsdecay[ibs]) >= 20. or abs(ch.mup_dz_Bsdecay[ibs]) >= 20. or
-        # ch.mumAngT[ibs] == 0 or ch.mupAngT[ibs] == 0  ) else 1
-        #
-        # # Default Tight J/psi muons #
-        # areTight_def[0] = 0   if ( ch.mum_isTight[ibs] <= 0 or ch.mup_isTight[ibs] <= 0) else 1
-        #
-        #
-        # # Handmade Tight J/psi muons #
-        # areTight_HM[0] = 0	  if ( ch.mum_isGlobalMuon[ibs] == 0 or ch.mup_isGlobalMuon[ibs] == 0 or
-        # ch.mum_normChi2[ibs] >= 10. or ch.mup_normChi2[ibs] >= 10. or
-        # ch.mum_normChi2[ibs] < 0. or ch.mup_normChi2[ibs] < 0. or
-        # ch.mum_NMuonHits[ibs] <= 0 or ch.mup_NMuonHits[ibs] <= 0 or
-        # ch.mum_NMuonStations[ibs] <= 1 or ch.mup_NMuonStations[ibs] <= 1 or
-        # abs(ch.mum_dxy_Bsdecay[ibs]) >= 0.2 or abs(ch.mup_dxy_Bsdecay[ibs]) >= 0.2 or abs(ch.mum_dz_Bsdecay[ibs]) >= 0.5 or abs(ch.mup_dz_Bsdecay[ibs]) >= 0.5 or
-        # ch.mumNPHits[ibs] <= 0 or ch.mupNPHits[ibs] <= 0 or
-        # ch.mum_NTrackerLayers[ibs] <= 5 or ch.mup_NTrackerLayers[ibs] <= 5 or
-        # ch.mum_normChi2[ibs] < 0 or ch.mum_NMuonHits < 0 or
-        # ch.mup_normChi2[ibs] < 0 or ch.mup_NMuonHits < 0 ) else 1
-        #
-        #
-        # mum_relIso[0] = ch.mum_relIso[ibs]; mup_relIso[0] = ch.mup_relIso[ibs];
-        # mum_isGlobalMuon[0] = ch.mum_isGlobalMuon[ibs]; mup_isGlobalMuon[0] = ch.mup_isGlobalMuon[ibs];
-        # mum_NMuonStations[0] = ch.mum_NMuonStations[ibs]; mup_NMuonStations[0] = ch.mup_NMuonStations[ibs];
-        #
-        #
-        # #   Global muon requirements from CMS AN-2008/098   #
-        # #                 (without d0 cut)                  #
-        # areMyGlobal[0] = 0    if (   ch.mum_isGlobalMuon[ibs] == 0 or ch.mup_isGlobalMuon[ibs] == 0 or
-        # ch.mum_normChi2[ibs] >= 10. or ch.mup_normChi2[ibs] >= 10. or
-        # ch.mum_normChi2[ibs] < 0. or ch.mup_normChi2[ibs] < 0. or
-        # ch.mumNHits[ibs] <= 10 or ch.mupNHits[ibs] <= 10)   else 1
-
-        # mum_dxy_Bsdecay[0]   = ch.mum_dxy_Bsdecay[ibs];    mum_dz_Bsdecay[0]      = ch.mum_dz_Bsdecay[ibs];
-        # mum_isTrackerMuon[0] = ch.mum_isTrackerMuon[ibs];  mum_isGoodLS_OptimT[0] = ch.mum_isGoodLS_OptimT[ibs];
-        #
-        # mup_dxy_Bsdecay[0]   = ch.mup_dxy_Bsdecay[ibs];    mup_dz_Bsdecay[0]      = ch.mup_dz_Bsdecay[ibs];
-        # mup_isTrackerMuon[0] = ch.mup_isTrackerMuon[ibs];  mup_isGoodLS_OptimT[0] = ch.mup_isGoodLS_OptimT[ibs];
-
 
         ###~~~~~~~~~~ J/PSI ~~~~~~~~~~###
 
@@ -423,25 +345,12 @@ for evt in range(0, nEvt):
         Jpsi_eta_Cjp[0] = MUMUP4_cjp.Eta()
         Jpsi_DS2_PV_c0[0] = DetachSignificance2( JPV - PV, PVE, JPVE)
         Jpsi_pvcos2_Cjp[0] = DirectionCos2 ( JPV - PV, JPP3 )
-        # JP_Bsdecay_weight[0] = ch.JP_Bsdecay_weight[ibs]
-
-#-----~-----
-
-
 
 
         #---------------------------------------------------
+        ###~~~~~~~~~~ WE ARE DONE HERE~~~~~~~~~~###
+        #---------------------------------------------------
 
-        _mctr = 0
-        if isMC:
-            _mctr   =   1 if abs(ch.MCID_k1[ibs])==321      else 0;
-            _mctr   +=  2 if abs(ch.MCID_pk1[ibs])==521     else 0;
-            MC_k1[0] =  _mctr
-            _mctr   =   1 if (abs(ch.MCID_mu1[ibs])==13     and abs(ch.MCID_mu2[ibs])==13)      else 0;
-            _mctr   +=  2 if (abs(ch.MCID_pmu1[ibs])==443   and abs(ch.MCID_pmu2[ibs])==443)    else 0;
-            _mctr   +=  4 if (abs(ch.MCID_ppmu1[ibs])==521  and abs(ch.MCID_ppmu2[ibs])==521)   else 0;
-            MC_mu[0] = _mctr
-        #
         SAMEEVENT[0] = 0;
         if (BBB > -1) :
             SAMEEVENT[0] = 1

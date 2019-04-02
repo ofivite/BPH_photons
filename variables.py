@@ -63,23 +63,3 @@ def DirectionChi23 (vtx0, vtx0E, vtx1, vtx1E, P, PE):
     Pscaled = P * (dvtx.Mag() / P.Mag()) ## scaled momentum to be the same length as vertex difference
     PscaledE= PE * (dvtx.Mag() / P.Mag()) ## its error
     return DetachSignificance3 (Pscaled - dvtx, PscaledE, dvtxE);
-
-
-def MCpath(i):
-    if i<1 or i>9:
-        print 'wrong number'
-        return 0
-    #
-    if i==4 or i==5 or i==6 :
-        return '/afs/cern.ch/work/s/spolikar/CMSSW_5_3_24/src/XbFrame/Xb_Frame/crab_projects_Bfinder_MC_Bdk%i_new_v1/crab_Bfinder_MC_Bdk%i_new_v1/results/'%(i,i)
-    else:
-        return '/afs/cern.ch/work/s/spolikar/CMSSW_5_3_24/src/XbFrame/Xb_Frame/crab_projects_Bfinder_MC_Buk%i_new_v1/crab_Bfinder_MC_Buk%i_new_v1/results/'%(i,i)
-
-
-### Tp = Tlab * sqrt(1-v2/c2) = d/v * sqrt(1-v2/c2)
-### p = m*v / sqrt(1-v2/c2)
-### sqrt(1-v2/c2) = m*v/p
-### m2v2c2/p2c2 + v2/c2= 1
-### v = c * sqrt(1/(1+m2c2/p2)) [=~ c * (1-m2c2/2p2)]
-### Tp = d/v * sqrt(1-1/(1+m2c2/p2))
-###
