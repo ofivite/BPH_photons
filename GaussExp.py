@@ -17,12 +17,11 @@ Dhists = False
 
 
 ch = TChain("mytree");
-MyFileNames = glob.glob('2017_Igorek_v0_1227_of_1271.root')
+MyFileNames = glob.glob('2017_Igorek_v0_1269_of_1271.root')
 for fName in MyFileNames :
     ch.Add(fName);
 
 print "Adding chain done", ch.GetNtrees(), 'files '
-
 #varset  = RooArgSet (mb, mjpp, mjpl, mlkk, mphi, mlk)
 varset  = RooArgSet (mB, mchi) 
 dataset = RooDataSet("ds","Dataset",varset)

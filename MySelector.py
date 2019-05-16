@@ -4,13 +4,13 @@ from variables import *
 import ROOT
 from math import sqrt
 
-__aa = 0;    __bb = 50
-# __aa = 0;  __bb =  len(MyFileNamesDA);
-
-MyFileNames = glob.glob("/eos/user/o/ofilatov/2017_Igorek_v0/crab_Bfinder_2017_Igorek_v0_*/results/*.root")[__aa: __bb]
+#__aa = 0;    __bb = 50
+MyFileNames = glob.glob("/eos/user/o/ofilatov/2017_Igorek_v0/crab_Bfinder_2017_Igorek_v0_*/results/*.root")
 ch = ROOT.TChain('rootuple/ntuple');
 
-for fName in  MyFileNames:
+__aa = 0;  __bb =  len(MyFileNames);
+
+for fName in  MyFileNames[__aa: __bb]:
     ii = ch.Add(fName);
 print ('get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created')
 
@@ -43,8 +43,9 @@ _MY_VARS_ = [
 #-----~-----
 # 'phi_Bsdecay_weight',
 
-'photon_c0_mass_1', 'photon_c0_VtxProb_1',
+'photon_c0_mass_1', 'photon_c0_VtxProb_1', 'photon_mass_FromColl',
 
+'photon_VtxX', 'photon_VtxY',
 'photon0_VtxProb_1', 'photon0_pt_1', 'photon0_eta_1',
 'photon_c0_DS2_common_1', 'photon_c0_DS2_PV_1', 'photon_flags_1', 'photon0_cos2D_common_1', 'photon0_cos2D_common_Bfinder_1', 'photon0_cos2D_PV_1',
 
@@ -256,8 +257,12 @@ for evt in range(0, nEvt):
 
         photon_c0_VtxProb_1[0] = ch.photon1_Prob[ibs]
         photon_c0_mass_1[0] = ch.photon_c0_mass_1[ibs]
+        photon_mass_FromColl[0] = ch.photon_mass_FromColl[ibs]
 
         #-----~-----
+        photon_VtxX[0]      = ch.PhotonDecayVtxX_1[ibs]
+        photon_VtxY[0]      = ch.PhotonDecayVtxY_1[ibs]
+        
         photon_cjp_mass_1[0] = ch.photon_mass_1[ibs]
         photon_cjp_pt_1[0] = photon_cjp_P4_1.Pt()
         photon_cjp_eta_1[0] = photon_cjp_P4_1.Eta()
