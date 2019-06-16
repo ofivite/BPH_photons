@@ -17,7 +17,7 @@ Dhists = False
 
 
 ch = TChain("mytree");
-MyFileNames = glob.glob('2017_Igorek_v0_1269_of_1271.root')
+MyFileNames = glob.glob('2017_Jpsiphoton_v2_test3_1150_.root')
 for fName in MyFileNames :
     ch.Add(fName);
 
@@ -47,24 +47,25 @@ for evt in range(nEvt):
         dataset.add(varset); flag_empty = 1;              ## now empty and reset par
         par_0 = 0;
 #########################################################################################
-#    if (cuts == True) :
+    if (cuts == True) :
 
        # B cuts 
 #       if ch.chi_mass_cjp  < 3.3           :continue
 #       if ch.chi_mass_cjp  > 3.7           :continue
 #       if (ch.photon_flags_1 / 10000) % 10 > 0.1      :continue
-#       if ch.B_cos2D_PV < 0.999                :continue
+       if ch.Jpsi_pvcos2_Cjp < 0.999                :continue
 #       if ch.B_DS2_PV < 5                      :continue
-#       if ch.B_vtxprob < 0.1                   :continue
+       if ch.photon_VtxProb < 0.5                   :continue
 
 
     if  (not REMUC) or (ch.SAMEEVENT == 0) :
-       if ch.chi_mass_cjp < 3.41 : continue
-       if ch.chi_mass_cjp > 3.52 : continue  
+       if ch.chi_mass_Cjp < 3.4 : continue
+       if ch.chi_mass_Cjp > 3.64 : continue  
 #       if ch.B_mass > 5.4 : continue
 #       if ch.B_mass < 5.1 : continue
-       mchi1 .setVal( ch.chi_mass_cjp    )
-       PhotExy.setVal( ch.photon0_pt_1 )
+       mchi1 .setVal( ch.chi_mass_Cjp    )
+       PhotExy.setVal( ch.photon_pt_0c )
+       PhotM.setVal( ch.photon_mass_0c)
        flag_empty = 0;
 
 if flag_empty != 1 : dataset.add(varset);  ## write last event if needed
@@ -147,7 +148,7 @@ CB_chi1    = RooCBShape('CB_chi1', '', mchi1, CB_1_mean, CB_1_sigma, CB_1_alpha,
 #GaussExp
 
 GE_chi1 = RooGenericPdf('GE_chi1', '((mchi1-chi1_mean)/sigma_chi1>(0-alpha_chi1))*(exp(-(mchi1-chi1_mean)*(mchi1-chi1_mean)/(2*sigma_chi1*sigma_chi1)))+((mchi1-chi1_mean)/sigma_chi1<(0-alpha_chi1))*exp(alpha_chi1*alpha_chi1/2+alpha_chi1*(mchi1 - chi1_mean)/(sigma_chi1))', RooArgList(mchi1, CB_1_mean, CB_1_sigma, CB_1_alpha))
-#GE_chi2 = RooGenericPdf('GE_chi2', '((mchi-chi2_mean)/sigma_chi1>(0-alpha_chi1))*(exp(-(mchi-chi2_mean)*(mchi-chi2_mean)/(2*sigma_chi1*sigma_chi1)))+((mchi-chi2_mean)/sigma_chi1<(0-alpha_chi1))*exp(alpha_chi1*alpha_chi1/2+alpha_chi1*(mchi - chi2_mean)/(sigma_chi1))', RooArgList(mchi, CB_2_mean, CB_1_sigma, CB_1_alpha))
+GE_chi2 = RooGenericPdf('GE_chi2', '((mchi1-chi2_mean)/sigma_chi1>(0-alpha_chi1))*(exp(-(mchi1-chi2_mean)*(mchi1-chi2_mean)/(2*sigma_chi1*sigma_chi1)))+((mchi1-chi2_mean)/sigma_chi1<(0-alpha_chi1))*exp(alpha_chi1*alpha_chi1/2+alpha_chi1*(mchi1 - chi2_mean)/(sigma_chi1))', RooArgList(mchi1, CB_2_mean, CB_1_sigma, CB_1_alpha))
 
 #Chi_m_distr = RooGenericPdf('Chi_m_distr', '(((mchi-chi1_mean)/sigma_chi1>(0-alpha_chi1))*(exp(-(mchi-chi1_mean)*(mchi-chi1_mean)/(2*sigma_chi1*sigma_chi1)))+((mchi-chi1_mean)/sigma_chi1<(0-alpha_chi1))*exp(alpha_chi1*alpha_chi1/2+alpha_chi1*(mchi - chi1_mean)/(sigma_chi1))) * (1 - Frac_chi2)+ (((mchi-chi2_mean)/sigma_chi1>(0-alpha_chi1))*(exp(-(mchi-chi2_mean)*(mchi-chi2_mean)/(2*sigma_chi1*sigma_chi1)))+((mchi-chi2_mean)/sigma_chi1<(0-alpha_chi1))*exp(alpha_chi1*alpha_chi1/2+alpha_chi1*(mchi - chi2_mean)/(sigma_chi1)))*Frac_chi2', RooArgList(mchi, CB_1_mean, CB_2_mean, CB_1_sigma, CB_1_alpha, Frac_chi2))
 
@@ -156,7 +157,7 @@ GE_chi1 = RooGenericPdf('GE_chi1', '((mchi1-chi1_mean)/sigma_chi1>(0-alpha_chi1)
 
 # Gauss for B
 
-alist1  = RooArgList (GE_chi1, pdfBerBg); alist2 = RooArgList (S_chi1, B)  
+alist1  = RooArgList (GE_chi1, GE_chi2, pdfBerBg); alist2 = RooArgList (S_chi1, S_chi2, B)  
 
 pdfSum  = RooAddPdf  ("model", "model", alist1, alist2)
 
@@ -165,25 +166,26 @@ rrr = pdfSum.fitTo( dataset, RooFit.NumCPU(7), RooFit.PrintLevel(2), RooFit.Save
 rrr = pdfSum.fitTo( dataset, RooFit.NumCPU(7), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
 rrr.Print()
 
-Set = RooArgSet(S_chi1, B, CB_1_mean, CB_1_sigma, CB_1_alpha)
 cB=TCanvas("cB","cB",1200,900);
-mframe = 0; mframe = mchi1.frame(110);
+mframe = 0; mframe = mchi1.frame(120);
 mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
 dataset.plotOn(mframe,RooFit.MarkerSize(0.6));   # size of dots  
 pdfSum.plotOn(mframe, RooFit.Components('pdfBerBg'), RooFit.LineColor(kYellow+1), RooFit.LineStyle(kDashed), RooFit.LineWidth(2))
-#pdfSum.plotOn(mframe,RooFit.Components('GE_chi1'), RooFit.LineColor(kMagenta+1), RooFit.LineWidth(2))
+pdfSum.plotOn(mframe,RooFit.Components('GE_chi2'), RooFit.LineColor(kMagenta+1), RooFit.LineWidth(2))
 pdfSum.plotOn(mframe,RooFit.Components('GE_chi1'), RooFit.LineColor(kBlue+1), RooFit.LineWidth(2))
 pdfSum.plotOn(mframe,RooFit.LineColor(kRed+1), RooFit.LineWidth(2))
 chisqn = mframe.chiSquare(rrr.floatParsFinal().getSize() )
-mframe.SetTitle('Chi mass distribution')
-pdfSum.paramOn(mframe, RooFit.Parameters(Set), RooFit.Format("NE",RooFit.AutoPrecision(1)), RooFit.Layout(0.15,0.65,0.88));
+Set = RooArgSet(S_chi1, S_chi2, B, CB_1_mean, CB_2_mean, CB_1_sigma, CB_1_alpha)
+mframe.SetTitle('#chi mass distribution')
+pdfSum.paramOn(mframe, RooFit.Parameters(Set), RooFit.Format("NE",RooFit.AutoPrecision(1)), RooFit.Layout(0.55,0.97,0.88));
 mframe.Draw()
 #l1=TLine(S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 80)
 #l2=TLine(S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 80)
 #l1.Draw('same'); l2.Draw('same')
 cB.SaveAs('Chi_incl.gif')
+print "Fit chi2", mframe.chiSquare(10)
 
-sPlot_list = RooArgList(S_chi1, B)
+sPlot_list = RooArgList(S_chi1, S_chi2, B)
 sData_chi = RooStats.SPlot('sData_chi', 'sData_chi', dataset, pdfSum, sPlot_list)
 dataset_weighted = RooDataSet(dataset.GetName(), dataset.GetTitle(), dataset, dataset.get(), '1 > 0', S_chi1.GetName() + '_sw')
 
@@ -203,4 +205,22 @@ mframe.Draw()
 #l2=TLine(S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 80)
 #l1.Draw('same'); l2.Draw('same')
 cB.SaveAs('Photon_sPlot.gif')
+
+cB=TCanvas("cB","cB",1200,900);
+mframe = 0; mframe = PhotM.frame(75);
+mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
+dataset_weighted.plotOn(mframe,RooFit.MarkerSize(0.6));   # size of dots  
+#pdfSum.plotOn(mframe, RooFit.Components('pdfBerBg'), RooFit.LineColor(kYellow+1), RooFit.LineStyle(kDashed), RooFit.LineWidth(2))
+#pdfSum.plotOn(mframe,RooFit.Components('GE_chi1'), RooFit.LineColor(kMagenta+1), RooFit.LineWidth(2))
+#pdfSum.plotOn(mframe,RooFit.Components('GE_chi1'), RooFit.LineColor(kBlue+1), RooFit.LineWidth(2))
+#pdfSum.plotOn(mframe,RooFit.LineColor(kRed+1), RooFit.LineWidth(2))
+#chisqn = mframe.chiSquare(rrr.floatParsFinal().getSize() )
+mframe.SetTitle('Photon mass')
+#pdfSum.paramOn(mframe, RooFit.Parameters(Set), RooFit.Format("NE",RooFit.AutoPrecision(1)), RooFit.Layout(0.15,0.65,0.88));
+mframe.Draw()
+#l1=TLine(S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 80)
+#l2=TLine(S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 80)
+#l1.Draw('same'); l2.Draw('same')
+cB.SaveAs('PhotonM.gif')
+
 
