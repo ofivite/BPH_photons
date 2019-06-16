@@ -143,7 +143,7 @@ CB_2_alpha   = RooRealVar('alpha_chi2', 'alpha', 2., .1, 10.)
 CB_2_n       = RooRealVar('n_chi2', '', 3., 2., 10.)
 
 CB_chi1    = RooCBShape('CB_chi1', '', mchi1, CB_1_mean, CB_1_sigma, CB_1_alpha, CB_1_n)
-#CB_chi2    = RooCBShape('CB_chi2', '', mchi, CB_2_mean, CB_1_sigma, CB_1_alpha, CB_1_n)
+CB_chi2    = RooCBShape('CB_chi2', '', mchi1, CB_2_mean, CB_1_sigma, CB_1_alpha, CB_1_n)
 
 #GaussExp
 
@@ -157,7 +157,7 @@ GE_chi2 = RooGenericPdf('GE_chi2', '((mchi1-chi2_mean)/sigma_chi1>(0-alpha_chi1)
 
 # Gauss for B
 
-alist1  = RooArgList (GE_chi1, GE_chi2, pdfBerBg); alist2 = RooArgList (S_chi1, S_chi2, B)  
+alist1  = RooArgList (CB_chi1, CB_chi2, pdfBerBg); alist2 = RooArgList (S_chi1, S_chi2, B)  
 
 pdfSum  = RooAddPdf  ("model", "model", alist1, alist2)
 
@@ -171,19 +171,19 @@ mframe = 0; mframe = mchi1.frame(120);
 mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
 dataset.plotOn(mframe,RooFit.MarkerSize(0.6));   # size of dots  
 pdfSum.plotOn(mframe, RooFit.Components('pdfBerBg'), RooFit.LineColor(kYellow+1), RooFit.LineStyle(kDashed), RooFit.LineWidth(2))
-pdfSum.plotOn(mframe,RooFit.Components('GE_chi2'), RooFit.LineColor(kMagenta+1), RooFit.LineWidth(2))
-pdfSum.plotOn(mframe,RooFit.Components('GE_chi1'), RooFit.LineColor(kBlue+1), RooFit.LineWidth(2))
+pdfSum.plotOn(mframe,RooFit.Components('CB_chi2'), RooFit.LineColor(kMagenta+1), RooFit.LineWidth(2))
+pdfSum.plotOn(mframe,RooFit.Components('CB_chi1'), RooFit.LineColor(kBlue+1), RooFit.LineWidth(2))
 pdfSum.plotOn(mframe,RooFit.LineColor(kRed+1), RooFit.LineWidth(2))
 chisqn = mframe.chiSquare(rrr.floatParsFinal().getSize() )
-Set = RooArgSet(S_chi1, S_chi2, B, CB_1_mean, CB_2_mean, CB_1_sigma, CB_1_alpha)
-mframe.SetTitle('#chi mass distribution')
+Set = RooArgSet(S_chi1, S_chi2, B, CB_1_mean, CB_2_mean, CB_1_sigma, CB_1_alpha, CB_1_n)
+mframe.SetTitle('#chi mass CrystalBall fit')
 pdfSum.paramOn(mframe, RooFit.Parameters(Set), RooFit.Format("NE",RooFit.AutoPrecision(1)), RooFit.Layout(0.55,0.97,0.88));
 mframe.Draw()
 #l1=TLine(S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 80)
 #l2=TLine(S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 80)
 #l1.Draw('same'); l2.Draw('same')
 cB.SaveAs('Chi_incl.gif')
-print "Fit chi2", mframe.chiSquare(10)
+print "Fit chi2", mframe.chiSquare(11)
 
 sPlot_list = RooArgList(S_chi1, S_chi2, B)
 sData_chi = RooStats.SPlot('sData_chi', 'sData_chi', dataset, pdfSum, sPlot_list)
