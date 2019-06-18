@@ -176,13 +176,13 @@ pdfSum.plotOn(mframe,RooFit.Components('GE_chi1'), RooFit.LineColor(kBlue+1), Ro
 pdfSum.plotOn(mframe,RooFit.LineColor(kRed+1), RooFit.LineWidth(2))
 chisqn = mframe.chiSquare(rrr.floatParsFinal().getSize() )
 Set = RooArgSet(S_chi1, S_chi2, B, CB_1_mean, CB_2_mean, CB_1_sigma, CB_1_alpha)
-mframe.SetTitle('#chi mass distribution')
+mframe.SetTitle('#chi mass GaussExp fit')
 pdfSum.paramOn(mframe, RooFit.Parameters(Set), RooFit.Format("NE",RooFit.AutoPrecision(1)), RooFit.Layout(0.55,0.97,0.88));
 mframe.Draw()
 #l1=TLine(S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 80)
 #l2=TLine(S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 80)
 #l1.Draw('same'); l2.Draw('same')
-cB.SaveAs('Chi_incl.gif')
+cB.SaveAs('Chi_incl_GE.gif')
 print "Fit chi2", mframe.chiSquare(10)
 
 sPlot_list = RooArgList(S_chi1, S_chi2, B)
