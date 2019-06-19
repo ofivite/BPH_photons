@@ -50,23 +50,23 @@ for evt in range(nEvt):
     if (cuts == True) :
 
        # B cuts 
-#       if ch.chi_mass_cjp  < 3.3           :continue
-#       if ch.chi_mass_cjp  > 3.7           :continue
-#       if (ch.photon_flags_1 / 10000) % 10 > 0.1      :continue
-       if ch.Jpsi_pvcos2_Cjp < 0.999                :continue
-#       if ch.B_DS2_PV < 5                      :continue
-       if ch.photon_VtxProb < 0.5                   :continue
+       if ch.chi_mass_Cjp  < 3.3           :continue
+       if ch.chi_mass_Cjp  > 3.7           :continue
+#       if (ch.photon_flags / 1000) % 10 > 0.5      :continue
+#       if ch.Jpsi_pvcos2_Cjp < 0.999                :continue
+#       if ch.B_DS2_PV < 3                      :continue
+#       if ch.photon_VtxProb < 0.05                   :continue
 
 
     if  (not REMUC) or (ch.SAMEEVENT == 0) :
-       if ch.chi_mass_Cjp < 3.4 : continue
-       if ch.chi_mass_Cjp > 3.64 : continue  
-#       if ch.B_mass > 5.4 : continue
-#       if ch.B_mass < 5.1 : continue
-       mchi1 .setVal( ch.chi_mass_Cjp    )
-       PhotExy.setVal( ch.photon_pt_0c )
-       PhotM.setVal( ch.photon_mass_0c)
-       flag_empty = 0;
+        if ch.chi_mass_Cjp < 3.4 : continue
+        if ch.chi_mass_Cjp > 3.64 : continue  
+#        if ch.B_mass > 5.4 : continue
+#        if ch.B_mass < 5.1 : continue
+        mchi1 .setVal( ch.chi_mass_Cjp    )
+        PhotExy.setVal( ch.photon_pt_0c )
+        PhotM.setVal( ch.photon_mass_0c)
+        flag_empty = 0;
 
 if flag_empty != 1 : dataset.add(varset);  ## write last event if needed
 
@@ -133,13 +133,13 @@ Frac_chi2      = RooRealVar( "Frac_chi2","Frac_chi2"     , 0.3   , 0.000001    ,
 
 CB_1_mean    = RooRealVar("chi1_mean", "mean", 3.5069, 3.50, 3.53)
 CB_1_sigma   = RooRealVar("sigma_chi1", "sigma", 0.01, 0.001, 0.05)
-CB_1_alpha   = RooRealVar("alpha_chi1", 'alpha', 1., .1, 3.)
+CB_1_alpha   = RooRealVar("alpha_chi1", 'alpha', 1., .3, 3.)
 CB_1_n       = RooRealVar('n_chi1', 'n', 3., 2., 100.)
 
 CB_2_mean    = RooRealVar("chi2_mean", "mean",3.5524, 3.545, 3.555)
 #CB_2_mean    = RooFormulaVar("chi2_mean", "mean", 'chi1_mean + 0.04554', RooArgList(CB_1_mean))
 CB_2_sigma   = RooRealVar("sigma_chi2", "sigma", 0.01, 0., 0.05)
-CB_2_alpha   = RooRealVar('alpha_chi2', 'alpha', 2., .1, 10.)
+CB_2_alpha   = RooRealVar('alpha_chi2', 'alpha', 2., .3, 10.)
 CB_2_n       = RooRealVar('n_chi2', '', 3., 2., 10.)
 
 CB_chi1    = RooCBShape('CB_chi1', '', mchi1, CB_1_mean, CB_1_sigma, CB_1_alpha, CB_1_n)
@@ -149,6 +149,8 @@ CB_chi1    = RooCBShape('CB_chi1', '', mchi1, CB_1_mean, CB_1_sigma, CB_1_alpha,
 
 GE_chi1 = RooGenericPdf('GE_chi1', '((mchi1-chi1_mean)/sigma_chi1>(0-alpha_chi1))*(exp(-(mchi1-chi1_mean)*(mchi1-chi1_mean)/(2*sigma_chi1*sigma_chi1)))+((mchi1-chi1_mean)/sigma_chi1<(0-alpha_chi1))*exp(alpha_chi1*alpha_chi1/2+alpha_chi1*(mchi1 - chi1_mean)/(sigma_chi1))', RooArgList(mchi1, CB_1_mean, CB_1_sigma, CB_1_alpha))
 GE_chi2 = RooGenericPdf('GE_chi2', '((mchi1-chi2_mean)/sigma_chi1>(0-alpha_chi1))*(exp(-(mchi1-chi2_mean)*(mchi1-chi2_mean)/(2*sigma_chi1*sigma_chi1)))+((mchi1-chi2_mean)/sigma_chi1<(0-alpha_chi1))*exp(alpha_chi1*alpha_chi1/2+alpha_chi1*(mchi1 - chi2_mean)/(sigma_chi1))', RooArgList(mchi1, CB_2_mean, CB_1_sigma, CB_1_alpha))
+
+#GE_chi2 = RooGenericPdf('GE_chi2', '((mchi1-chi2_mean)/sigma_chi2>(0-alpha_chi2))*(exp(-(mchi1-chi2_mean)*(mchi1-chi2_mean)/(2*sigma_chi2*sigma_chi2)))+((mchi1-chi2_mean)/sigma_chi2<(0-alpha_chi2))*exp(alpha_chi2*alpha_chi2/2+alpha_chi2*(mchi1 - chi2_mean)/(sigma_chi2))', RooArgList(mchi1, CB_2_mean, CB_2_sigma, CB_2_alpha))
 
 #Chi_m_distr = RooGenericPdf('Chi_m_distr', '(((mchi-chi1_mean)/sigma_chi1>(0-alpha_chi1))*(exp(-(mchi-chi1_mean)*(mchi-chi1_mean)/(2*sigma_chi1*sigma_chi1)))+((mchi-chi1_mean)/sigma_chi1<(0-alpha_chi1))*exp(alpha_chi1*alpha_chi1/2+alpha_chi1*(mchi - chi1_mean)/(sigma_chi1))) * (1 - Frac_chi2)+ (((mchi-chi2_mean)/sigma_chi1>(0-alpha_chi1))*(exp(-(mchi-chi2_mean)*(mchi-chi2_mean)/(2*sigma_chi1*sigma_chi1)))+((mchi-chi2_mean)/sigma_chi1<(0-alpha_chi1))*exp(alpha_chi1*alpha_chi1/2+alpha_chi1*(mchi - chi2_mean)/(sigma_chi1)))*Frac_chi2', RooArgList(mchi, CB_1_mean, CB_2_mean, CB_1_sigma, CB_1_alpha, Frac_chi2))
 
@@ -175,9 +177,10 @@ pdfSum.plotOn(mframe,RooFit.Components('GE_chi2'), RooFit.LineColor(kMagenta+1),
 pdfSum.plotOn(mframe,RooFit.Components('GE_chi1'), RooFit.LineColor(kBlue+1), RooFit.LineWidth(2))
 pdfSum.plotOn(mframe,RooFit.LineColor(kRed+1), RooFit.LineWidth(2))
 chisqn = mframe.chiSquare(rrr.floatParsFinal().getSize() )
+#Set = RooArgSet(S_chi1, S_chi2, B, CB_1_mean, CB_2_mean, CB_1_sigma, CB_2_sigma, CB_1_alpha, CB_2_alpha)
 Set = RooArgSet(S_chi1, S_chi2, B, CB_1_mean, CB_2_mean, CB_1_sigma, CB_1_alpha)
-mframe.SetTitle('#chi mass GaussExp fit')
-pdfSum.paramOn(mframe, RooFit.Parameters(Set), RooFit.Format("NE",RooFit.AutoPrecision(1)), RooFit.Layout(0.55,0.97,0.88));
+mframe.SetTitle('#chi mass GaussExp fit                                                ')
+pdfSum.paramOn(mframe, RooFit.Parameters(Set), RooFit.Format("NE",RooFit.AutoPrecision(1)), RooFit.Layout(0.5,0.97,0.97));
 mframe.Draw()
 #l1=TLine(S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 80)
 #l2=TLine(S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 80)

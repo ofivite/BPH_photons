@@ -35,7 +35,7 @@ mchi    = RooRealVar ( "mchi"   ,"M(#chi), [Gev]", 3.4 , 3.64)
 mchi1   = RooRealVar ( "mchi1"   ,"M(#chi), [Gev]", 3.4 , 3.64)
 mB      = RooRealVar ( "mB"     ,"M(B), [Gev]", 5.05 , 5.4)
 PhotExy = RooRealVar ( "PhotonE","E(#gamma), [Gev]", 0, 15)
-PhotM   = RooRealVar ( "PhotonE","M(#gamma), [Gev]", -0.001, 0.005)
+PhotM   = RooRealVar ( "PhotonE","M(#gamma), [Gev]", -0.001, 0.1)
 
 def DetachSignificance2(vtx, vtxE1, vtxE2):
     return ( 9999 if vtxE1.X() * vtxE1.Y() * vtxE1.Z() * vtxE2.X() * vtxE2.Y() * vtxE2.Z() == 0. else

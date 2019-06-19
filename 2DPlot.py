@@ -16,7 +16,7 @@ for fName in MyFileNames :
 
 nEvt = ch.GetEntries();
 n = 0
-PhotonVtx = TH2F("PhotonVtx", ";VtxX; VtxY", 1300, -65 , 65, 1300, -65 , 65)
+PhotonVtx = TH2F("PhotonVtx", ";VtxX; VtxY", 500, -10 , 10, 500, -10 , 10)
 
 
 for evt in range( nEvt ):
@@ -24,9 +24,10 @@ for evt in range( nEvt ):
     if (evt % 10000 == 0) :    ## printout progress
         _perc = str(TMath.Nint(100*(evt-0)/(nEvt-0+0.0)));
         print "["+_perc+(' ' * (3 - len(_perc)))+"%];evt",evt,";saved",n
+    if (ch.photon_flags_1 / 10000) % 10 > 0.5 :continue
     PhotonVtx.Fill(ch.photon_VtxX, ch.photon_VtxY)
     n = n + 1
 
-f = TFile('2DPhotonVtx65x65.root','recreate')
+f = TFile('2DPhotonVtx65x65_Pi_large.root','recreate')
 PhotonVtx.Write()
 f.Close()

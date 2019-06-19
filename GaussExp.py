@@ -52,7 +52,7 @@ for evt in range(nEvt):
        # B cuts 
 #       if ch.chi_mass_cjp  < 3.3           :continue
 #       if ch.chi_mass_cjp  > 3.7           :continue
-       if (ch.photon_flags_1 / 10000) % 10 > 0.1      :continue
+       if (ch.photon_flags_1 / 10000) % 10 > 0.5      :continue
        if ch.B_cos2D_PV < 0.999                :continue
        if ch.B_DS2_PV < 4                      :continue
        if ch.B_vtxprob < 0.05                   :continue
