@@ -347,7 +347,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	  //Now that we have a J/psi candidate, we look for K^+ candidates
 
-	  /*for(View<pat::PackedCandidate>::const_iterator iTrack1 = thePATTrackHandle->begin();
+	  for(View<pat::PackedCandidate>::const_iterator iTrack1 = thePATTrackHandle->begin();
 		   iTrack1 != thePATTrackHandle->end(); ++iTrack1 )
 		   {
 
@@ -361,7 +361,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 		   reco::TransientTrack kaonTT((*theB).build(iTrack1->pseudoTrack()));
 
-*/
+
 
 
         /////////////////////
@@ -471,10 +471,10 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   // ***************************
 		   // JpsiKaon invariant mass (before kinematic vertex fit)
 		   // ***************************
-//		   TLorentzVector kaon14V;
-//		   kaon14V.SetXYZM(iTrack1->px(),iTrack1->py(),iTrack1->pz(),kaon_mass);
+		   TLorentzVector kaon14V;
+		   kaon14V.SetXYZM(iTrack1->px(),iTrack1->py(),iTrack1->pz(),kaon_mass);
 
-//		   if ( (kaon14V + p4photon1 + p4_jpsi).M()<4.2 || (kaon14V + p4photon1 + p4_jpsi).M()>6.2 ) continue;
+		   if ( (kaon14V + p4photon1 + p4_jpsi).M()<4.2 || (kaon14V + p4photon1 + p4_jpsi).M()>6.2 ) continue;
 
 		   //Now we are ready to combine!
 		   // JPsi mass constraint is applied in the final Bplus fit,
@@ -482,8 +482,8 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   vector<RefCountedKinematicParticle> vFitMCParticles;
 		   vFitMCParticles.push_back(pFactory.particle(muon1TT,muon_mass,chi,ndf,muon_sigma));
 		   vFitMCParticles.push_back(pFactory.particle(muon2TT,muon_mass,chi,ndf,muon_sigma));
-//		   vFitMCParticles.push_back(pFactory.particle(kaonTT,kaon_mass ,chi,ndf,kaon_sigma));
-                   vFitMCParticles.push_back(photon_vFit_withMC_1);
+		   vFitMCParticles.push_back(pFactory.particle(kaonTT,kaon_mass ,chi,ndf,kaon_sigma));
+       vFitMCParticles.push_back(photon_vFit_withMC_1);
 
 		   MultiTrackKinematicConstraint *  j_psi_c = new  TwoTrackMassKinematicConstraint(psi_mass);
 		   KinematicConstrainedVertexFitter kcvFitter;
@@ -500,7 +500,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         if (!bCandMC->currentState().isValid()) continue;
         if (!bDecayVertexMC->vertexIsValid())  continue;
 
-		    if ( (bCandMC->currentState().mass() < 3.0) || (bCandMC->currentState().mass() > 4.) ) {
+		    if ( (bCandMC->currentState().mass() < 5.0) || (bCandMC->currentState().mass() > 5.6) ) {
 		      continue;
 		    }
 
@@ -561,10 +561,10 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 		    vertexFitTree->movePointerToTheNextChild();
-//		    RefCountedKinematicParticle kCandMC = vertexFitTree->currentParticle();
-//       if (!kCandMC->currentState().isValid()) continue;
+		    RefCountedKinematicParticle kCandMC = vertexFitTree->currentParticle();
+        if (!kCandMC->currentState().isValid()) continue;
 
-//        vertexFitTree->movePointerToTheNextChild();
+        vertexFitTree->movePointerToTheNextChild();
 		    RefCountedKinematicParticle photonCandMC = vertexFitTree->currentParticle();
         if (!photonCandMC->currentState().isValid()) continue;
 
@@ -587,7 +587,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 				       mu2CandMC->currentState().globalMomentum().y(),
  				       mu2CandMC->currentState().globalMomentum().z());
 
-//		   KinematicParameters VCandKP = kCandMC->currentState().kinematicParameters();
+		   KinematicParameters VCandKP = kCandMC->currentState().kinematicParameters();
        KinematicParameters photonCandKP = photonCandMC->currentState().kinematicParameters();
 
        ///
@@ -620,14 +620,14 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 		   // You can get the momentum components (for muons and kaon) from the final B childrens or of the original Tracks. Here, a example for the kaon:
-/*		   B_k_px->push_back(VCandKP.momentum().x() );
+		   B_k_px->push_back(VCandKP.momentum().x() );
 		   B_k_py->push_back(VCandKP.momentum().y() );
 		   B_k_pz->push_back(VCandKP.momentum().z() );
 		   B_k_px_track->push_back(iTrack1->px() );
 		   B_k_py_track->push_back(iTrack1->py() );
 		   B_k_pz_track->push_back(iTrack1->pz() );
 		   B_k_charge1->push_back(kCandMC->currentState().particleCharge());
-*/
+
 		   B_J_mass->push_back( psi_vFit_noMC->currentState().mass() );
 		   B_J_px->push_back( psi_vFit_noMC->currentState().globalMomentum().x() );
 		   B_J_py->push_back( psi_vFit_noMC->currentState().globalMomentum().y() );
@@ -793,7 +793,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	          }
 	        }
-  //    	}
+      	}
       }
    }
 
