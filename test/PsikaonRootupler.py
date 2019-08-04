@@ -40,9 +40,9 @@ process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
                                         throw = cms.bool(False)
                                         )
 
-process.load("Photons.slimmedMuonsTriggerMatcher_cfi")
+process.load("myAnalyzers.JPsiKsPAT.slimmedMuonsTriggerMatcher_cfi")
 
-process.load("Photons.PsikaonRootupler_cfi")
+process.load("myAnalyzers.JPsiKsPAT.PsikaonRootupler_cfi")
 process.rootuple.dimuons = cms.InputTag('slimmedMuonsWithTrigger')
 
 process.TFileService = cms.Service("TFileService",
