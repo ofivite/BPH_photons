@@ -361,9 +361,11 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 		   reco::TransientTrack kaonTT((*theB).build(iTrack1->pseudoTrack()));
                    
-                   TLorentzVector kaon14V;
-                   kaon14V.SetXYZM(iTrack1->px(),iTrack1->py(),iTrack1->pz(),kaon_mass);
-                   p4chi0 = p4_jpsi + kaon14V;
+		   ParticleMass kaon_mass = 0.493677;
+                   TLorentzVector kaon14V, p4_jpsi;
+		   kaon14V.SetXYZM(iTrack1->px(),iTrack1->py(),iTrack1->pz(),kaon_mass);
+                   p4_jpsi.SetXYZM(psi_vFit_noMC->currentState().globalMomentum().x(),psi_vFit_noMC->currentState().globalMomentum().y(),psi_vFit_noMC->currentState().globalMomentum().z(),psi_vFit_noMC->currentState().mass());
+		   p4chi0 = p4_jpsi + kaon14V;
 		   if (p4chi0.M() < 4.2 || p4chi0.M() > 6.2) continue;
 
 
@@ -379,7 +381,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
        	   for ( View< pat::CompositeCandidate > ::const_iterator iPhoton1 = photonHandle->begin(); iPhoton1 != photonHandle->end(); ++iPhoton1 )
        		 {
-              TLorentzVector p4photon1, p4photon2, p4photon2_0, p4_jpsi, p4chi0, p4chi, p4casc;
+              TLorentzVector p4photon1, p4photon2, p4photon2_0, p4chi0, p4chi, p4casc;
               p4_jpsi.SetXYZM(psi_vFit_noMC->currentState().globalMomentum().x(),psi_vFit_noMC->currentState().globalMomentum().y(),psi_vFit_noMC->currentState().globalMomentum().z(),psi_vFit_noMC->currentState().mass());
               p4photon1.SetXYZM(iPhoton1->px(), iPhoton1->py(), iPhoton1->pz(), iPhoton1->mass());
 
@@ -465,7 +467,6 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 */
 
 
-		   ParticleMass kaon_mass = 0.493677;
 		   float kaon_sigma = kaon_mass*1.e-6;
 
 		   float chi = 0.;
@@ -501,7 +502,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         if (!bCandMC->currentState().isValid()) continue;
         if (!bDecayVertexMC->vertexIsValid())  continue;
 
-		    if ( (bCandMC->currentState().mass() < 5.0) || (bCandMC->currentState().mass() > 5.6) ) {
+		    if ( (bCandMC->currentState().mass() < 5.0) || (bCandMC->currentState().mass() > 5.7) ) {
 		      continue;
 		    }
 
