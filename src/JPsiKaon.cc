@@ -291,10 +291,10 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 	  ParticleMass electron_mass = 0.0005109989461;
-    ParticleMass photon_null_mass = 0.;
+    //ParticleMass photon_null_mass = 0.;
 
     float PM_sigma = 1.e-7;
-    float photon_null_sigma = 1.e-7;
+   // float photon_null_sigma = 1.e-7;
 
 
 	  //Creating a KinematicParticleFactory
@@ -362,7 +362,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   reco::TransientTrack kaonTT((*theB).build(iTrack1->pseudoTrack()));
                    
 		   ParticleMass kaon_mass = 0.493677;
-                   TLorentzVector kaon14V, p4_jpsi;
+                   TLorentzVector kaon14V, p4_jpsi, p4chi0;
 		   kaon14V.SetXYZM(iTrack1->px(),iTrack1->py(),iTrack1->pz(),kaon_mass);
                    p4_jpsi.SetXYZM(psi_vFit_noMC->currentState().globalMomentum().x(),psi_vFit_noMC->currentState().globalMomentum().y(),psi_vFit_noMC->currentState().globalMomentum().z(),psi_vFit_noMC->currentState().mass());
 		   p4chi0 = p4_jpsi + kaon14V;
@@ -381,7 +381,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
        	   for ( View< pat::CompositeCandidate > ::const_iterator iPhoton1 = photonHandle->begin(); iPhoton1 != photonHandle->end(); ++iPhoton1 )
        		 {
-              TLorentzVector p4photon1, p4photon2, p4photon2_0, p4chi0, p4chi, p4casc;
+              TLorentzVector p4photon1, p4photon2, p4photon2_0, p4chi, p4casc;
               p4_jpsi.SetXYZM(psi_vFit_noMC->currentState().globalMomentum().x(),psi_vFit_noMC->currentState().globalMomentum().y(),psi_vFit_noMC->currentState().globalMomentum().z(),psi_vFit_noMC->currentState().mass());
               p4photon1.SetXYZM(iPhoton1->px(), iPhoton1->py(), iPhoton1->pz(), iPhoton1->mass());
 
@@ -457,6 +457,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                 if (!photonVertexFitTree_1->isValid()){
                   //std::cout << "caught an exception in the ks mass constraint fit" << std::endl;
                   continue;
+
                 }
 
                 photonVertexFitTree_1->movePointerToTheTop();
