@@ -360,6 +360,11 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   if ( IsTheSame(*iTrack1,*iMuon1) || IsTheSame(*iTrack1,*iMuon2) ) continue;
 
 		   reco::TransientTrack kaonTT((*theB).build(iTrack1->pseudoTrack()));
+                   
+                   TLorentzVector kaon14V;
+                   kaon14V.SetXYZM(iTrack1->px(),iTrack1->py(),iTrack1->pz(),kaon_mass);
+                   p4chi0 = p4_jpsi + kaon14V;
+		   if (p4chi0.M() < 4.2 || p4chi0.M() > 6.2) continue;
 
 
 
@@ -377,8 +382,6 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
               TLorentzVector p4photon1, p4photon2, p4photon2_0, p4_jpsi, p4chi0, p4chi, p4casc;
               p4_jpsi.SetXYZM(psi_vFit_noMC->currentState().globalMomentum().x(),psi_vFit_noMC->currentState().globalMomentum().y(),psi_vFit_noMC->currentState().globalMomentum().z(),psi_vFit_noMC->currentState().mass());
               p4photon1.SetXYZM(iPhoton1->px(), iPhoton1->py(), iPhoton1->pz(), iPhoton1->mass());
-              p4chi0 = p4_jpsi + p4photon1;
-              if (p4chi0.M() < 2.5 || p4chi0.M() > 4.5) continue;
 
              const reco::Track *e1_track1 = iPhoton1->userData<reco::Track>("track0");
              const reco::Track *e2_track1 = iPhoton1->userData<reco::Track>("track1");
@@ -443,7 +446,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           ////////************      PHOTON_1 VTX FIT IWTH 0 CONSTRAINT
           ///////
 
-
+/*
                 KinematicParticleFitter csFitterPhoton;
                 KinematicConstraint * photon_c = new MassKinematicConstraint(photon_null_mass, photon_null_sigma);
                 // add mass constraint to the ks0 fit to do a constrained fit:
@@ -459,7 +462,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                 RefCountedKinematicVertex photon_vFit_vertex_withMC_1 = photonVertexFitTree_1->currentDecayVertex();
                 if (!photon_vFit_vertex_withMC_1->vertexIsValid())  continue;
                 if (!photon_vFit_withMC_1->currentState().isValid()) continue;
-
+*/
 
 
 		   ParticleMass kaon_mass = 0.493677;
@@ -471,10 +474,8 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   // ***************************
 		   // JpsiKaon invariant mass (before kinematic vertex fit)
 		   // ***************************
-		   TLorentzVector kaon14V;
-		   kaon14V.SetXYZM(iTrack1->px(),iTrack1->py(),iTrack1->pz(),kaon_mass);
 
-		   if ( (kaon14V + p4photon1 + p4_jpsi).M()<4.2 || (kaon14V + p4photon1 + p4_jpsi).M()>6.2 ) continue;
+		   if ( (kaon14V + p4photon1 + p4_jpsi).M()<4.3 || (kaon14V + p4photon1 + p4_jpsi).M()>6.3 ) continue;
 
 		   //Now we are ready to combine!
 		   // JPsi mass constraint is applied in the final Bplus fit,
@@ -483,7 +484,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   vFitMCParticles.push_back(pFactory.particle(muon1TT,muon_mass,chi,ndf,muon_sigma));
 		   vFitMCParticles.push_back(pFactory.particle(muon2TT,muon_mass,chi,ndf,muon_sigma));
 		   vFitMCParticles.push_back(pFactory.particle(kaonTT,kaon_mass ,chi,ndf,kaon_sigma));
-       vFitMCParticles.push_back(photon_vFit_withMC_1);
+                   vFitMCParticles.push_back(photon_vFit_noMC_1);
 
 		   MultiTrackKinematicConstraint *  j_psi_c = new  TwoTrackMassKinematicConstraint(psi_mass);
 		   KinematicConstrainedVertexFitter kcvFitter;
@@ -541,10 +542,10 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                            }
                       reco::Vertex bestVtxRf = bestPV_Bang;
 
-                      Double_t dx_gamma_1 = (*photon_vFit_vertex_withMC_1).position().x() - (*bDecayVertexMC).position().x();
-                      Double_t dy_gamma_1 = (*photon_vFit_vertex_withMC_1).position().y() - (*bDecayVertexMC).position().y();
-                      Double_t photon1_px = photon_vFit_withMC_1->currentState().globalMomentum().x();
-                      Double_t photon1_py = photon_vFit_withMC_1->currentState().globalMomentum().y();
+                      Double_t dx_gamma_1 = (*photon_vFit_vertex_noMC_1).position().x() - (*bDecayVertexMC).position().x();
+                      Double_t dy_gamma_1 = (*photon_vFit_vertex_noMC_1).position().y() - (*bDecayVertexMC).position().y();
+                      Double_t photon1_px = photon_vFit_noMC_1->currentState().globalMomentum().x();
+                      Double_t photon1_py = photon_vFit_noMC_1->currentState().globalMomentum().y();
                       Double_t cos2D_gamma0_common_1 = ( photon1_px * dx_gamma_1 + photon1_py * dy_gamma_1 ) / ( sqrt(dx_gamma_1*dx_gamma_1 + dy_gamma_1*dy_gamma_1) * sqrt(photon1_px * photon1_px + photon1_py * photon1_py ) );
                       Double_t cos3D_B_PV = lip;
 
@@ -648,10 +649,10 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        photon_c0_mass_1->push_back( photon_vFit_noMC_1->currentState().mass() );
 
        photon_mass_FromColl->push_back( p4photon1.M() );
-       photon0_mass_photonMC->push_back ( photon_vFit_withMC_1->currentState().mass() );
-       photon0_px_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().x() );
-       photon0_py_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().y() );
-       photon0_pz_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().z() );
+       photon0_mass_photonMC->push_back ( photon_vFit_noMC_1->currentState().mass() );
+       photon0_px_1->push_back( photon_vFit_noMC_1->currentState().globalMomentum().x() );
+       photon0_py_1->push_back( photon_vFit_noMC_1->currentState().globalMomentum().y() );
+       photon0_pz_1->push_back( photon_vFit_noMC_1->currentState().globalMomentum().z() );
 
        photon_mass_1->push_back( photonCandMC->currentState().mass() );
        photon_px_1->push_back( photonCandKP.momentum().x() );
@@ -697,7 +698,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   B_Prob    ->push_back(B_Prob_tmp);
 		   B_J_Prob  ->push_back(J_Prob_tmp);
        photon1_Prob ->push_back(photon_Prob_tmp_1);
-       photon0_Prob_1 ->push_back(TMath::Prob(photon_vFit_vertex_withMC_1->chiSquared(),(int)photon_vFit_vertex_withMC_1->degreesOfFreedom()));
+       photon0_Prob_1 ->push_back(TMath::Prob(photon_vFit_vertex_noMC_1->chiSquared(),(int)photon_vFit_vertex_noMC_1->degreesOfFreedom()));
 
        bDecayVtxX->push_back((*bDecayVertexMC).position().x());
        bDecayVtxY->push_back((*bDecayVertexMC).position().y());
