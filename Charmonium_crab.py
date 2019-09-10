@@ -10,6 +10,7 @@ config.General.transferLogs = True
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'test/PsikaonRootupler.py'
+config.JobType.allowUndistributedCMSSW = True
 
 config.section_("Data")
 config.Data.inputDataset = '/MuOnia/Run2012B-22Jan2013-v1/AOD'
@@ -65,7 +66,7 @@ if __name__ == '__main__':
     ## 2017_c1 = Jpsi D+ (pi+ k- pi+) K0s (based on D+ v2) working (rearranged loops etc)
     ## 2017_c2 = Jpsi D+ (pi+ k- pi+) K0s (based on D+ v2) upd
     ##
-    ## 2017_d0 = B0s (Jpsi phi) pi+ pi- pi+ (displaced 3piBs vtx)
+    # 2017_d0 = B0s (Jpsi phi) pi+ pi- pi+ (displaced 3piBs vtx)
     ## 2017_d1 = B0s (Jpsi phi) pi+ pi- pi+ (displaced 3piBs vtx) fixed
     ## 2017_d2 = B0s (Jpsi phi) pi+ pi- pi+ (displaced 3piBs vtx) pt05 no ips m6.7
     ## 2017_d3 = B0s (Jpsi phi) pi+ pi- pi+ (displaced 3piBs vtx) pt05 no ips loose m6.6
@@ -91,7 +92,7 @@ if __name__ == '__main__':
         n = int(sys.argv[1])
         #
     else:
-        print ' ADD A NUMBER TO SET DATASET ... 0 - %i'%(len(DS_names) - 1)
+        print ' ADD A NUMBER TO SET DATASET ... 1 - %i'%(len(DS_names) - 1)
         exit(0)
 
     def submit(cfg):

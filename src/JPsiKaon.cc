@@ -406,7 +406,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                   photonParticles_1.push_back(pFactory.particle(e2TT_1,electron_mass,chi,ndf,PM_sigma));
                 }
                 catch(...) {
-                  std::cout<<" Exception caught ... continuing 3 "<<std::endl;
+      //            std::cout<<" Exception caught ... continuing 3 "<<std::endl;
                   continue;
                 }
 
@@ -415,7 +415,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                   photonVertexFitTree_1 = fitter.fit(photonParticles_1);
                 }
                 catch(...) {
-                  std::cout<<" Exception caught ... continuing 4 "<<std::endl;
+      //            std::cout<<" Exception caught ... continuing 4 "<<std::endl;
                   continue;
                 }
                 if (!photonVertexFitTree_1->isValid()) continue;
