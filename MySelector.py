@@ -5,7 +5,7 @@ import ROOT
 from math import sqrt
 
 #__aa = 0;    __bb = 50
-MyFileNames = glob.glob("/eos/user/o/ofilatov/2017_Igorek_v0/crab_Bfinder_2017_Igorek_v0_*/results/*.root")
+MyFileNames = glob.glob("/eos/user/o/ofilatov/2017_Igorek_v0/crab_Bfinder_2017_Igorek_v0_1_*/results/*.root")
 ch = ROOT.TChain('rootuple/ntuple');
 
 __aa = 0;  __bb =  len(MyFileNames);
@@ -83,14 +83,14 @@ _MY_VARS_ = [
 
 
 #-----~-----
-"chi_mass_cjp",
-"chi_pt_cjp", "chi_eta_cjp", "chi_phi_cjp",
+"B_mass_cjp",
+"B_pt_cjp", "B_eta_cjp", "B_phi_cjp",
 
 #-----~-----
-"B_mass", "B_mass_0",
-"B_Pt", "B_Eta", "B_Phi",
-"B_vtxprob", 'B_cos2D_PV', 'B_cos3D_PV_Bfinder',
-'B_DS2_PV',
+"Bst_mass", "Bst_mass_0",
+"Bst_Pt", "Bst_Eta", "Bst_Phi",
+"Bst_vtxprob", 'Bst_cos2D_PV', 'Bst_cos3D_PV_Bfinder',
+'Bst_DS2_PV',
 
 'PV_refit_prob',
 "SAMEEVENT"]
@@ -205,17 +205,17 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~Chi~~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~#####
 
-        chiP4_Cjp = MUMUP4_cjp + photon_cjp_P4_1
+        BP4_Cjp = MUMUP4_cjp + K_P4_cjp
 
 
         #####~~~~~~~~~~~~~~~~~~#####
         ###~~~~~~~~~~B~~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~#####
 
-        B_P4    .SetXYZM  ( ch.B_px[ibs], ch.B_py[ibs], ch.B_pz[ibs], ch.B_mass[ibs])
-        B_P3 = B_P4.Vect()
-        B_V     = ROOT.TVector3(ch.bDecayVtxX[ibs],  ch.bDecayVtxY[ibs],  ch.bDecayVtxZ[ibs]   )
-        B_VE    = ROOT.TVector3( 0 if ch.bDecayVtxXE[ibs] <= 0 else sqrt(ch.bDecayVtxXE[ibs]),
+        Bst_P4    .SetXYZM  ( ch.B_px[ibs], ch.B_py[ibs], ch.B_pz[ibs], ch.B_mass[ibs])
+        Bst_P3 = Bst_P4.Vect()
+        Bst_V     = ROOT.TVector3(ch.bDecayVtxX[ibs],  ch.bDecayVtxY[ibs],  ch.bDecayVtxZ[ibs]   )
+        Bst_VE    = ROOT.TVector3( 0 if ch.bDecayVtxXE[ibs] <= 0 else sqrt(ch.bDecayVtxXE[ibs]),
                                  0 if ch.bDecayVtxYE[ibs] <= 0 else sqrt(ch.bDecayVtxYE[ibs]),
                                  0 if ch.bDecayVtxZE[ibs] <= 0 else sqrt(ch.bDecayVtxZE[ibs])  )
 
@@ -228,29 +228,29 @@ for evt in range(0, nEvt):
         #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
 
 
-        ###~~~~~~~~~~ B ~~~~~~~~~~###
+        ###~~~~~~~~~~ B star ~~~~~~~~~~###
 
-        B_mass[0]          = ch.B_mass[ibs]
-        B_mass_0[0]        = (chiP4_Cjp + K_P4_cjp).M()
-        B_Pt[0]            = B_P4.Pt()
-        B_Phi[0]            = B_P4.Phi()
-        B_Eta[0]            = B_P4.Eta()
+        Bst_mass[0]          = ch.B_mass[ibs]
+        Bst_mass_0[0]        = (BP4_Cjp + K_P4_cjp).M()
+        Bst_Pt[0]            = Bst_P4.Pt()
+        Bst_Phi[0]            = Bst_P4.Phi()
+        Bst_Eta[0]            = Bst_P4.Eta()
 
-        B_vtxprob[0]       = ch.B_Prob[ibs]
-        B_cos3D_PV_Bfinder[0] = ch.B_cos3D_PV[ibs]
-        B_cos2D_PV[0] = DirectionCos2 ( B_V - PV , B_P3 )
-        B_DS2_PV[0] = DetachSignificance2(B_V - PV, PVE, B_VE)
+        Bst_vtxprob[0]       = ch.B_Prob[ibs]
+        Bst_cos3D_PV_Bfinder[0] = ch.B_cos3D_PV[ibs]
+        Bst_cos2D_PV[0] = DirectionCos2 ( B_V - PV , B_P3 )
+        Bst_DS2_PV[0] = DetachSignificance2(B_V - PV, PVE, B_VE)
 
         PV_refit_prob[0] = ch.PV_bestBang_RF_CL[ibs]
 
 
-        ###~~~~~~~~~~ chi ~~~~~~~~~~###
+        ###~~~~~~~~~~ B ~~~~~~~~~~###
 
-        # chi_mass_Cjp[0]          = ch.chi_mass[ibs]
-        chi_mass_cjp[0]        = chiP4_Cjp.M()
-        chi_pt_cjp[0]          = chiP4_Cjp.Pt()
-        chi_phi_cjp[0]         = chiP4_Cjp.Phi()
-        chi_eta_cjp[0]         = chiP4_Cjp.Eta()
+        # B_mass_Cjp[0]          = ch.chi_mass[ibs]
+        B_mass_cjp[0]        = BP4_Cjp.M()
+        B_pt_cjp[0]          = BP4_Cjp.Pt()
+        B_phi_cjp[0]         = BP4_Cjp.Phi()
+        B_eta_cjp[0]         = BP4_Cjp.Eta()
 
 
         ###~~~~~~~~~~ PHOTON ~~~~~~~~~~###
