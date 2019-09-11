@@ -5,7 +5,7 @@ import ROOT
 from math import sqrt
 
 #__aa = 0;    __bb = 50
-MyFileNames = glob.glob("/eos/user/o/ofilatov/2017_Igorek_v0/crab_Bfinder_2017_Igorek_v0_1_*/results/*.root")
+MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_9_4_10/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2017_Igorek_v0_1_*/results/*.root")
 ch = ROOT.TChain('rootuple/ntuple');
 
 __aa = 0;  __bb =  len(MyFileNames);
@@ -14,7 +14,7 @@ for fName in  MyFileNames[__aa: __bb]:
     ii = ch.Add(fName);
 print ('get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created')
 
-_fileOUT = '2017_Igorek_v0_' + str(len(MyFileNames)) + '_of_1271.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
+_fileOUT = '2017_Igorek_v0_1_' + str(len(MyFileNames)) + '_of_1271.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
 fileOUT  = ROOT.TFile (_fileOUT, "recreate");    mytree = ROOT.TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print ("entries: from", 0, 'to', nEvt-1);
@@ -22,7 +22,7 @@ H_cuts = ROOT.TH1F("H_cuts", "H_cuts", 40, 0, 20)
 
 ###  declaration and connecting to the branches of my new variables {{{1
 NOUT, NOUT_evt, BBB, ibs = [int(0) for i in range(4)];
-MU1P4_cjp, MU2P4_cjp, K_P4_cjp, photon0_P4_1, photon_cjp_P4_1, B_P4 = [ROOT.TLorentzVector() for i in range(6)];
+MU1P4_cjp, MU2P4_cjp, K_P4_cjp, photon0_P4_1, photon_cjp_P4_1, Bst_P4 = [ROOT.TLorentzVector() for i in range(6)];
 
 
 _MY_VARS_ = [
@@ -238,8 +238,8 @@ for evt in range(0, nEvt):
 
         Bst_vtxprob[0]       = ch.B_Prob[ibs]
         Bst_cos3D_PV_Bfinder[0] = ch.B_cos3D_PV[ibs]
-        Bst_cos2D_PV[0] = DirectionCos2 ( B_V - PV , B_P3 )
-        Bst_DS2_PV[0] = DetachSignificance2(B_V - PV, PVE, B_VE)
+        Bst_cos2D_PV[0] = DirectionCos2 ( Bst_V - PV , Bst_P3 )
+        Bst_DS2_PV[0] = DetachSignificance2(Bst_V - PV, PVE, Bst_VE)
 
         PV_refit_prob[0] = ch.PV_bestBang_RF_CL[ibs]
 
@@ -267,7 +267,7 @@ for evt in range(0, nEvt):
         photon_cjp_pt_1[0] = photon_cjp_P4_1.Pt()
         photon_cjp_eta_1[0] = photon_cjp_P4_1.Eta()
 
-        photon_cjp_cos2D_common_1[0]    = DirectionCos2 ( photonV_c0_1 - B_V, photon_cjp_P3_1 )
+        photon_cjp_cos2D_common_1[0]    = DirectionCos2 ( photonV_c0_1 - Bst_V, photon_cjp_P3_1 )
         photon_cjp_cos2D_PV_1[0]        = DirectionCos2 ( photonV_c0_1 - PV, photon_cjp_P3_1 )
 
         #-----~-----
@@ -277,10 +277,10 @@ for evt in range(0, nEvt):
         photon0_eta_1[0] = photon0_P4_1.Eta()
 
         photon0_cos2D_common_Bfinder_1[0] = ch.photon0_cos2D_common_1[ibs]
-        photon0_cos2D_common_1[0]    = DirectionCos2 ( photonV_c0_1 - B_V, photon0_P3_1 )
+        photon0_cos2D_common_1[0]    = DirectionCos2 ( photonV_c0_1 - Bst_V, photon0_P3_1 )
         photon0_cos2D_PV_1[0]        = DirectionCos2 ( photonV_c0_1 - PV, photon0_P3_1 )
 
-        photon_c0_DS2_common_1[0] = DetachSignificance2(photonV_c0_1 - B_V, B_VE, photonVE_c0_1)
+        photon_c0_DS2_common_1[0] = DetachSignificance2(photonV_c0_1 - Bst_V, Bst_VE, photonVE_c0_1)
         photon_c0_DS2_PV_1[0] = DetachSignificance2(photonV_c0_1 - PV, PVE, photonVE_c0_1)
 
         photon_flags_1[0] = int("{0:b}".format(ch.photon_flags_1[ibs]))
