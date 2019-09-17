@@ -24,7 +24,7 @@ for fName in MyFileNames :
 
 print "Adding chain done", ch.GetNtrees(), 'files '
 #varset  = RooArgSet (mb, mjpp, mjpl, mlkk, mphi, mlk)
-varset  = RooArgSet (mBst) 
+varset  = RooArgSet (mBst, PhotExy) 
 
 dataset = RooDataSet("ds","Dataset",varset)
 
@@ -56,8 +56,8 @@ for evt in range(nEvt):
        if ch.Bst_minus_B  > .065           :continue
    #    if (ch.photon_flags_1 / 1000) % 10 > 0.5      :continue
    #    if ch.B_cos2D_PV < 0.9999                :continue
-   #    if ch.B_DS2_PV < 5                      :continue
-   #    if ch.B_vtxprob < 0.05                  :continue
+       if ch.B_DS2_PV < 3                  :continue
+       if ch. photon0_pt_1 < 0.05          :continue
       
        # Phi cuts 
    
@@ -75,6 +75,7 @@ for evt in range(nEvt):
     #   if ch.B_mass > 5.4 : continue
     #   if ch.B_mass < 5.05 : continue
        mBst .setVal( ch.Bst_minus_B  )
+       PhotExy .setVal( ch.photon0_pt_1 ) 
  #      mB.setVal(ch.B_mass)
        if (Dhists == True):
           JPLA_data.Fill(ch.JPLA_mass)
@@ -218,11 +219,9 @@ rrr = pdfSum.fitTo( dataset, RooFit.NumCPU(7), RooFit.PrintLevel(2), RooFit.Save
 rrr = pdfSum.fitTo( dataset, RooFit.NumCPU(7), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
 rrr.Print()
 
-
 cB=TCanvas("cB","cB",800,600);
-mframe = 0; mframe = mBst.frame(70);
+mframe = 0; mframe = mBst.frame(80);
 mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
-
 
 """
 dataset_weighted.plotOn(mframe, RooFit.MarkerSize(0.6));   # size of dots  
@@ -249,7 +248,12 @@ mframe.Draw()
 #l2=TLine(S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 80)
 #l1.Draw('same'); l2.Draw('same')
 cB.SaveAs('Bstar_res/Mdiff_distribution.png')
-print "Fit chi^2", mframe.chiSquare(7)
+#print "Fit chi^2", mframe.chiSquare(7)
+
+sPlot_list = RooArgList(B_signal, Bg)
+sData_Bst = RooStats.SPlot('sData_Bst', 'sData_Bst', dataset, pdfSum, sPlot_list)
+dataset_weighted = RooDataSet(dataset.GetName(), dataset.GetTitle(), dataset, dataset.get(), '1 > 0', B_signal.GetName() + '_sw') 
+
 
 """
 LS = rrr.minNll()
@@ -270,12 +274,6 @@ prob = TMath.Prob(L0-LS, 2 )
 print 'Signif =', TMath.ErfcInverse (prob) * sqrt(2.)
 """
 
-
-#sPlot_list = RooArgList(S_B, B)
-#sData_B = RooStats.SPlot('sData_B', 'sData_B', dataset, pdfSum, sPlot_list)
-#dataset_weighted = RooDataSet(dataset.GetName(), dataset.GetTitle(), dataset, dataset.get(), '1 > 0', S_B.GetName() + '_sw') 
-
-
 #alist2 = RooArgList (S_B, B)
 #alist3 = RooArgList(GE_B, pdfPolBg)
 #sP_pdfSum = RooAddPdf  ("model", "model", alist3, alist2)
@@ -285,6 +283,16 @@ print 'Signif =', TMath.ErfcInverse (prob) * sqrt(2.)
 #rrr = sP_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
 #rrr.Print()
 
+cB=TCanvas("cB","cB",800,600);
+mframe = 0; mframe = PhotExy.frame(50);
+mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
+
+dataset_weighted.plotOn(mframe, RooFit.MarkerSize(0.6));   # size of dots  
+#pdfSum.plotOn(mframe, RooFit.Components('pdfB'), RooFit.LineColor(kYellow+1), RooFit.LineStyle(kDashed), RooFit.LineWidth(2))
+#pdfSum.plotOn(mframe,RooFit.Components('G_B'), RooFit.LineColor(kMagenta+1), RooFit.LineWidth(2))
+mframe.SetTitle('Photon E distribution')
+mframe.Draw()
+cB.SaveAs('Bstar_res/PhotonE.png')
 
 ##########################################################################################  design
 """
