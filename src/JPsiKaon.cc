@@ -365,8 +365,9 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                    TLorentzVector kaon14V, p4_jpsi, p4chi0;
 		   kaon14V.SetXYZM(iTrack1->px(),iTrack1->py(),iTrack1->pz(),kaon_mass);
                    p4_jpsi.SetXYZM(psi_vFit_noMC->currentState().globalMomentum().x(),psi_vFit_noMC->currentState().globalMomentum().y(),psi_vFit_noMC->currentState().globalMomentum().z(),psi_vFit_noMC->currentState().mass());
+		   
 		   p4chi0 = p4_jpsi + kaon14V;
-		   if (p4chi0.M() < 4.2 || p4chi0.M() > 6.2) continue;
+		   if (p4chi0.M() < 4.3 || p4chi0.M() > 6.3) continue;
 
 
 
@@ -477,7 +478,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   // JpsiKaon invariant mass (before kinematic vertex fit)
 		   // ***************************
 
-		   if ( (kaon14V + p4photon1 + p4_jpsi).M()<4.3 || (kaon14V + p4photon1 + p4_jpsi).M()>6.3 ) continue;
+		   if ( ((kaon14V + p4photon1 + p4_jpsi).M() - (kaon14V + p4_jpsi).M())<0 || ((kaon14V + p4photon1 + p4_jpsi).M() - (kaon14V + p4_jpsi).M())>0.25 ) continue;
 
 		   //Now we are ready to combine!
 		   // JPsi mass constraint is applied in the final Bplus fit,
@@ -486,7 +487,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   vFitMCParticles.push_back(pFactory.particle(muon1TT,muon_mass,chi,ndf,muon_sigma));
 		   vFitMCParticles.push_back(pFactory.particle(muon2TT,muon_mass,chi,ndf,muon_sigma));
 		   vFitMCParticles.push_back(pFactory.particle(kaonTT,kaon_mass ,chi,ndf,kaon_sigma));
-                   vFitMCParticles.push_back(photon_vFit_noMC_1);
+                   //vFitMCParticles.push_back(photon_vFit_noMC_1);
 
 		   MultiTrackKinematicConstraint *  j_psi_c = new  TwoTrackMassKinematicConstraint(psi_mass);
 		   KinematicConstrainedVertexFitter kcvFitter;
@@ -503,7 +504,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         if (!bCandMC->currentState().isValid()) continue;
         if (!bDecayVertexMC->vertexIsValid())  continue;
 
-		    if ( (bCandMC->currentState().mass() < 5.0) || (bCandMC->currentState().mass() > 5.7) ) {
+		    if ( (bCandMC->currentState().mass() < 5.16) || (bCandMC->currentState().mass() > 5.44) ) {
 		      continue;
 		    }
 

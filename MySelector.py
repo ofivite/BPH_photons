@@ -22,7 +22,7 @@ H_cuts = ROOT.TH1F("H_cuts", "H_cuts", 40, 0, 20)
 
 ###  declaration and connecting to the branches of my new variables {{{1
 NOUT, NOUT_evt, BBB, ibs = [int(0) for i in range(4)];
-MU1P4_cjp, MU2P4_cjp, K_P4_cjp, photon0_P4_1, photon_cjp_P4_1, Bst_P4 = [ROOT.TLorentzVector() for i in range(6)];
+MU1P4_cjp, MU2P4_cjp, K_P4_cjp, photon0_P4_1, photon_cjp_P4_1, B_P4 = [ROOT.TLorentzVector() for i in range(6)];
 
 
 _MY_VARS_ = [
@@ -47,12 +47,15 @@ _MY_VARS_ = [
 
 'photon_VtxX', 'photon_VtxY',
 'photon0_VtxProb_1', 'photon0_pt_1', 'photon0_eta_1',
-'photon_c0_DS2_common_1', 'photon_c0_DS2_PV_1', 'photon_flags_1', 'photon0_cos2D_common_1', 'photon0_cos2D_common_Bfinder_1', 'photon0_cos2D_PV_1',
+#'photon_c0_DS2_common_1', 
+'photon_c0_DS2_PV_1', 'photon_flags_1', 
+#'photon0_cos2D_common_1', 'photon0_cos2D_common_Bfinder_1', 
+'photon0_cos2D_PV_1','photon0_cos3D_PV_1',
 
 #-----~-----
 
-'photon_cjp_mass_1', 'photon_cjp_pt_1', 'photon_cjp_eta_1',
-'photon_cjp_cos2D_PV_1', 'photon_cjp_cos2D_common_1',
+#'photon_cjp_mass_1', 'photon_cjp_pt_1', 'photon_cjp_eta_1',
+#'photon_cjp_cos2D_PV_1', 'photon_cjp_cos2D_common_1',
 
 #-----~-----
 
@@ -83,16 +86,17 @@ _MY_VARS_ = [
 
 
 #-----~-----
-"B_mass_cjp",
-"B_pt_cjp", "B_eta_cjp", "B_phi_cjp",
+#"chi_mass_cjp",
+#"chi_pt_cjp", "chi_eta_cjp", "chi_phi_cjp",
 
 #-----~-----
-"Bst_mass", "Bst_mass_0",
-"Bst_Pt", "Bst_Eta", "Bst_Phi",
-"Bst_vtxprob", 'Bst_cos2D_PV', 'Bst_cos3D_PV_Bfinder',
-'Bst_DS2_PV',
+"B_mass_cjp", "B_mass_0", 'B_mass',
+"B_Pt", "B_Eta", "B_Phi",
+"B_vtxprob", 'B_cos2D_PV', 'B_cos3D_PV_Bfinder',
+'B_DS2_PV',
 
 'PV_refit_prob',
+'Bst_mass', 'Bst_Pt', 'Bst_Phi', 'Bst_Eta', 'Bst_minus_B',
 "SAMEEVENT"]
 
 for _var_ in _MY_VARS_:
@@ -189,8 +193,8 @@ for evt in range(0, nEvt):
                                 0 if ch.PhotonDecayVtxYE_1[ibs] <= 0 else sqrt(ch.PhotonDecayVtxYE_1[ibs]),
                                 0 if ch.PhotonDecayVtxZE_1[ibs] <= 0 else sqrt(ch.PhotonDecayVtxZE_1[ibs])  )
 
-        photon_cjp_P4_1.SetXYZM(ch.photon_px_1[ibs], ch.photon_py_1[ibs], ch.photon_pz_1[ibs], ch.photon_mass_1[ibs] )
-        photon_cjp_P3_1 = photon_cjp_P4_1.Vect()
+        #photon_cjp_P4_1.SetXYZM(ch.photon_px_1[ibs], ch.photon_py_1[ibs], ch.photon_pz_1[ibs], ch.photon_mass_1[ibs] )
+        #photon_cjp_P3_1 = photon_cjp_P4_1.Vect()
 
 
         #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
@@ -198,24 +202,24 @@ for evt in range(0, nEvt):
         #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
 
         photon0_P4_1.SetXYZM(ch.photon0_px_1[ibs], ch.photon0_py_1[ibs], ch.photon0_pz_1[ibs], 0. )
-        photon0_P3_1 = photon0_P4_1.Vect()
-
+        photon0_P3_1 = photon0_P4_1.Vect() 
 
         #####~~~~~~~~~~~~~~~~~~~~#####
         ###~~~~~~~~~~Chi~~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~#####
 
-        BP4_Cjp = MUMUP4_cjp + K_P4_cjp
-
+        BstP4 = MUMUP4_cjp + K_P4_cjp + photon0_P4_1
+	
+	if (DirectionCos3( photonV_c0_1 - PV, photon0_P3_1 ) < 0.99): continue
 
         #####~~~~~~~~~~~~~~~~~~#####
         ###~~~~~~~~~~B~~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~#####
 
-        Bst_P4    .SetXYZM  ( ch.B_px[ibs], ch.B_py[ibs], ch.B_pz[ibs], ch.B_mass[ibs])
-        Bst_P3 = Bst_P4.Vect()
-        Bst_V     = ROOT.TVector3(ch.bDecayVtxX[ibs],  ch.bDecayVtxY[ibs],  ch.bDecayVtxZ[ibs]   )
-        Bst_VE    = ROOT.TVector3( 0 if ch.bDecayVtxXE[ibs] <= 0 else sqrt(ch.bDecayVtxXE[ibs]),
+        B_P4    .SetXYZM  ( ch.B_px[ibs], ch.B_py[ibs], ch.B_pz[ibs], ch.B_mass[ibs])
+        B_P3    = B_P4.Vect()
+        B_V     = ROOT.TVector3(ch.bDecayVtxX[ibs],  ch.bDecayVtxY[ibs],  ch.bDecayVtxZ[ibs]   )
+        B_VE    = ROOT.TVector3( 0 if ch.bDecayVtxXE[ibs] <= 0 else sqrt(ch.bDecayVtxXE[ibs]),
                                  0 if ch.bDecayVtxYE[ibs] <= 0 else sqrt(ch.bDecayVtxYE[ibs]),
                                  0 if ch.bDecayVtxZE[ibs] <= 0 else sqrt(ch.bDecayVtxZE[ibs])  )
 
@@ -228,29 +232,30 @@ for evt in range(0, nEvt):
         #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
 
 
-        ###~~~~~~~~~~ B star ~~~~~~~~~~###
+        ###~~~~~~~~~~ B ~~~~~~~~~~###
 
-        Bst_mass[0]          = ch.B_mass[ibs]
-        Bst_mass_0[0]        = (BP4_Cjp + K_P4_cjp).M()
-        Bst_Pt[0]            = Bst_P4.Pt()
-        Bst_Phi[0]            = Bst_P4.Phi()
-        Bst_Eta[0]            = Bst_P4.Eta()
+        B_mass[0]          = ch.B_mass[ibs]
+        B_mass_0[0]        = (MUMUP4_cjp + K_P4_cjp).M()
+        B_Pt[0]            = B_P4.Pt()
+        B_Phi[0]           = B_P4.Phi()
+        B_Eta[0]           = B_P4.Eta()
 
-        Bst_vtxprob[0]       = ch.B_Prob[ibs]
-        Bst_cos3D_PV_Bfinder[0] = ch.B_cos3D_PV[ibs]
-        Bst_cos2D_PV[0] = DirectionCos2 ( Bst_V - PV , Bst_P3 )
-        Bst_DS2_PV[0] = DetachSignificance2(Bst_V - PV, PVE, Bst_VE)
+        B_vtxprob[0]       = ch.B_Prob[ibs]
+        B_cos3D_PV_Bfinder[0] = ch.B_cos3D_PV[ibs]
+        B_cos2D_PV[0] = DirectionCos2 ( B_V - PV , B_P3 )
+        B_DS2_PV[0] = DetachSignificance2(B_V - PV, PVE, B_VE)
 
         PV_refit_prob[0] = ch.PV_bestBang_RF_CL[ibs]
 
 
-        ###~~~~~~~~~~ B ~~~~~~~~~~###
+        ###~~~~~~~~~~ B* ~~~~~~~~~~###
 
         # B_mass_Cjp[0]          = ch.chi_mass[ibs]
-        B_mass_cjp[0]        = BP4_Cjp.M()
-        B_pt_cjp[0]          = BP4_Cjp.Pt()
-        B_phi_cjp[0]         = BP4_Cjp.Phi()
-        B_eta_cjp[0]         = BP4_Cjp.Eta()
+        Bst_mass[0]        = BstP4.M()
+        Bst_Pt[0]          = BstP4.Pt()
+        Bst_Phi[0]         = BstP4.Phi()
+        Bst_Eta[0]         = BstP4.Eta()
+	Bst_minus_B[0]     = BstP4.M() - B_mass_0
 
 
         ###~~~~~~~~~~ PHOTON ~~~~~~~~~~###
@@ -263,12 +268,12 @@ for evt in range(0, nEvt):
         photon_VtxX[0]      = ch.PhotonDecayVtxX_1[ibs]
         photon_VtxY[0]      = ch.PhotonDecayVtxY_1[ibs]
         
-        photon_cjp_mass_1[0] = ch.photon_mass_1[ibs]
-        photon_cjp_pt_1[0] = photon_cjp_P4_1.Pt()
-        photon_cjp_eta_1[0] = photon_cjp_P4_1.Eta()
+ #       photon_cjp_mass_1[0] = ch.photon_mass_1[ibs]
+ #       photon_cjp_pt_1[0] = photon_cjp_P4_1.Pt()
+ #       photon_cjp_eta_1[0] = photon_cjp_P4_1.Eta()
 
-        photon_cjp_cos2D_common_1[0]    = DirectionCos2 ( photonV_c0_1 - Bst_V, photon_cjp_P3_1 )
-        photon_cjp_cos2D_PV_1[0]        = DirectionCos2 ( photonV_c0_1 - PV, photon_cjp_P3_1 )
+ #       photon_cjp_cos2D_common_1[0]    = DirectionCos2 ( photonV_c0_1 - B_V, photon_cjp_P3_1 )
+ #       photon_cjp_cos2D_PV_1[0]        = DirectionCos2 ( photonV_c0_1 - PV, photon_cjp_P3_1 )
 
         #-----~-----
 
@@ -276,11 +281,12 @@ for evt in range(0, nEvt):
         photon0_pt_1[0] = photon0_P4_1.Pt()
         photon0_eta_1[0] = photon0_P4_1.Eta()
 
-        photon0_cos2D_common_Bfinder_1[0] = ch.photon0_cos2D_common_1[ibs]
-        photon0_cos2D_common_1[0]    = DirectionCos2 ( photonV_c0_1 - Bst_V, photon0_P3_1 )
+#        photon0_cos2D_common_Bfinder_1[0] = ch.photon0_cos2D_common_1[ibs]
+#        photon0_cos2D_common_1[0]    = DirectionCos2 ( photonV_c0_1 - B_V, photon0_P3_1 )
         photon0_cos2D_PV_1[0]        = DirectionCos2 ( photonV_c0_1 - PV, photon0_P3_1 )
+        photon0_cos3D_PV_1[0]        = DirectionCos3 ( photonV_c0_1 - PV, photon0_P3_1 )
 
-        photon_c0_DS2_common_1[0] = DetachSignificance2(photonV_c0_1 - Bst_V, Bst_VE, photonVE_c0_1)
+#        photon_c0_DS2_common_1[0] = DetachSignificance2(photonV_c0_1 - B_V, B_VE, photonVE_c0_1)
         photon_c0_DS2_PV_1[0] = DetachSignificance2(photonV_c0_1 - PV, PVE, photonVE_c0_1)
 
         photon_flags_1[0] = int("{0:b}".format(ch.photon_flags_1[ibs]))
