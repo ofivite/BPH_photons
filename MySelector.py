@@ -5,7 +5,7 @@ import ROOT
 from math import sqrt
 
 #__aa = 0;    __bb = 50
-MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_9_4_10/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2017_Igorek_v0_1_*/results/*.root")
+MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_9_4_10/src/myAnalyzers/JPsiKsPAT/crab_projects2017_Igorek_Bc_v1/crab_Bfinder_2017_Igorek_Bc_v1_*/results/*.root")
 ch = ROOT.TChain('rootuple/ntuple');
 
 __aa = 0;  __bb =  len(MyFileNames);
@@ -14,7 +14,7 @@ for fName in  MyFileNames[__aa: __bb]:
     ii = ch.Add(fName);
 print ('get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created')
 
-_fileOUT = '2017_Igorek_v0_1_' + str(len(MyFileNames)) + '_of_1271.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
+_fileOUT = '2017_Igorek_Bc_v1_' + str(len(MyFileNames)) + '_of_1271.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
 fileOUT  = ROOT.TFile (_fileOUT, "recreate");    mytree = ROOT.TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print ("entries: from", 0, 'to', nEvt-1);
@@ -168,7 +168,7 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~Kaon~~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~~#####
 
-        K_P4_cjp   .SetXYZM(ch.B_k_px[ibs], ch.B_k_py[ibs], ch.B_k_pz[ibs], PDG_KAON_MASS)
+        K_P4_cjp   .SetXYZM(ch.B_k_px[ibs], ch.B_k_py[ibs], ch.B_k_pz[ibs], PDG_PION_MASS)
 
 
         #####~~~~~~~~~~~~~~~~~~~~~~~~~#####

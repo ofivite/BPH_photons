@@ -478,7 +478,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   // JpsiKaon invariant mass (before kinematic vertex fit)
 		   // ***************************
 
-		   if ( ((kaon14V + p4photon1 + p4_jpsi).M() - (kaon14V + p4_jpsi).M())<0 || ((kaon14V + p4photon1 + p4_jpsi).M() - (kaon14V + p4_jpsi).M())>0.25 ) continue;
+		   if ( ((kaon14V + p4photon1 + p4_jpsi).M() - (kaon14V + p4_jpsi).M())<0 || ((kaon14V + p4photon1 + p4_jpsi).M() - (kaon14V + p4_jpsi).M())>0.55 ) continue;
 
 		   //Now we are ready to combine!
 		   // JPsi mass constraint is applied in the final Bplus fit,

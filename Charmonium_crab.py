@@ -105,8 +105,8 @@ if __name__ == '__main__':
     #if dset == '/Charmonium/Run2017D-PromptReco-v1/AOD':
     #    config.Site.ignoreGlobalBlacklist = True
     #
-    config.General.requestName = 'Bfinder_' + task + '_' + dset[19]
-    config.General.workArea = 'crab_projects_' + task
+    config.General.requestName = 'Bfinder1_' + task + '_' + dset[19]
+    config.General.workArea = 'crab_projects1_' + task
     config.Data.inputDataset = dset
     print '\n', config.General.requestName
     print config.General.workArea
@@ -114,12 +114,12 @@ if __name__ == '__main__':
     #
     lumi_mask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_MuonPhys.txt'
     #
-    split_modifier = 1;
-    if ('2017C' in dset) : split_modifier = 0.8
+    split_modifier = 0.5;
+    if ('2017C' in dset) : split_modifier = 1.6
     #
-    if ('2017E' in dset) : split_modifier = 0.5
+    if ('2017E' in dset) : split_modifier = 1
     #
-    if ('2017F' in dset) : split_modifier = 0.8
+    if ('2017F' in dset) : split_modifier = 1.6
     #
     config.Data.unitsPerJob = int(units_per_job * split_modifier)
     config.Data.lumiMask = lumi_mask
