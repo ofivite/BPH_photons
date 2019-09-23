@@ -367,7 +367,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                    p4_jpsi.SetXYZM(psi_vFit_noMC->currentState().globalMomentum().x(),psi_vFit_noMC->currentState().globalMomentum().y(),psi_vFit_noMC->currentState().globalMomentum().z(),psi_vFit_noMC->currentState().mass());
 		   
 		   p4chi0 = p4_jpsi + kaon14V;
-		   if (p4chi0.M() < 5.3 || p4chi0.M() > 7.3) continue;
+		   if (p4chi0.M() < 4.3 || p4chi0.M() > 7.3) continue;
 
 
 
@@ -504,7 +504,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         if (!bCandMC->currentState().isValid()) continue;
         if (!bDecayVertexMC->vertexIsValid())  continue;
 
-		    if ( (bCandMC->currentState().mass() < 6.16) || (bCandMC->currentState().mass() > 6.44) ) {
+		    if ( (bCandMC->currentState().mass() < 5.16) || (bCandMC->currentState().mass() > 6.44) ) {
 		      continue;
 		    }
 
