@@ -32,7 +32,7 @@
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
-
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 //For kinematic fit:
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
@@ -225,13 +225,11 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   lumiblock = iEvent.id().luminosityBlock();
   run = iEvent.id().run();
   event = iEvent.id().event();
-
   //*****************************************
   //Let's begin by looking for J/psi+K^+
 
   unsigned int nMu_tmp = thePATMuonHandle->size();
   //nMu = nMu_tmp;
-
  for(View<pat::Muon>::const_iterator iMuon1 = thePATMuonHandle->begin(); iMuon1 != thePATMuonHandle->end(); ++iMuon1)
     {
       for(View<pat::Muon>::const_iterator iMuon2 = iMuon1+1; iMuon2 != thePATMuonHandle->end(); ++iMuon2)
@@ -255,7 +253,6 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      //std::cout << "continue due to no track ref" << endl;
 	      continue;
 	    }
-
 	  if(iMuon1->track()->pt()<4.0) continue;
 	  if(iMuon2->track()->pt()<4.0) continue;
 
@@ -367,8 +364,8 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                    p4_jpsi.SetXYZM(psi_vFit_noMC->currentState().globalMomentum().x(),psi_vFit_noMC->currentState().globalMomentum().y(),psi_vFit_noMC->currentState().globalMomentum().z(),psi_vFit_noMC->currentState().mass());
 		   
 		   p4chi0 = p4_jpsi + kaon14V;
-		   if (p4chi0.M() < 4.3 || p4chi0.M() > 7.3) continue;
-
+		   if (p4chi0.M() < 5.3 || p4chi0.M() > 7.3) continue;
+                   
 
 
 
@@ -504,7 +501,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         if (!bCandMC->currentState().isValid()) continue;
         if (!bDecayVertexMC->vertexIsValid())  continue;
 
-		    if ( (bCandMC->currentState().mass() < 5.16) || (bCandMC->currentState().mass() > 6.44) ) {
+		    if ( (bCandMC->currentState().mass() < 6.16) || (bCandMC->currentState().mass() > 6.44) ) {
 		      continue;
 		    }
 
@@ -746,21 +743,21 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
  // ********************* muon-trigger-machint ****************
-
-		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t1 = iMuon1->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
-		   const pat::TriggerObjectStandAloneCollection muHLTMatches2_t1 = iMuon2->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
-
-		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t2 = iMuon1->triggerObjectMatchesByFilter("hltJpsiTkVertexFilter");
-		   const pat::TriggerObjectStandAloneCollection muHLTMatches2_t2 = iMuon2->triggerObjectMatchesByFilter("hltJpsiTkVertexFilter");
-
-		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t4 = iMuon1->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon20JpsiBarrelnoCow");
-		   const pat::TriggerObjectStandAloneCollection muHLTMatches2_t4 = iMuon2->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon20JpsiBarrelnoCow");
+		   
+//		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t1 = iMuon1->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
+//		   cout << "PIZDA\n";
+//		   const pat::TriggerObjectStandAloneCollection muHLTMatches2_t1 = iMuon2->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
+//		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t2 = iMuon1->triggerObjectMatchesByFilter("hltJpsiTkVertexFilter");
+//		   const pat::TriggerObjectStandAloneCollection muHLTMatches2_t2 = iMuon2->triggerObjectMatchesByFilter("hltJpsiTkVertexFilter");
+			
+//		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t4 = iMuon1->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon20JpsiBarrelnoCow");
+//		   const pat::TriggerObjectStandAloneCollection muHLTMatches2_t4 = iMuon2->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon20JpsiBarrelnoCow");
 
 		   int tri_Dim25_tmp = 0, tri_JpsiTk_tmp = 0,  tri_Dim20_tmp = 0;
 
-		   if (muHLTMatches1_t1.size() > 0 && muHLTMatches2_t1.size() > 0) tri_Dim25_tmp = 1;
-		   if (muHLTMatches1_t2.size() > 0 && muHLTMatches2_t2.size() > 0) tri_JpsiTk_tmp = 1;
-		   if (muHLTMatches1_t4.size() > 0 && muHLTMatches2_t4.size() > 0) tri_Dim20_tmp = 1;
+//		   if (muHLTMatches1_t1.size() > 0 && muHLTMatches2_t1.size() > 0) tri_Dim25_tmp = 1;
+//		   if (muHLTMatches1_t2.size() > 0 && muHLTMatches2_t2.size() > 0) tri_JpsiTk_tmp = 1;
+//		   if (muHLTMatches1_t4.size() > 0 && muHLTMatches2_t4.size() > 0) tri_Dim20_tmp = 1;
 
 		   tri_Dim25->push_back( tri_Dim25_tmp );
 		   tri_JpsiTk->push_back( tri_JpsiTk_tmp );

@@ -23,9 +23,13 @@ config.Data.outputDatasetTag = 'CRAB3_Bfinder'
 config.Data.outLFNDirBase = '/store/user/'+getUsernameFromSiteDB()+'/Bfinder/'
 
 config.section_("Site")
-config.Site.storageSite = 'T2_US_Florida'
-#config.Site.storageSite = 'T1_UK_RAL_Disk'
 config.Site.whitelist = ['T2_AT_Vienna', 'T2_BE_*', 'T2_BR_*', 'T2_CH_*', 'T2_DE_*', 'T2_ES_*', 'T2_FR_*', 'T2_HU_*', 'T2_IT_*', 'T2_PL_*', 'T2_PT_NCG_Lisbon', 'T2_TR_METU', 'T2_RU_*', 'T2_US_*', 'T1_UK_*']
+#config.Site.storageSite = 'T2_US_Florida'  # A NOT WORKING
+#config.Site.storageSite = 'T2_US_Nebraska' # B WORKS FOR A & C
+#config.Site.storageSite = 'T2_US_Purdue'   # C NOT WORKING
+
+config.Site.storageSite = 'T1_UK_RAL_Disk'
+#config.Site.whitelist = ['T2_AT_Vienna', 'T2_BE_*', 'T2_BR_*', 'T2_CH_*', 'T2_DE_*', 'T2_ES_*', 'T2_FR_*', 'T2_HU_*', 'T2_IT_*', 'T2_PL_*', 'T2_PT_NCG_Lisbon', 'T2_TR_METU', 'T2_RU_*', 'T2_US_*', 'T1_UK_*']
 
 DS_names = [ '' , ## 4 items
 '/Charmonium/Run2018A-17Sep2018-v1/MINIAOD',
@@ -119,7 +123,7 @@ if __name__ == '__main__':
     #
     #if ('2017E' in dset) : split_modifier = 1
     #
-    #if ('2017F' in dset) : split_modifier = 1.6
+    if ('2018D' in dset) : split_modifier = 0.6
     #
     config.Data.unitsPerJob = int(units_per_job * split_modifier)
     config.Data.lumiMask = lumi_mask
