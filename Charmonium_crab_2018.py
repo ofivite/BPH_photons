@@ -21,6 +21,7 @@ config.Data.publication = False
 config.Data.publishDBS = 'phys03'
 config.Data.outputDatasetTag = 'CRAB3_Bfinder'
 config.Data.outLFNDirBase = '/store/user/'+getUsernameFromSiteDB()+'/Bfinder/'
+config.Data.ignoreLocality = True
 
 config.section_("Site")
 config.Site.whitelist = ['T2_AT_Vienna', 'T2_BE_*', 'T2_BR_*', 'T2_CH_*', 'T2_DE_*', 'T2_ES_*', 'T2_FR_*', 'T2_HU_*', 'T2_IT_*', 'T2_PL_*', 'T2_PT_NCG_Lisbon', 'T2_TR_METU', 'T2_RU_*', 'T2_US_*', 'T1_UK_*']
@@ -28,7 +29,7 @@ config.Site.whitelist = ['T2_AT_Vienna', 'T2_BE_*', 'T2_BR_*', 'T2_CH_*', 'T2_DE
 #config.Site.storageSite = 'T2_US_Nebraska' # B WORKS FOR A & C
 #config.Site.storageSite = 'T2_US_Purdue'   # C NOT WORKING
 
-config.Site.storageSite = 'T1_UK_RAL_Disk'
+config.Site.storageSite = 'T2_RU_IHEP' # D
 #config.Site.whitelist = ['T2_AT_Vienna', 'T2_BE_*', 'T2_BR_*', 'T2_CH_*', 'T2_DE_*', 'T2_ES_*', 'T2_FR_*', 'T2_HU_*', 'T2_IT_*', 'T2_PL_*', 'T2_PT_NCG_Lisbon', 'T2_TR_METU', 'T2_RU_*', 'T2_US_*', 'T1_UK_*']
 
 DS_names = [ '' , ## 4 items
@@ -109,7 +110,7 @@ if __name__ == '__main__':
     #if dset == '/Charmonium/Run2017D-PromptReco-v1/AOD':
     #    config.Site.ignoreGlobalBlacklist = True
     #
-    config.General.requestName = 'Bfinder_' + task + '_' + dset[19]
+    config.General.requestName = 'Bfinder_' + task + '_' + dset[19] + '2'
     config.General.workArea = 'crab_projects_' + task
     config.Data.inputDataset = dset
     print '\n', config.General.requestName
