@@ -31,11 +31,12 @@ PDG_DMBstB          =   0.04538
 
 bmin = 6; bmax = 6.6; binN = 120
 
-mB      = RooRealVar ( "mB"   ,"M(B), [Gev]", 5.0 , 5.4)
-mB1     = RooRealVar ( "mB1"   ,"M(B), [Gev]", 5.0 , 5.4)
+mB      = RooRealVar ( "mB"   ,"M(B), [Gev]", 5.16 , 5.44)
+mB1     = RooRealVar ( "mB1"   ,"M(B), [Gev]", 5.18 , 5.51)
 mBst    = RooRealVar ( "mBst-mB"     ,"M(B*) - M(B), [Gev]", 0.025, 0.065)
-PhotExy = RooRealVar ( "PhotonE","E(#gamma), [Gev]", 0, 2.5)
-PhotM   = RooRealVar ( "PhotonE","M(#gamma), [Gev]", -0.001, 0.1)
+PhotExy = RooRealVar ( "PhotonPt","Pt(#gamma), [Gev]", 0, 2.5)
+PhotE   = RooRealVar ( "PhotonE","E(#gamma), [Gev]", 0, 5.)
+PhotM   = RooRealVar ( "PhotonM","M(#gamma), [Gev]", -0.001, 0.1)
 
 def DetachSignificance2(vtx, vtxE1, vtxE2):
     return ( 9999 if vtxE1.X() * vtxE1.Y() * vtxE1.Z() * vtxE2.X() * vtxE2.Y() * vtxE2.Z() == 0. else

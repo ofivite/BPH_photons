@@ -18,13 +18,13 @@ Dhists = False
 
 
 ch = TChain("mytree");
-MyFileNames = glob.glob('2017_Igorek_v0_1_1270_of_1271.root')
+MyFileNames = glob.glob('2017_Igorek_Best_v1_1270_of_1271.root')
 for fName in MyFileNames :
     ch.Add(fName);
 
 print "Adding chain done", ch.GetNtrees(), 'files '
 #varset  = RooArgSet (mb, mjpp, mjpl, mlkk, mphi, mlk)
-varset  = RooArgSet (mBst, PhotExy) 
+varset  = RooArgSet (mBst, PhotExy, mB, mB1, PhotE) 
 
 dataset = RooDataSet("ds","Dataset",varset)
 
@@ -54,6 +54,11 @@ for evt in range(nEvt):
        # B cuts 
        if ch.Bst_minus_B  < .025           :continue
        if ch.Bst_minus_B  > .065           :continue
+       if ch.B_mass       < 5.16           :continue
+       if ch.B_mass       > 5.44           :continue
+       if ch.Bst_mass     < 5.18           :continue
+       if ch.Bst_mass     > 5.51           :continue
+
    #    if (ch.photon_flags_1 / 1000) % 10 > 0.5      :continue
    #    if ch.B_cos2D_PV < 0.9999                :continue
        if ch.B_DS2_PV < 3                  :continue
@@ -74,8 +79,11 @@ for evt in range(nEvt):
     #   if ch.chi_mass_cjp > 3.64 : continue  
     #   if ch.B_mass > 5.4 : continue
     #   if ch.B_mass < 5.05 : continue
-       mBst .setVal( ch.Bst_minus_B  )
-       PhotExy .setVal( ch.photon0_pt_1 ) 
+       mBst    .setVal( ch.Bst_minus_B  )
+       PhotExy .setVal( ch.photon0_pt_1 )
+       PhotE   .setVal( ch.photon0_E_1  ) 
+       mB      .setVal( ch.B_mass       )
+       mB1     .setVal( ch.Bst_mass     )
  #      mB.setVal(ch.B_mass)
        if (Dhists == True):
           JPLA_data.Fill(ch.JPLA_mass)
@@ -108,26 +116,28 @@ if (Dhists == True):
 
 #Gausses  
 
-S       = RooRealVar ( "S"      , "Signal"  , 600   , 0    , 900000)
-S2_frac = RooRealVar ( "S2_frac","frac"     , 0.3   , 0.000001    , 1.0   )
-S3_frac = RooRealVar ( "S3_frac","frac"     , 0.3   , 0.000001    , 1.0   )
+#S       = RooRealVar ( "S"      , "Signal"  , 600   , 0    , 900000)
+#S2_frac = RooRealVar ( "S2_frac","frac"     , 0.3   , 0.000001    , 1.0   )
+#S3_frac = RooRealVar ( "S3_frac","frac"     , 0.3   , 0.000001    , 1.0   )
 #S1      = RooFormulaVar( "S1"   , "Signal"  , 'S * (1.0 - S2_frac- S3_frac)', RooArgList(S,S2_frac, S3_frac))
 #S1      = RooFormulaVar( "S1"   , "Signal"  , 'S * (1.0 - S2_frac)', RooArgList(S,S2_frac))
-S2      = RooFormulaVar( "S2"   , "Signal"  , 'S * S2_frac', RooArgList(S,S2_frac))
-S3      = RooFormulaVar( "S3"   , "Signal"  , 'S * S3_frac', RooArgList(S,S3_frac))
+#S2      = RooFormulaVar( "S2"   , "Signal"  , 'S * S2_frac', RooArgList(S,S2_frac))
+#S3      = RooFormulaVar( "S3"   , "Signal"  , 'S * S3_frac', RooArgList(S,S3_frac))
 
-S1_mean = RooRealVar ( "S1_mean", "mean "   , 5.619, 5.6  , 5.625  )
-S2_mean = RooRealVar ( "S2_mean", "mean "   , 5.235 , bmin  , bmax  )
-S3_mean = RooRealVar ( "S3_mean", "mean "   , 5.235 , bmin  , bmax  )
-S1_sigma= RooRealVar ( "S1_sigma","sigma"   , 0.002 , 0.0006 , 0.04  )
-S2_sigma= RooRealVar ( "S2_sigma","sigma"   , 0.007 , 0.0006 , 0.1  )
-S3_sigma= RooRealVar ( "S3_sigma","sigma"   , 0.007 , 0.0006 , 0.1  )
+#S1_mean = RooRealVar ( "S1_mean", "mean "   , 5.619, 5.6  , 5.625  )
+#S2_mean = RooRealVar ( "S2_mean", "mean "   , 5.235 , bmin  , bmax  )
+#S3_mean = RooRealVar ( "S3_mean", "mean "   , 5.235 , bmin  , bmax  )
+#S1_sigma= RooRealVar ( "S1_sigma","sigma"   , 0.002 , 0.0006 , 0.04  )
+#S2_sigma= RooRealVar ( "S2_sigma","sigma"   , 0.007 , 0.0006 , 0.1  )
+#S3_sigma= RooRealVar ( "S3_sigma","sigma"   , 0.007 , 0.0006 , 0.1  )
 
 
 
 #Bernstein 
 
 Bg  = RooRealVar ( "Bg"      , "Bg"       , 100   , 1     , 900000000 )
+Bg2  = RooRealVar ( "Bg"      , "Bg"       , 100   , 1     , 900000000 )
+Bg3  = RooRealVar ( "Bg"      , "Bg"       , 100   , 1     , 900000000 )
 a1 = RooRealVar('a1', 'a1', 0.01, 0., 1.)
 #a2 = RooFormulaVar('a2', 'a2', '1.0 - a1', RooArgList(a1))
 a2 = RooRealVar('a2', 'a2', 0.01, 0., 1.)
@@ -137,7 +147,8 @@ pdfBerBg    = RooBernstein('pdfBerBg', 'pdfBerBg', mBst, RooArgList(a1, a2, a3, 
 
 #pol0 background
 
-#pdfPolBg = RooPolynomial('pdfPolBg', 'pdfPolBg', mBst, RooArgList(a1, a2))
+pdfPolBg2 = RooPolynomial('pdfPolBg2', 'pdfPolBg2', mB, RooArgList(a1))
+pdfPolBg3 = RooPolynomial('pdfPolBg3', 'pdfPolBg3', mB1, RooArgList(a1))
 
 #Exp BG
 
@@ -184,10 +195,31 @@ B_mean    = RooRealVar("B_mean", "mean", 0.046, .025, .065)
 B_sigma   = RooRealVar("B_sigma", "sigma",0.0016, 0., 0.003)
 #B_alpha   = RooRealVar("B_alpha", 'alpha', 1., .1, 3.)
 G_B       = RooGaussian("G_B", "gaus", mBst, B_mean, B_sigma)
-S_B2      = RooRealVar("S_B2", "Signal", 600, 0 , 900000)
-B2_mean   = RooRealVar("B2_mean", "mean", 5.22, 5.2, 5.24)
-B2_sigma  = RooRealVar("B2_sigma", "sigma",0.01, 0., 0.03)
-G_B2      = RooGaussian("G_B2", "gaus", mBst, B2_mean, B2_sigma)
+
+S_Bpl       = RooRealVar("S_B+", "Signal", 600, 0 , 900000)
+S_Bpl_frac  = RooRealVar("B+_frac", "Fraction", 0.1, 0 , 1)
+S_Bpl1      = RooFormulaVar("S_B+1", "S_B+1", '@0*@1', RooArgList(S_Bpl, S_Bpl_frac))
+S_Bpl2      = RooFormulaVar("S_B+2", "S_B+2", '@0*(1 - @1)', RooArgList(S_Bpl, S_Bpl_frac))
+
+Bpl_mean    = RooRealVar("B+_mean", "mean", 5.28, 5.2, 5.40)
+Bpl1_sigma  = RooRealVar("B+_sigma1", "sigma",0.01, 0., 0.1)
+Bpl2_sigma  = RooRealVar("B+_sigma2", "sigma",0.05, 0., 0.1)
+Bpl_sigmeff = RooFormulaVar ("B+_sigmff", "sigmaeff", "((@1**2)*(1.0-@2) + (@0**2)*@2)**0.5", RooArgList(Bpl1_sigma, Bpl2_sigma, S_Bpl_frac))
+G_Bpl1      = RooGaussian("G_Bpl1", "gaus", mB, Bpl_mean, Bpl1_sigma)
+G_Bpl2      = RooGaussian("G_Bpl2", "gaus", mB, Bpl_mean, Bpl2_sigma)
+
+
+S_Bst       = RooRealVar("S_B*", "Signal", 600, 0 , 900000)
+S_Bst_frac  = RooRealVar("B*_frac", "Fraction", 0.1, 0 , 1)
+S_Bst1      = RooFormulaVar("S_B*1", "S_B*1", '@0*@1', RooArgList(S_Bst, S_Bst_frac))
+S_Bst2      = RooFormulaVar("S_B*2", "S_B*2", '@0*(1 - @1)', RooArgList(S_Bst, S_Bst_frac))
+
+Bst_mean    = RooRealVar("B*_mean", "mean", 5.32, 5.2, 5.50)
+Bst1_sigma  = RooRealVar("B*_sigma1", "sigma", 0.01, 0., 0.1)
+Bst2_sigma  = RooRealVar("B*_sigma2", "sigma", 0.05, 0., 0.1)
+Bst_sigmeff = RooFormulaVar ("B*_sigeff", "sigmaeff", "((@1**2)*(1.0-@2) + (@0**2)*@2)**0.5", RooArgList(Bst1_sigma, Bst2_sigma, S_Bst_frac))
+G_Bst1      = RooGaussian("G_Bst1", "gaus", mB1, Bst_mean, Bst1_sigma)
+G_Bst2      = RooGaussian("G_Bst2", "gaus", mB1, Bst_mean, Bst2_sigma)
 
 #GE_B = RooGenericPdf('GE_B', '((mB-B_mean)/B_sigma>(0-B_alpha))*(exp(-(mB-B_mean)*(mB-B_mean)/(2*B_sigma*B_sigma)))+((mB-B_mean)/B_sigma<(0-B_alpha))*exp(B_alpha*B_alpha/2+B_alpha*(mB - B_mean)/(B_sigma))', RooArgList(mB, B_mean, B_sigma, B_alpha))
 
@@ -283,8 +315,91 @@ print 'Signif =', TMath.ErfcInverse (prob) * sqrt(2.)
 #rrr = sP_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
 #rrr.Print()
 
+###############
+# B^+ mass after sPlot
+###############
+
+alist3 = RooArgList(S_Bpl1, S_Bpl2, Bg2)
+alist4 = RooArgList(G_Bpl1, G_Bpl2, pdfPolBg2)
+sP_pdfSum = RooAddPdf  ("model", "model", alist4, alist3)
+
+rrr = sP_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
+rrr = sP_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
+rrr = sP_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
+rrr.Print()
+
+Bpl_err = Bpl_sigmeff.getPropagatedError(rrr)
+
+cB=TCanvas("cB","cB",800,600);
+mframe = 0; mframe = mB.frame(70);
+mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
+
+dataset_weighted.plotOn(mframe, RooFit.MarkerSize(0.6));   # size of dots  
+sP_pdfSum.plotOn(mframe,RooFit.LineColor(kRed+1), RooFit.LineStyle(kDashed))
+sP_pdfSum.plotOn(mframe, RooFit.Components('pdfPolBg2'), RooFit.LineColor(kYellow+1), RooFit.LineStyle(kDashed), RooFit.LineWidth(2))
+sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bpl1'), RooFit.LineColor(kMagenta+1), RooFit.LineWidth(2))
+sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bpl2'), RooFit.LineColor(kGreen+1), RooFit.LineWidth(2))
+
+Set = RooArgSet(S_Bpl, Bg2, Bpl_mean, S_Bpl_frac, Bpl_sigmeff)
+sP_pdfSum.paramOn(mframe, RooFit.Parameters(Set), RooFit.Layout(0.55,0.95,0.93));
+
+mframe.SetTitle('B+ mass distribution')
+mframe.Draw()
+cB.SaveAs('Bstar_res/B_mass.png')
+
+###############
+# B* mass after sPlot
+###############
+
+alist5 = RooArgList (S_Bst1, S_Bst2, Bg3)
+alist6 = RooArgList(G_Bst1, G_Bst2, pdfPolBg3)
+sP_pdfSum = RooAddPdf  ("model", "model", alist6, alist5)
+
+rrr = sP_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
+rrr = sP_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
+rrr = sP_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
+rrr.Print()
+
+Bst_err = Bpl_sigmeff.getPropagatedError(rrr)
+
+cB=TCanvas("cB","cB",800,600);
+mframe = 0; mframe = mB1.frame(66);
+mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
+
+dataset_weighted.plotOn(mframe, RooFit.MarkerSize(0.6));   # size of dots  
+sP_pdfSum.plotOn(mframe,RooFit.LineColor(kRed+1), RooFit.LineStyle(kDashed))
+sP_pdfSum.plotOn(mframe, RooFit.Components('pdfPolBg3'), RooFit.LineColor(kYellow+1), RooFit.LineStyle(kDashed), RooFit.LineWidth(2))
+sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bst1'), RooFit.LineColor(kMagenta+1), RooFit.LineWidth(2))
+sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bst2'), RooFit.LineColor(kGreen+1), RooFit.LineWidth(2))
+
+Set = RooArgSet(S_Bst, Bg3, Bst_mean, S_Bst_frac)
+sP_pdfSum.paramOn(mframe, RooFit.Parameters(Set), RooFit.Layout(0.55,0.95,0.93));
+
+mframe.SetTitle('B* mass distribution')
+mframe.Draw()
+cB.SaveAs('Bstar_res/Bst_mass.png')
+
+###############
+#Photon Pt after sPlot
+###############
+
 cB=TCanvas("cB","cB",800,600);
 mframe = 0; mframe = PhotExy.frame(50);
+mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
+
+dataset_weighted.plotOn(mframe, RooFit.MarkerSize(0.6));   # size of dots  
+#pdfSum.plotOn(mframe, RooFit.Components('pdfB'), RooFit.LineColor(kYellow+1), RooFit.LineStyle(kDashed), RooFit.LineWidth(2))
+#pdfSum.plotOn(mframe,RooFit.Components('G_B'), RooFit.LineColor(kMagenta+1), RooFit.LineWidth(2))
+mframe.SetTitle('Photon Pt distribution')
+mframe.Draw()
+cB.SaveAs('Bstar_res/PhotonPt.png')
+
+###############
+#Photon E after sPlot
+###############
+
+cB=TCanvas("cB","cB",800,600);
+mframe = 0; mframe = PhotE.frame(75);
 mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
 
 dataset_weighted.plotOn(mframe, RooFit.MarkerSize(0.6));   # size of dots  
@@ -294,32 +409,34 @@ mframe.SetTitle('Photon E distribution')
 mframe.Draw()
 cB.SaveAs('Bstar_res/PhotonE.png')
 
+print Bpl_sigmeff, ' ', Bst_sigmeff 
+
 ##########################################################################################  design
-"""
+#"""
 #Chi after sPlot
-
-
-x, y = array( 'd' ), array( 'd' )
-n = 60
-cl90 = -1000000
-f = True
-for i in range( n ):
-   if (i >= 27):
-      if (i <= 37):
-         xi = (27.8 + (i - 27.) / 100)/1000
-      else:
-         xi = (i - 10.)/1000
-   else:
-      xi = i/1000.0
-   x.append( xi )
-   S2_frac.setVal( xi )
-   S2_frac.setConstant(True)
-   alist3 =     RooArgList(S_chi1, S_chi2, B)
-   alist4 =     RooArgList(GE_chi1, GE_chi2, pdfBerBg)
-   chi_pdfSum = RooAddPdf  ("model", "model", alist4, alist3)
-
-   rrr = chi_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
-   rrr = chi_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
-   rrr = chi_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
-   rrr.Print()
-"""
+#
+#
+#x, y = array( 'd' ), array( 'd' )
+#n = 60
+#cl90 = -1000000
+#f = True
+#for i in range( n ):
+#   if (i >= 27):
+#      if (i <= 37):
+#         xi = (27.8 + (i - 27.) / 100)/1000
+#      else:
+#         xi = (i - 10.)/1000
+#   else:
+#      xi = i/1000.0
+#   x.append( xi )
+#   S2_frac.setVal( xi )
+#   S2_frac.setConstant(True)
+#   alist3 =     RooArgList(S_chi1, S_chi2, B)
+#   alist4 =     RooArgList(GE_chi1, GE_chi2, pdfBerBg)
+#   chi_pdfSum = RooAddPdf  ("model", "model", alist4, alist3)
+#
+#   rrr = chi_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
+#   rrr = chi_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
+#   rrr = chi_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
+#   rrr.Print()
+#"""
