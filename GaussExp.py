@@ -60,11 +60,11 @@ for evt in range(nEvt):
        if ch.Bst_mass     > 5.51           :continue
 
    #    if (ch.photon_flags_1 / 1000) % 10 > 0.5      :continue
-   #    if ch.B_cos2D_PV < 0.9999                :continue
+       if ch.B_cos2D_PV < 0.9999           :continue
        if ch.B_DS2_PV < 3                  :continue
        if ch. photon0_pt_1 < 0.05          :continue
-      
-       # Phi cuts 
+       if ch. photon0_cos3D_PV_1 < 0.9999  :continue
+      # Phi cuts 
    
 
        # Lambda cuts 
@@ -135,9 +135,9 @@ if (Dhists == True):
 
 #Bernstein 
 
-Bg  = RooRealVar ( "Bg"      , "Bg"       , 100   , 1     , 900000000 )
-Bg2  = RooRealVar ( "Bg"      , "Bg"       , 100   , 1     , 900000000 )
-Bg3  = RooRealVar ( "Bg"      , "Bg"       , 100   , 1     , 900000000 )
+Bg  = RooRealVar ( "Bg"      , "Bg"       , 100   , 0.     , 900000000 )
+Bg2  = RooRealVar ( "Bg"      , "Bg"       , 100   , 0.     , 900000000 )
+Bg3  = RooRealVar ( "Bg"      , "Bg"       , 100   , 0.     , 900000000 )
 a1 = RooRealVar('a1', 'a1', 0.01, 0., 1.)
 #a2 = RooFormulaVar('a2', 'a2', '1.0 - a1', RooArgList(a1))
 a2 = RooRealVar('a2', 'a2', 0.01, 0., 1.)
@@ -319,8 +319,8 @@ print 'Signif =', TMath.ErfcInverse (prob) * sqrt(2.)
 # B^+ mass after sPlot
 ###############
 
-alist3 = RooArgList(S_Bpl1, S_Bpl2, Bg2)
-alist4 = RooArgList(G_Bpl1, G_Bpl2, pdfPolBg2)
+alist3 = RooArgList(S_Bpl1, S_Bpl2)
+alist4 = RooArgList(G_Bpl1, G_Bpl2)
 sP_pdfSum = RooAddPdf  ("model", "model", alist4, alist3)
 
 rrr = sP_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
@@ -331,28 +331,30 @@ rrr.Print()
 Bpl_err = Bpl_sigmeff.getPropagatedError(rrr)
 
 cB=TCanvas("cB","cB",800,600);
-mframe = 0; mframe = mB.frame(70);
+mframe = 0; mframe = mB.frame(35);
 mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
 
 dataset_weighted.plotOn(mframe, RooFit.MarkerSize(0.6));   # size of dots  
 sP_pdfSum.plotOn(mframe,RooFit.LineColor(kRed+1), RooFit.LineStyle(kDashed))
-sP_pdfSum.plotOn(mframe, RooFit.Components('pdfPolBg2'), RooFit.LineColor(kYellow+1), RooFit.LineStyle(kDashed), RooFit.LineWidth(2))
+#sP_pdfSum.plotOn(mframe, RooFit.Components('pdfPolBg2'), RooFit.LineColor(kYellow+1), RooFit.LineStyle(kDashed), RooFit.LineWidth(2))
 sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bpl1'), RooFit.LineColor(kMagenta+1), RooFit.LineWidth(2))
 sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bpl2'), RooFit.LineColor(kGreen+1), RooFit.LineWidth(2))
 
-Set = RooArgSet(S_Bpl, Bg2, Bpl_mean, S_Bpl_frac, Bpl_sigmeff)
+lpl = TLine(5.16, 0., 5.44, 0.)
+
+Set = RooArgSet(S_Bpl, Bpl_mean, Bpl_sigmeff)
 sP_pdfSum.paramOn(mframe, RooFit.Parameters(Set), RooFit.Layout(0.55,0.95,0.93));
 
 mframe.SetTitle('B+ mass distribution')
-mframe.Draw()
+mframe.Draw(); lpl.Draw("same")
 cB.SaveAs('Bstar_res/B_mass.png')
 
 ###############
 # B* mass after sPlot
 ###############
 
-alist5 = RooArgList (S_Bst1, S_Bst2, Bg3)
-alist6 = RooArgList(G_Bst1, G_Bst2, pdfPolBg3)
+alist5 = RooArgList (S_Bst1, S_Bst2)
+alist6 = RooArgList(G_Bst1, G_Bst2)
 sP_pdfSum = RooAddPdf  ("model", "model", alist6, alist5)
 
 rrr = sP_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
@@ -360,23 +362,25 @@ rrr = sP_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2)
 rrr = sP_pdfSum.fitTo( dataset_weighted, RooFit.NumCPU(10), RooFit.PrintLevel(2), RooFit.Save(), RooFit.Extended(True))
 rrr.Print()
 
-Bst_err = Bpl_sigmeff.getPropagatedError(rrr)
+Bst_err = Bst_sigmeff.getPropagatedError(rrr)
 
 cB=TCanvas("cB","cB",800,600);
-mframe = 0; mframe = mB1.frame(66);
+mframe = 0; mframe = mB1.frame(33);
 mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
 
 dataset_weighted.plotOn(mframe, RooFit.MarkerSize(0.6));   # size of dots  
 sP_pdfSum.plotOn(mframe,RooFit.LineColor(kRed+1), RooFit.LineStyle(kDashed))
-sP_pdfSum.plotOn(mframe, RooFit.Components('pdfPolBg3'), RooFit.LineColor(kYellow+1), RooFit.LineStyle(kDashed), RooFit.LineWidth(2))
+#sP_pdfSum.plotOn(mframe, RooFit.Components('pdfPolBg3'), RooFit.LineColor(kYellow+1), RooFit.LineStyle(kDashed), RooFit.LineWidth(2))
 sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bst1'), RooFit.LineColor(kMagenta+1), RooFit.LineWidth(2))
 sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bst2'), RooFit.LineColor(kGreen+1), RooFit.LineWidth(2))
 
-Set = RooArgSet(S_Bst, Bg3, Bst_mean, S_Bst_frac)
+lst = TLine(5.18, 0., 5.51, 0.)
+
+Set = RooArgSet(S_Bst, Bst_mean)
 sP_pdfSum.paramOn(mframe, RooFit.Parameters(Set), RooFit.Layout(0.55,0.95,0.93));
 
 mframe.SetTitle('B* mass distribution')
-mframe.Draw()
+mframe.Draw(); lst.Draw("same")
 cB.SaveAs('Bstar_res/Bst_mass.png')
 
 ###############
@@ -399,7 +403,7 @@ cB.SaveAs('Bstar_res/PhotonPt.png')
 ###############
 
 cB=TCanvas("cB","cB",800,600);
-mframe = 0; mframe = PhotE.frame(75);
+mframe = 0; mframe = PhotE.frame(45);
 mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
 
 dataset_weighted.plotOn(mframe, RooFit.MarkerSize(0.6));   # size of dots  
@@ -409,7 +413,18 @@ mframe.SetTitle('Photon E distribution')
 mframe.Draw()
 cB.SaveAs('Bstar_res/PhotonE.png')
 
-print Bpl_sigmeff, ' ', Bst_sigmeff 
+##################
+# Weighted Hist of PhotonE
+##################
+
+#PhotE_hist = dataset_weighted.createHistogram(PhotE, "PhotE_hist")
+
+#f = TFile('PhotE_hist.root','recreate')
+#PhotE_hist.Write()
+#f.Close()
+
+print Bpl_sigmeff, Bpl_err, '\n', Bst_sigmeff, Bst_err 
+
 
 ##########################################################################################  design
 #"""
