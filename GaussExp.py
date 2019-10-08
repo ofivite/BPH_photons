@@ -6,8 +6,8 @@ from variables import * ## import vars
 from array import array
 
 #########################################################################################
-par = 0.; par_0 = 9999.; 
-REMUC = False
+par = 0.; par_0 = 0.; 
+REMUC = True;
 flag_empty = 1;
 
 cuts = True; 
@@ -59,12 +59,15 @@ for evt in range(nEvt):
        if ch.Bst_mass     < 5.18           :continue
        if ch.Bst_mass     > 5.51           :continue
 
-   #    if (ch.photon_flags_1 / 1000) % 10 > 0.5      :continue
-       if ch.B_cos2D_PV < 0.9999           :continue
-       if ch.B_DS2_PV < 3                  :continue
-       if ch. photon0_pt_1 < 0.05          :continue
-       if ch. photon0_cos3D_PV_1 < 0.9999  :continue
-      # Phi cuts 
+#       if (ch.photon_flags_1 / 100) % 10 > 0.5      :continue
+       if ch.B_cos2D_PV         < 0.9999   :continue
+       if ch.B_DS2_PV           < 3        :continue
+       if ch.photon0_pt_1       < 0.05     :continue
+       if ch.photon0_cos3D_PV_1 < 0.9999   :continue
+#       if abs(ch.mu1_eta_Cjp)   < 1.5      :continue
+#       if abs(ch.mu2_eta_Cjp)   < 1.5      :continue
+
+   # Phi cuts 
    
 
        # Lambda cuts 
@@ -73,12 +76,13 @@ for evt in range(nEvt):
        # Jpsi Psi cuts
  
 ########################################################################################## 
-
-    if  (not REMUC) or (ch.SAMEEVENT == 0) :
+    par = ch.B_vtxprob
+    if  (not REMUC) or (ch.SAMEEVENT == 0) or (ch.SAMEEVENT == 1 and par > par_0):
     #   if ch.chi_mass_cjp < 3.40 : continue
     #   if ch.chi_mass_cjp > 3.64 : continue  
     #   if ch.B_mass > 5.4 : continue
     #   if ch.B_mass < 5.05 : continue
+       par_0 = par
        mBst    .setVal( ch.Bst_minus_B  )
        PhotExy .setVal( ch.photon0_pt_1 )
        PhotE   .setVal( ch.photon0_E_1  ) 
@@ -139,11 +143,12 @@ Bg  = RooRealVar ( "Bg"      , "Bg"       , 100   , 0.     , 900000000 )
 Bg2  = RooRealVar ( "Bg"      , "Bg"       , 100   , 0.     , 900000000 )
 Bg3  = RooRealVar ( "Bg"      , "Bg"       , 100   , 0.     , 900000000 )
 a1 = RooRealVar('a1', 'a1', 0.01, 0., 1.)
-#a2 = RooFormulaVar('a2', 'a2', '1.0 - a1', RooArgList(a1))
+a5 = RooFormulaVar('a5', 'a5', '1.0 - a1', RooArgList(a1))
 a2 = RooRealVar('a2', 'a2', 0.01, 0., 1.)
 a3 = RooRealVar('a3', 'a3', 0.01, 0., 1.)
 a4 = RooFormulaVar('a4', 'a4', '1.0 - a1 - a2 - a3', RooArgList(a1, a2, a3))
 pdfBerBg    = RooBernstein('pdfBerBg', 'pdfBerBg', mBst, RooArgList(a1, a2, a3, a4))
+pdfBerBg1    = RooBernstein('pdfBerBg1', 'pdfBerBg1', mB1, RooArgList(a1, a5))
 
 #pol0 background
 
@@ -335,10 +340,10 @@ mframe = 0; mframe = mB.frame(35);
 mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
 
 dataset_weighted.plotOn(mframe, RooFit.MarkerSize(0.6));   # size of dots  
-sP_pdfSum.plotOn(mframe,RooFit.LineColor(kRed+1), RooFit.LineStyle(kDashed))
 #sP_pdfSum.plotOn(mframe, RooFit.Components('pdfPolBg2'), RooFit.LineColor(kYellow+1), RooFit.LineStyle(kDashed), RooFit.LineWidth(2))
-sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bpl1'), RooFit.LineColor(kMagenta+1), RooFit.LineWidth(2))
+sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bpl1'), RooFit.LineColor(kGreen+1), RooFit.LineWidth(2))
 sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bpl2'), RooFit.LineColor(kGreen+1), RooFit.LineWidth(2))
+sP_pdfSum.plotOn(mframe,RooFit.LineColor(kRed+1), RooFit.LineStyle(kDashed))
 
 lpl = TLine(5.16, 0., 5.44, 0.)
 
@@ -353,7 +358,7 @@ cB.SaveAs('Bstar_res/B_mass.png')
 # B* mass after sPlot
 ###############
 
-alist5 = RooArgList (S_Bst1, S_Bst2)
+alist5 = RooArgList(S_Bst1, S_Bst2)
 alist6 = RooArgList(G_Bst1, G_Bst2)
 sP_pdfSum = RooAddPdf  ("model", "model", alist6, alist5)
 
@@ -369,14 +374,16 @@ mframe = 0; mframe = mB1.frame(33);
 mframe.GetXaxis().SetTitleOffset(1.20); mframe.GetYaxis().SetTitleOffset(1.30);
 
 dataset_weighted.plotOn(mframe, RooFit.MarkerSize(0.6));   # size of dots  
-sP_pdfSum.plotOn(mframe,RooFit.LineColor(kRed+1), RooFit.LineStyle(kDashed))
 #sP_pdfSum.plotOn(mframe, RooFit.Components('pdfPolBg3'), RooFit.LineColor(kYellow+1), RooFit.LineStyle(kDashed), RooFit.LineWidth(2))
-sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bst1'), RooFit.LineColor(kMagenta+1), RooFit.LineWidth(2))
+#sP_pdfSum.plotOn(mframe,RooFit.Components('pdfBerBg1'), RooFit.LineColor(kYellow+1), RooFit.LineWidth(2))
+
+sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bst1'), RooFit.LineColor(kGreen+1), RooFit.LineWidth(2))
 sP_pdfSum.plotOn(mframe,RooFit.Components('G_Bst2'), RooFit.LineColor(kGreen+1), RooFit.LineWidth(2))
+sP_pdfSum.plotOn(mframe,RooFit.LineColor(kRed+1), RooFit.LineStyle(kDashed))
 
 lst = TLine(5.18, 0., 5.51, 0.)
 
-Set = RooArgSet(S_Bst, Bst_mean)
+Set = RooArgSet(S_Bst, Bst_mean, Bg)
 sP_pdfSum.paramOn(mframe, RooFit.Parameters(Set), RooFit.Layout(0.55,0.95,0.93));
 
 mframe.SetTitle('B* mass distribution')

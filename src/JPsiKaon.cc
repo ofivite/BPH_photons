@@ -291,10 +291,10 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 	  ParticleMass electron_mass = 0.0005109989461;
-    //ParticleMass photon_null_mass = 0.;
+    ParticleMass photon_null_mass = 0.;
 
     float PM_sigma = 1.e-7;
-   // float photon_null_sigma = 1.e-7;
+    float photon_null_sigma = 1.e-7;
 
 
 	  //Creating a KinematicParticleFactory
@@ -449,7 +449,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           ////////************      PHOTON_1 VTX FIT IWTH 0 CONSTRAINT
           ///////
 
-/*
+
                 KinematicParticleFitter csFitterPhoton;
                 KinematicConstraint * photon_c = new MassKinematicConstraint(photon_null_mass, photon_null_sigma);
                 // add mass constraint to the ks0 fit to do a constrained fit:
@@ -466,7 +466,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                 RefCountedKinematicVertex photon_vFit_vertex_withMC_1 = photonVertexFitTree_1->currentDecayVertex();
                 if (!photon_vFit_vertex_withMC_1->vertexIsValid())  continue;
                 if (!photon_vFit_withMC_1->currentState().isValid()) continue;
-*/
+
 
 
 		   float kaon_sigma = kaon_mass*1.e-6;
@@ -478,7 +478,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   // JpsiKaon invariant mass (before kinematic vertex fit)
 		   // ***************************
 
-		   if ( ((kaon14V + p4photon1 + p4_jpsi).M() - (kaon14V + p4_jpsi).M())<0 || ((kaon14V + p4photon1 + p4_jpsi).M() - (kaon14V + p4_jpsi).M())>0.25 ) continue;
+		   if ( ((kaon14V + p4photon1 + p4_jpsi).M() - (kaon14V + p4_jpsi).M())<0 || ((kaon14V + p4photon1 + p4_jpsi).M() - (kaon14V + p4_jpsi).M())>0.100 ) continue;
 
 		   //Now we are ready to combine!
 		   // JPsi mass constraint is applied in the final Bplus fit,
@@ -568,9 +568,9 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		    RefCountedKinematicParticle kCandMC = vertexFitTree->currentParticle();
         if (!kCandMC->currentState().isValid()) continue;
 
-        vertexFitTree->movePointerToTheNextChild();
-		    RefCountedKinematicParticle photonCandMC = vertexFitTree->currentParticle();
-        if (!photonCandMC->currentState().isValid()) continue;
+//        vertexFitTree->movePointerToTheNextChild();
+//		    RefCountedKinematicParticle photonCandMC = vertexFitTree->currentParticle();
+       // if (!photonCandMC->currentState().isValid()) continue;
 
 		   KinematicParameters psiMu1KP = mu1CandMC->currentState().kinematicParameters();
 		   KinematicParameters psiMu2KP = mu2CandMC->currentState().kinematicParameters();
@@ -592,7 +592,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
  				       mu2CandMC->currentState().globalMomentum().z());
 
 		   KinematicParameters VCandKP = kCandMC->currentState().kinematicParameters();
-       KinematicParameters photonCandKP = photonCandMC->currentState().kinematicParameters();
+  //     KinematicParameters photonCandKP = photonCandMC->currentState().kinematicParameters();
 
        ///
        GlobalVector photon_p1_vec_1(T1CandMC_1->currentState().globalMomentum().x(),
@@ -657,10 +657,10 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        photon0_py_1->push_back( photon_vFit_noMC_1->currentState().globalMomentum().y() );
        photon0_pz_1->push_back( photon_vFit_noMC_1->currentState().globalMomentum().z() );
 
-       photon_mass_1->push_back( photonCandMC->currentState().mass() );
-       photon_px_1->push_back( photonCandKP.momentum().x() );
-       photon_py_1->push_back( photonCandKP.momentum().y() );
-       photon_pz_1->push_back( photonCandKP.momentum().z() );
+       photon_mass_1->push_back( photon_vFit_withMC_1->currentState().mass() );
+       photon_px_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().x() );
+       photon_py_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().y() );
+       photon_pz_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().z() );
        photon_flags_1->push_back( iPhoton1->userInt("flags") );
        photon0_cos2D_common_1->push_back( cos2D_gamma0_common_1 );
 
