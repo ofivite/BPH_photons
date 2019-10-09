@@ -42,7 +42,7 @@ if __name__ == '__main__':
     import sys
     from CRABAPI.RawCommand import crabCommand
     from httplib import HTTPException
-    task = '2017_Igorek_v0_1'
+    task = '2017_Igorek_v1_Bs'
     ####
     ## MY: b1 == Bc+ --> J/psi pi+
     ##      x1 = Xi-    -> Lambda pi
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     #    config.Site.ignoreGlobalBlacklist = True
     #
     config.General.requestName = 'Bfinder_' + task + '_' + dset[19]
-    config.General.workArea = 'crab_projects'
+    config.General.workArea = 'crab_projects_Bs'
     config.Data.inputDataset = dset
     print '\n', config.General.requestName
     print config.General.workArea

@@ -104,8 +104,11 @@ JPsiKaon::JPsiKaon(const edm::ParameterSet& iConfig)
 
   nB(0), nMu(0),
   B_mass(0), B_px(0), B_py(0), B_pz(0), B_charge(0), B_cos3D_PV(0), B_cos2D_PV(0),
-  B_k_px(0), B_k_py(0), B_k_pz(0), B_k_charge1(0),
-  B_k_px_track(0), B_k_py_track(0), B_k_pz_track(0),
+  B_k1_px(0), B_k1_py(0), B_k1_pz(0), B_k_charge1(0),
+  B_k1_px_track(0), B_k1_py_track(0), B_k1_pz_track(0),
+  B_k2_px(0), B_k2_py(0), B_k2_pz(0), B_k_charge2(0),
+  B_k2_px_track(0), B_k2_py_track(0), B_k2_pz_track(0),
+  B_Phi_mass(0),
   B_J_mass(0), B_J_px(0), B_J_py(0), B_J_pz(0),
 
   B_J_pt1(0), B_J_px1(0), B_J_py1(0), B_J_pz1(0),
@@ -154,6 +157,9 @@ JPsiKaon::JPsiKaon(const edm::ParameterSet& iConfig)
 
   PhotonDecayVtxX_1(0), PhotonDecayVtxY_1(0), PhotonDecayVtxZ_1(0), PhotonDecayVtxXE_1(0), PhotonDecayVtxYE_1(0), PhotonDecayVtxZE_1(0),
   PhotonDecayVtxXYE_1(0), PhotonDecayVtxXZE_1(0), PhotonDecayVtxYZE_1(0),
+
+  PhotonDecayVtxX_2(0), PhotonDecayVtxY_2(0), PhotonDecayVtxZ_2(0), PhotonDecayVtxXE_2(0), PhotonDecayVtxYE_2(0), PhotonDecayVtxZE_2(0),
+  PhotonDecayVtxXYE_2(0), PhotonDecayVtxXZE_2(0), PhotonDecayVtxYZE_2(0),
 
   PV_bestBang_RF_X(0),   PV_bestBang_RF_Y(0),  PV_bestBang_RF_Z(0),
   PV_bestBang_RF_XE(0),  PV_bestBang_RF_YE(0), PV_bestBang_RF_ZE(0),
@@ -291,10 +297,10 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 	  ParticleMass electron_mass = 0.0005109989461;
-    //ParticleMass photon_null_mass = 0.;
+    ParticleMass photon_null_mass = 0.;
 
     float PM_sigma = 1.e-7;
-   // float photon_null_sigma = 1.e-7;
+    float photon_null_sigma = 1.e-7;
 
 
 	  //Creating a KinematicParticleFactory
@@ -359,15 +365,30 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 		   if ( IsTheSame(*iTrack1,*iMuon1) || IsTheSame(*iTrack1,*iMuon2) ) continue;
 
-		   reco::TransientTrack kaonTT((*theB).build(iTrack1->pseudoTrack()));
+		   reco::TransientTrack kaonTT1((*theB).build(iTrack1->pseudoTrack()));
                    
 		   ParticleMass kaon_mass = 0.493677;
-                   TLorentzVector kaon14V, p4_jpsi, p4chi0;
+                   TLorentzVector kaon14V, p4_jpsi;
 		   kaon14V.SetXYZM(iTrack1->px(),iTrack1->py(),iTrack1->pz(),kaon_mass);
                    p4_jpsi.SetXYZM(psi_vFit_noMC->currentState().globalMomentum().x(),psi_vFit_noMC->currentState().globalMomentum().y(),psi_vFit_noMC->currentState().globalMomentum().z(),psi_vFit_noMC->currentState().mass());
 		   
-		   p4chi0 = p4_jpsi + kaon14V;
-		   if (p4chi0.M() < 4.3 || p4chi0.M() > 6.3) continue;
+		   		   
+		   for (View<pat::PackedCandidate>::const_iterator iTrack2 = iTrack1 + 1;
+                   	iTrack2 != thePATTrackHandle->end(); ++iTrack2)
+			{
+	                   if(iTrack2->charge()*iTrack1->charge() > -0.5) continue;
+			   if(iTrack2->pt()<1.) continue;
+                           if(!(iTrack2->trackHighPurity())) continue;
+			   
+	                   if ( IsTheSame(*iTrack2,*iMuon1) || IsTheSame(*iTrack2,*iMuon2) ) continue;
+			   reco::TransientTrack kaonTT2((*theB).build(iTrack2->pseudoTrack()));
+                   
+			   TLorentzVector kaon24V, p4chi0, p4phi;
+                           kaon24V.SetXYZM(iTrack2->px(),iTrack2->py(),iTrack2->pz(),kaon_mass);
+			   p4phi = kaon14V + kaon24V;
+			   p4chi0 = p4phi + p4_jpsi;
+			   if (p4phi.M() > 1.05) continue;
+			   if (p4chi0.M() < 4.4 || p4chi0.M() > 6.4) continue;
 
 
 
@@ -449,7 +470,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           ////////************      PHOTON_1 VTX FIT IWTH 0 CONSTRAINT
           ///////
 
-/*
+
                 KinematicParticleFitter csFitterPhoton;
                 KinematicConstraint * photon_c = new MassKinematicConstraint(photon_null_mass, photon_null_sigma);
                 // add mass constraint to the ks0 fit to do a constrained fit:
@@ -466,7 +487,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                 RefCountedKinematicVertex photon_vFit_vertex_withMC_1 = photonVertexFitTree_1->currentDecayVertex();
                 if (!photon_vFit_vertex_withMC_1->vertexIsValid())  continue;
                 if (!photon_vFit_withMC_1->currentState().isValid()) continue;
-*/
+
 
 
 		   float kaon_sigma = kaon_mass*1.e-6;
@@ -478,7 +499,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   // JpsiKaon invariant mass (before kinematic vertex fit)
 		   // ***************************
 
-		   if ( ((kaon14V + p4photon1 + p4_jpsi).M() - (kaon14V + p4_jpsi).M())<0 || ((kaon14V + p4photon1 + p4_jpsi).M() - (kaon14V + p4_jpsi).M())>0.25 ) continue;
+		   if ( ((p4phi + p4photon1 + p4_jpsi).M() - (p4phi + p4_jpsi).M())<0 || ((p4phi + p4photon1 + p4_jpsi).M() - (p4phi + p4_jpsi).M())>0.25 ) continue;
 
 		   //Now we are ready to combine!
 		   // JPsi mass constraint is applied in the final Bplus fit,
@@ -486,7 +507,8 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   vector<RefCountedKinematicParticle> vFitMCParticles;
 		   vFitMCParticles.push_back(pFactory.particle(muon1TT,muon_mass,chi,ndf,muon_sigma));
 		   vFitMCParticles.push_back(pFactory.particle(muon2TT,muon_mass,chi,ndf,muon_sigma));
-		   vFitMCParticles.push_back(pFactory.particle(kaonTT,kaon_mass ,chi,ndf,kaon_sigma));
+		   vFitMCParticles.push_back(pFactory.particle(kaonTT1,kaon_mass ,chi,ndf,kaon_sigma));
+                   vFitMCParticles.push_back(pFactory.particle(kaonTT2,kaon_mass ,chi,ndf,kaon_sigma));
                    //vFitMCParticles.push_back(photon_vFit_noMC_1);
 
 		   MultiTrackKinematicConstraint *  j_psi_c = new  TwoTrackMassKinematicConstraint(psi_mass);
@@ -504,7 +526,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         if (!bCandMC->currentState().isValid()) continue;
         if (!bDecayVertexMC->vertexIsValid())  continue;
 
-		    if ( (bCandMC->currentState().mass() < 5.16) || (bCandMC->currentState().mass() > 5.44) ) {
+		    if ( (bCandMC->currentState().mass() < 5.15) || (bCandMC->currentState().mass() > 5.55) ) {
 		      continue;
 		    }
 
@@ -565,12 +587,12 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 		    vertexFitTree->movePointerToTheNextChild();
-		    RefCountedKinematicParticle kCandMC = vertexFitTree->currentParticle();
-        if (!kCandMC->currentState().isValid()) continue;
+		    RefCountedKinematicParticle k1CandMC = vertexFitTree->currentParticle();
+        if (!k1CandMC->currentState().isValid()) continue;
 
         vertexFitTree->movePointerToTheNextChild();
-		    RefCountedKinematicParticle photonCandMC = vertexFitTree->currentParticle();
-        if (!photonCandMC->currentState().isValid()) continue;
+		    RefCountedKinematicParticle k2CandMC = vertexFitTree->currentParticle();
+        if (!k2CandMC->currentState().isValid()) continue;
 
 		   KinematicParameters psiMu1KP = mu1CandMC->currentState().kinematicParameters();
 		   KinematicParameters psiMu2KP = mu2CandMC->currentState().kinematicParameters();
@@ -591,8 +613,8 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 				       mu2CandMC->currentState().globalMomentum().y(),
  				       mu2CandMC->currentState().globalMomentum().z());
 
-		   KinematicParameters VCandKP = kCandMC->currentState().kinematicParameters();
-       KinematicParameters photonCandKP = photonCandMC->currentState().kinematicParameters();
+		   KinematicParameters k1CandKP = k1CandMC->currentState().kinematicParameters();
+       KinematicParameters k2CandKP = k2CandMC->currentState().kinematicParameters();
 
        ///
        GlobalVector photon_p1_vec_1(T1CandMC_1->currentState().globalMomentum().x(),
@@ -624,14 +646,23 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 		   // You can get the momentum components (for muons and kaon) from the final B childrens or of the original Tracks. Here, a example for the kaon:
-		   B_k_px->push_back(VCandKP.momentum().x() );
-		   B_k_py->push_back(VCandKP.momentum().y() );
-		   B_k_pz->push_back(VCandKP.momentum().z() );
-		   B_k_px_track->push_back(iTrack1->px() );
-		   B_k_py_track->push_back(iTrack1->py() );
-		   B_k_pz_track->push_back(iTrack1->pz() );
-		   B_k_charge1->push_back(kCandMC->currentState().particleCharge());
+		   B_k1_px->push_back(k1CandKP.momentum().x() );
+		   B_k1_py->push_back(k1CandKP.momentum().y() );
+		   B_k1_pz->push_back(k1CandKP.momentum().z() );
+		   B_k1_px_track->push_back(iTrack1->px() );
+		   B_k1_py_track->push_back(iTrack1->py() );
+		   B_k1_pz_track->push_back(iTrack1->pz() );
+		   B_k_charge1->push_back(k1CandMC->currentState().particleCharge());
 
+		   B_k2_px->push_back(k2CandKP.momentum().x() );
+                   B_k2_py->push_back(k2CandKP.momentum().y() );
+                   B_k2_pz->push_back(k2CandKP.momentum().z() );
+                   B_k2_px_track->push_back(iTrack2->px() );
+                   B_k2_py_track->push_back(iTrack2->py() );
+                   B_k2_pz_track->push_back(iTrack2->pz() );
+                   B_k_charge2->push_back(k2CandMC->currentState().particleCharge());
+		   
+		   B_Phi_mass->push_back(p4phi.M());
 		   B_J_mass->push_back( psi_vFit_noMC->currentState().mass() );
 		   B_J_px->push_back( psi_vFit_noMC->currentState().globalMomentum().x() );
 		   B_J_py->push_back( psi_vFit_noMC->currentState().globalMomentum().y() );
@@ -657,10 +688,10 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        photon0_py_1->push_back( photon_vFit_noMC_1->currentState().globalMomentum().y() );
        photon0_pz_1->push_back( photon_vFit_noMC_1->currentState().globalMomentum().z() );
 
-       photon_mass_1->push_back( photonCandMC->currentState().mass() );
-       photon_px_1->push_back( photonCandKP.momentum().x() );
-       photon_py_1->push_back( photonCandKP.momentum().y() );
-       photon_pz_1->push_back( photonCandKP.momentum().z() );
+       photon_mass_1->push_back( photon_vFit_withMC_1->currentState().mass() );
+       photon_px_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().x() );
+       photon_py_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().y() );
+       photon_pz_1->push_back( photon_vFit_withMC_1->currentState().globalMomentum().z() );
        photon_flags_1->push_back( iPhoton1->userInt("flags") );
        photon0_cos2D_common_1->push_back( cos2D_gamma0_common_1 );
 
@@ -733,6 +764,16 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        PhotonDecayVtxXZE_1->push_back( photon_vFit_vertex_noMC_1->error().czx() );
        PhotonDecayVtxYZE_1->push_back( photon_vFit_vertex_noMC_1->error().czy() );
 
+       PhotonDecayVtxX_2->push_back( photon_vFit_vertex_withMC_1->position().x() );
+       PhotonDecayVtxY_2->push_back( photon_vFit_vertex_withMC_1->position().y() );
+       PhotonDecayVtxZ_2->push_back( photon_vFit_vertex_withMC_1->position().z() );
+       PhotonDecayVtxXE_2->push_back( photon_vFit_vertex_withMC_1->error().cxx() );
+       PhotonDecayVtxYE_2->push_back( photon_vFit_vertex_withMC_1->error().cyy() );
+       PhotonDecayVtxZE_2->push_back( photon_vFit_vertex_withMC_1->error().czz() );
+       PhotonDecayVtxXYE_2->push_back( photon_vFit_vertex_withMC_1->error().cyx() );
+       PhotonDecayVtxXZE_2->push_back( photon_vFit_vertex_withMC_1->error().czx() );
+       PhotonDecayVtxYZE_2->push_back( photon_vFit_vertex_withMC_1->error().czy() );
+
        PV_bestBang_RF_X ->push_back(    bestVtxRf.x() );
        PV_bestBang_RF_Y ->push_back(    bestVtxRf.y() );
        PV_bestBang_RF_Z ->push_back(    bestVtxRf.z() );
@@ -796,6 +837,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        photonParticles_1.clear();
 
 	          }
+		}
 	        }
       	}
       }
@@ -813,9 +855,13 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    B_charge->clear();
    B_mass->clear();    B_px->clear();    B_py->clear();    B_pz->clear(); B_cos3D_PV->clear(); B_cos2D_PV->clear();
-   B_k_px->clear(); B_k_py->clear(); B_k_pz->clear();  B_k_charge1->clear();
-   B_k_px_track->clear(); B_k_py_track->clear(); B_k_pz_track->clear();
+   B_k1_px->clear(); B_k1_py->clear(); B_k1_pz->clear();  B_k_charge1->clear();
+   B_k1_px_track->clear(); B_k1_py_track->clear(); B_k1_pz_track->clear();
+   
+   B_k2_px->clear(); B_k2_py->clear(); B_k2_pz->clear();  B_k_charge2->clear();
+   B_k2_px_track->clear(); B_k2_py_track->clear(); B_k2_pz_track->clear();
 
+   B_Phi_mass->clear();
    B_J_mass->clear();  B_J_px->clear();  B_J_py->clear();  B_J_pz->clear();
 
    B_J_pt1->clear();  B_J_px1->clear();  B_J_py1->clear();  B_J_pz1->clear(), B_J_charge1->clear();
@@ -852,6 +898,10 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    PhotonDecayVtxX_1->clear(); PhotonDecayVtxY_1->clear(); PhotonDecayVtxZ_1->clear();
    PhotonDecayVtxXE_1->clear(); PhotonDecayVtxYE_1->clear(); PhotonDecayVtxZE_1->clear();
    PhotonDecayVtxXYE_1->clear(); PhotonDecayVtxXZE_1->clear(); PhotonDecayVtxYZE_1->clear();
+
+   PhotonDecayVtxX_2->clear(); PhotonDecayVtxY_2->clear(); PhotonDecayVtxZ_2->clear();
+   PhotonDecayVtxXE_2->clear(); PhotonDecayVtxYE_2->clear(); PhotonDecayVtxZE_2->clear();
+   PhotonDecayVtxXYE_2->clear(); PhotonDecayVtxXZE_2->clear(); PhotonDecayVtxYZE_2->clear();
 
    PV_bestBang_RF_X->clear();   PV_bestBang_RF_Y->clear();  PV_bestBang_RF_Z->clear();
    PV_bestBang_RF_XE->clear();  PV_bestBang_RF_YE->clear(); PV_bestBang_RF_ZE->clear();
@@ -908,13 +958,22 @@ JPsiKaon::beginJob()
 
 
   tree_->Branch("B_k_charge1", &B_k_charge1);
-  tree_->Branch("B_k_px", &B_k_px);
-  tree_->Branch("B_k_py", &B_k_py);
-  tree_->Branch("B_k_pz", &B_k_pz);
-  tree_->Branch("B_k_px_track", &B_k_px_track);
-  tree_->Branch("B_k_py_track", &B_k_py_track);
-  tree_->Branch("B_k_pz_track", &B_k_pz_track);
+  tree_->Branch("B_k1_px", &B_k1_px);
+  tree_->Branch("B_k1_py", &B_k1_py);
+  tree_->Branch("B_k1_pz", &B_k1_pz);
+  tree_->Branch("B_k1_px_track", &B_k1_px_track);
+  tree_->Branch("B_k1_py_track", &B_k1_py_track);
+  tree_->Branch("B_k_pz_track", &B_k1_pz_track);
 
+  tree_->Branch("B_k_charge2", &B_k_charge2);
+  tree_->Branch("B_k2_px", &B_k2_px);
+  tree_->Branch("B_k2_py", &B_k2_py);
+  tree_->Branch("B_k2_pz", &B_k2_pz);
+  tree_->Branch("B_k2_px_track", &B_k2_px_track);
+  tree_->Branch("B_k2_py_track", &B_k2_py_track);
+  tree_->Branch("B_k2_pz_track", &B_k2_pz_track);
+
+  tree_->Branch("B_Phi_mass", &B_Phi_mass);
   tree_->Branch("B_J_mass", &B_J_mass);
   tree_->Branch("B_J_px", &B_J_px);
   tree_->Branch("B_J_py", &B_J_py);
@@ -1022,6 +1081,16 @@ JPsiKaon::beginJob()
   tree_->Branch("PhotonDecayVtxXYE_1",&PhotonDecayVtxXYE_1);
   tree_->Branch("PhotonDecayVtxXZE_1",&PhotonDecayVtxXZE_1);
   tree_->Branch("PhotonDecayVtxYZE_1",&PhotonDecayVtxYZE_1);
+
+  tree_->Branch("PhotonDecayVtxX_2",&PhotonDecayVtxX_2);
+  tree_->Branch("PhotonDecayVtxY_2",&PhotonDecayVtxY_2);
+  tree_->Branch("PhotonDecayVtxZ_2",&PhotonDecayVtxZ_2);
+  tree_->Branch("PhotonDecayVtxXE_2",&PhotonDecayVtxXE_2);
+  tree_->Branch("PhotonDecayVtxYE_2",&PhotonDecayVtxYE_2);
+  tree_->Branch("PhotonDecayVtxZE_2",&PhotonDecayVtxZE_2);
+  tree_->Branch("PhotonDecayVtxXYE_2",&PhotonDecayVtxXYE_2);
+  tree_->Branch("PhotonDecayVtxXZE_2",&PhotonDecayVtxXZE_2);
+  tree_->Branch("PhotonDecayVtxYZE_2",&PhotonDecayVtxYZE_2);
 
   tree_->Branch("PV_bestBang_RF_X"  , &PV_bestBang_RF_X     );
   tree_->Branch("PV_bestBang_RF_Y"  , &PV_bestBang_RF_Y     );

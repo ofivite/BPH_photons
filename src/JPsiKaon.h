@@ -133,9 +133,13 @@ private:
   unsigned int             nMu;
 
   std::vector<float>       *B_mass, *B_px, *B_py, *B_pz, *B_charge, *B_cos3D_PV, *B_cos2D_PV;
-  std::vector<float>       *B_k_px, *B_k_py, *B_k_pz,  *B_k_charge1;
-  std::vector<float>       *B_k_px_track, *B_k_py_track, *B_k_pz_track;
+  std::vector<float>       *B_k1_px, *B_k1_py, *B_k1_pz,  *B_k_charge1;
+  std::vector<float>       *B_k1_px_track, *B_k1_py_track, *B_k1_pz_track;
 
+  std::vector<float>       *B_k2_px, *B_k2_py, *B_k2_pz,  *B_k_charge2;
+  std::vector<float>       *B_k2_px_track, *B_k2_py_track, *B_k2_pz_track;
+
+  std::vector<float>       *B_Phi_mass;
   std::vector<float>       *B_J_mass, *B_J_px, *B_J_py, *B_J_pz;
 
   std::vector<float>       *B_J_pt1, *B_J_px1, *B_J_py1, *B_J_pz1;
@@ -193,6 +197,10 @@ private:
   std::vector<float>       *PhotonDecayVtxX_1, *PhotonDecayVtxY_1, *PhotonDecayVtxZ_1;
   std::vector<float>       *PhotonDecayVtxXE_1, *PhotonDecayVtxYE_1, *PhotonDecayVtxZE_1;
   std::vector<float>       *PhotonDecayVtxXYE_1, *PhotonDecayVtxXZE_1, *PhotonDecayVtxYZE_1;
+
+  std::vector<float>       *PhotonDecayVtxX_2, *PhotonDecayVtxY_2, *PhotonDecayVtxZ_2;
+  std::vector<float>       *PhotonDecayVtxXE_2, *PhotonDecayVtxYE_2, *PhotonDecayVtxZE_2;
+  std::vector<float>       *PhotonDecayVtxXYE_2, *PhotonDecayVtxXZE_2, *PhotonDecayVtxYZE_2;
 
   std::vector<float>       *PV_bestBang_RF_X   , *PV_bestBang_RF_Y , *PV_bestBang_RF_Z;
   std::vector<float>       *PV_bestBang_RF_XE  , *PV_bestBang_RF_YE, *PV_bestBang_RF_ZE;
