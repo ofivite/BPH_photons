@@ -5,7 +5,7 @@ import ROOT
 from math import sqrt
 
 #__aa = 0;    __bb = 50
-MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_9_4_10/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2017_Igorek_v0_1_*/results/*.root")
+MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_10_2_5/src/myAnalyzers/JPsiKsPAT/crab_projects/crab_Bfinder_2017_Igorek_v0_*/results/*.root")
 ch = ROOT.TChain('rootuple/ntuple');
 
 __aa = 0;  __bb =  len(MyFileNames);
@@ -14,7 +14,7 @@ for fName in  MyFileNames[__aa: __bb]:
     ii = ch.Add(fName);
 print ('get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created')
 
-_fileOUT = '2017_Igorek_Bstar2_' + str(len(MyFileNames)) + '_of_ALL.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
+_fileOUT = '2017_Igorek_v1_Best_PhotMC_' + str(len(MyFileNames)) + '_of_2017.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
 fileOUT  = ROOT.TFile (_fileOUT, "recreate");    mytree = ROOT.TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print ("entries: from", 0, 'to', nEvt-1);
@@ -22,7 +22,7 @@ H_cuts = ROOT.TH1F("H_cuts", "H_cuts", 40, 0, 20)
 
 ###  declaration and connecting to the branches of my new variables {{{1
 NOUT, NOUT_evt, BBB, ibs = [int(0) for i in range(4)];
-MU1P4_cjp, MU2P4_cjp, K_P4_cjp, photon0_P4_1, photon_cjp_P4_1, B_P4 = [ROOT.TLorentzVector() for i in range(6)];
+MU1P4_cjp, MU2P4_cjp, K1_P4_cjp, K2_P4_cjp, photon_noMC_P4, photon_withMC_P4, B_P4 = [ROOT.TLorentzVector() for i in range(7)];
 
 
 _MY_VARS_ = [
@@ -46,11 +46,13 @@ _MY_VARS_ = [
 'photon_c0_mass_1', 'photon_c0_VtxProb_1', 'photon_mass_FromColl',
 
 'photon_VtxX', 'photon_VtxY',
-'photon0_VtxProb_1', 'photon0_pt_1', 'photon0_eta_1',
+'photon_noMC_VtxProb', 'photon_noMC_pt', 'photon_noMC_eta', 'photon_noMC_E', 
+'photon_withMC_pt', 'photon_withMC_eta', 'photon_withMC_E',
 #'photon_c0_DS2_common_1', 
-'photon_c0_DS2_PV_1', 'photon_flags_1', 
+'photon_noMC_DS2_PV', 'photon_flags_1', 
 #'photon0_cos2D_common_1', 'photon0_cos2D_common_Bfinder_1', 
-'photon0_cos2D_PV_1','photon0_cos3D_PV_1',
+'photon_noMC_cos2D_PV','photon_noMC_cos3D_PV',
+'photon_withMC_cos2D_PV','photon_withMC_cos3D_PV',
 
 #-----~-----
 
@@ -96,7 +98,8 @@ _MY_VARS_ = [
 'B_DS2_PV',
 
 'PV_refit_prob',
-'Bst_mass', 'Bst_Pt', 'Bst_Phi', 'Bst_Eta', 'Bst_minus_B',
+'Bst_noMC_mass', 'Bst_noMC_Pt', 'Bst_noMC_Phi', 'Bst_noMC_Eta', 'Bst_minus_B_noMC',
+'Bst_withMC_mass', 'Bst_withMC_Pt', 'Bst_withMC_Phi', 'Bst_withMC_Eta', 'Bst_minus_B_withMC',
 "SAMEEVENT"]
 
 for _var_ in _MY_VARS_:
@@ -168,7 +171,7 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~Kaon~~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~~#####
 
-        K_P4_cjp   .SetXYZM(ch.B_k_px[ibs], ch.B_k_py[ibs], ch.B_k_pz[ibs], PDG_KAON_MASS)
+        K1_P4_cjp   .SetXYZM(ch.B_k_px[ibs], ch.B_k_py[ibs], ch.B_k_pz[ibs], PDG_KAON_MASS)
 
 
         #####~~~~~~~~~~~~~~~~~~~~~~~~~#####
@@ -188,8 +191,10 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~Photon 1 CJP~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
 
-        photonV_c0_1     = ROOT.TVector3(ch.PhotonDecayVtxX_1[ibs],  ch.PhotonDecayVtxY_1[ibs],  ch.PhotonDecayVtxZ_1[ibs]   )
-        photonVE_c0_1    = ROOT.TVector3( 0 if ch.PhotonDecayVtxXE_1[ibs] <= 0 else sqrt(ch.PhotonDecayVtxXE_1[ibs]),
+        #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
+
+        photonV_noMC     = ROOT.TVector3(ch.PhotonDecayVtxX_1[ibs],  ch.PhotonDecayVtxY_1[ibs],  ch.PhotonDecayVtxZ_1[ibs]   )
+        photonVE_noMC    = ROOT.TVector3( 0 if ch.PhotonDecayVtxXE_1[ibs] <= 0 else sqrt(ch.PhotonDecayVtxXE_1[ibs]),
                                 0 if ch.PhotonDecayVtxYE_1[ibs] <= 0 else sqrt(ch.PhotonDecayVtxYE_1[ibs]),
                                 0 if ch.PhotonDecayVtxZE_1[ibs] <= 0 else sqrt(ch.PhotonDecayVtxZE_1[ibs])  )
 
@@ -201,16 +206,20 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~Photon 1 with zero-mass constraint~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
 
-        photon0_P4_1.SetXYZM(ch.photon0_px_1[ibs], ch.photon0_py_1[ibs], ch.photon0_pz_1[ibs], 0. )
-        photon0_P3_1 = photon0_P4_1.Vect() 
+        photon_noMC_P4.SetXYZM(ch.photon0_px_1[ibs], ch.photon0_py_1[ibs], ch.photon0_pz_1[ibs], 0. )
+        photon_noMC_P3 = photon_noMC_P4.Vect() 
+        photon_withMC_P4.SetXYZM(ch.photon_px_1[ibs], ch.photon_py_1[ibs], ch.photon_pz_1[ibs], 0. )
+        photon_withMC_P3 = photon_withMC_P4.Vect()  
 
         #####~~~~~~~~~~~~~~~~~~~~#####
         ###~~~~~~~~~~Chi~~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~#####
 
-        BstP4 = MUMUP4_cjp + K_P4_cjp + photon0_P4_1
+        Bst_noMC_P4 = MUMUP4_cjp + K1_P4_cjp + photon_noMC_P4
+        Bst_withMC_P4 = MUMUP4_cjp + K1_P4_cjp + photon_withMC_P4
 	
-	if (DirectionCos3( photonV_c0_1 - PV, photon0_P3_1 ) < 0.99): continue
+	if (DirectionCos3( photonV_noMC - PV, photon_noMC_P3 ) < 0.99): continue
+        if (DirectionCos3( photonV_noMC - PV, photon_withMC_P3 ) < 0.99): continue
 
         #####~~~~~~~~~~~~~~~~~~#####
         ###~~~~~~~~~~B~~~~~~~~~~~###
@@ -235,7 +244,7 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~ B ~~~~~~~~~~###
 
         B_mass[0]          = ch.B_mass[ibs]
-        B_mass_0[0]        = (MUMUP4_cjp + K_P4_cjp).M()
+        B_mass_0[0]        = (MUMUP4_cjp + K1_P4_cjp).M()
         B_Pt[0]            = B_P4.Pt()
         B_Phi[0]           = B_P4.Phi()
         B_Eta[0]           = B_P4.Eta()
@@ -251,12 +260,17 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~ B* ~~~~~~~~~~###
 
         # B_mass_Cjp[0]          = ch.chi_mass[ibs]
-        Bst_mass[0]        = BstP4.M()
-        Bst_Pt[0]          = BstP4.Pt()
-        Bst_Phi[0]         = BstP4.Phi()
-        Bst_Eta[0]         = BstP4.Eta()
-	Bst_minus_B[0]     = BstP4.M() - B_mass_0
+        Bst_noMC_mass[0]        = Bst_noMC_P4.M()
+        Bst_noMC_Pt[0]          = Bst_noMC_P4.Pt()
+        Bst_noMC_Phi[0]         = Bst_noMC_P4.Phi()
+        Bst_noMC_Eta[0]         = Bst_noMC_P4.Eta()
+	Bst_minus_B_noMC[0]     = Bst_noMC_P4.M() - B_mass_0
 
+        Bst_withMC_mass[0]        = Bst_withMC_P4.M()
+        Bst_withMC_Pt[0]          = Bst_withMC_P4.Pt()
+        Bst_withMC_Phi[0]         = Bst_withMC_P4.Phi()
+        Bst_withMC_Eta[0]         = Bst_withMC_P4.Eta()
+        Bst_minus_B_withMC[0]     = Bst_withMC_P4.M() - B_mass_0
 
         ###~~~~~~~~~~ PHOTON ~~~~~~~~~~###
 
@@ -277,25 +291,29 @@ for evt in range(0, nEvt):
 
         #-----~-----
 
-        photon0_VtxProb_1[0] = ch.photon0_Prob_1[ibs]
-        photon0_pt_1[0] = photon0_P4_1.Pt()
-        photon0_eta_1[0] = photon0_P4_1.Eta()
+        photon_noMC_VtxProb[0] = ch.photon1_Prob[ibs]
+        photon_noMC_pt[0] = photon_noMC_P4.Pt()
+        photon_noMC_eta[0] = photon_noMC_P4.Eta()
+        photon_noMC_E[0] = photon_noMC_P4.E()
 
-#        photon0_cos2D_common_Bfinder_1[0] = ch.photon0_cos2D_common_1[ibs]
-#        photon0_cos2D_common_1[0]    = DirectionCos2 ( photonV_c0_1 - B_V, photon0_P3_1 )
-        photon0_cos2D_PV_1[0]        = DirectionCos2 ( photonV_c0_1 - PV, photon0_P3_1 )
-        photon0_cos3D_PV_1[0]        = DirectionCos3 ( photonV_c0_1 - PV, photon0_P3_1 )
+        photon_noMC_cos2D_PV[0]        = DirectionCos2 ( photonV_noMC - PV, photon_noMC_P3 )
+        photon_noMC_cos3D_PV[0]        = DirectionCos3 ( photonV_noMC - PV, photon_noMC_P3 )
 
-#        photon_c0_DS2_common_1[0] = DetachSignificance2(photonV_c0_1 - B_V, B_VE, photonVE_c0_1)
-        photon_c0_DS2_PV_1[0] = DetachSignificance2(photonV_c0_1 - PV, PVE, photonVE_c0_1)
+        photon_noMC_DS2_PV[0] = DetachSignificance2(photonV_noMC - PV, PVE, photonVE_noMC)
+
+        photon_withMC_pt[0] = photon_withMC_P4.Pt()
+        photon_withMC_eta[0] = photon_withMC_P4.Eta()
+	photon_withMC_E[0] = photon_withMC_P4.E()
+
+        photon_withMC_cos2D_PV[0]        = DirectionCos2 ( photonV_noMC - PV, photon_withMC_P3 )
+        photon_withMC_cos3D_PV[0]        = DirectionCos3 ( photonV_noMC - PV, photon_withMC_P3 )
 
         photon_flags_1[0] = int("{0:b}".format(ch.photon_flags_1[ibs]))
 
         ###~~~~~~~~~~ KAON ~~~~~~~~~~###
 
-        K_pt_cjp[0] = K_P4_cjp.Pt()
-        K_eta_cjp[0] = K_P4_cjp.Eta()
-
+        K_pt_cjp[0] = K1_P4_cjp.Pt()
+        K_eta_cjp[0] = K1_P4_cjp.Eta()
 
         ###~~~~~~~~~~ ELECTRONS ~~~~~~~~~~###
 
@@ -347,19 +365,6 @@ for evt in range(0, nEvt):
         mu1loose[0] = float(ch.mu1loose[ibs].__bool__());           mu2loose[0] = float(ch.mu2loose[ibs].__bool__());
         # mu1_mvaValue[0] = ch.mu1_mvaValue[ibs];   mu2_mvaValue[0] = ch.mu2_mvaValue[ibs];
 
-
-        ###~~~~~~~~~~ J/PSI ~~~~~~~~~~###
-
-        # deltaR_mupmum_cjp[0] = MU1P4_cjp.DeltaR(MU2P4_cjp)
-        Jpsi_VtxProb_c0[0]       = ch.B_J_Prob[ibs]
-        Jpsi_pt_Cjp[0] = MUMUP4_cjp.Pt()
-        Jpsi_eta_Cjp[0] = MUMUP4_cjp.Eta()
-        Jpsi_DS2_PV_c0[0] = DetachSignificance2( JPV - PV, PVE, JPVE)
-        Jpsi_pvcos2_Cjp[0] = DirectionCos2 ( JPV - PV, JPP3 )
-
-
-        #---------------------------------------------------
-        ###~~~~~~~~~~ WE ARE DONE HERE~~~~~~~~~~###
         #---------------------------------------------------
 
         SAMEEVENT[0] = 0;

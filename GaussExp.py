@@ -7,7 +7,7 @@ from array import array
 
 #########################################################################################
 par = 0.; par_0 = 0.; 
-REMUC = True;
+REMUC = False;
 flag_empty = 1;
 
 cuts = True; 
@@ -18,7 +18,7 @@ Dhists = False
 
 
 ch = TChain("mytree");
-MyFileNames = glob.glob('2017_Igorek_Best_v1_1270_of_1271.root')
+MyFileNames = glob.glob('2017_Igorek_v1_Best_PhotMC_1269_of_2017.root')
 for fName in MyFileNames :
     ch.Add(fName);
 
@@ -60,10 +60,10 @@ for evt in range(nEvt):
        if ch.Bst_mass     > 5.51           :continue
 
 #       if (ch.photon_flags_1 / 100) % 10 > 0.5      :continue
-       if ch.B_cos2D_PV         < 0.9999   :continue
+       if ch.B_cos2D_PV         < 0.999    :continue
        if ch.B_DS2_PV           < 3        :continue
        if ch.photon0_pt_1       < 0.05     :continue
-       if ch.photon0_cos3D_PV_1 < 0.9999   :continue
+       if ch.photon0_cos3D_PV_1 < 0.999    :continue
 #       if abs(ch.mu1_eta_Cjp)   < 1.5      :continue
 #       if abs(ch.mu2_eta_Cjp)   < 1.5      :continue
 
@@ -83,7 +83,7 @@ for evt in range(nEvt):
     #   if ch.B_mass > 5.4 : continue
     #   if ch.B_mass < 5.05 : continue
        par_0 = par
-       mBst    .setVal( ch.Bst_minus_B  )
+       mBst    .setVal( ch.Bst_minus_B_noMC  )
        PhotExy .setVal( ch.photon0_pt_1 )
        PhotE   .setVal( ch.photon0_E_1  ) 
        mB      .setVal( ch.B_mass       )
@@ -284,7 +284,7 @@ mframe.Draw()
 #l1=TLine(S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 80)
 #l2=TLine(S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 80)
 #l1.Draw('same'); l2.Draw('same')
-cB.SaveAs('Bstar_res/Mdiff_distribution.png')
+cB.SaveAs('Bstar_res/Mdiff_distribution_noMC.png')
 #print "Fit chi^2", mframe.chiSquare(7)
 
 sPlot_list = RooArgList(B_signal, Bg)
