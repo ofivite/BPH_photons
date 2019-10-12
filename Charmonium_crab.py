@@ -106,7 +106,7 @@ if __name__ == '__main__':
     #    config.Site.ignoreGlobalBlacklist = True
     #
     config.General.requestName = 'Bfinder_' + task + '_' + dset[19]
-    config.General.workArea = 'crab_projects_Bs'
+    config.General.workArea = 'crab_projects_Bs17'
     config.Data.inputDataset = dset
     print '\n', config.General.requestName
     print config.General.workArea

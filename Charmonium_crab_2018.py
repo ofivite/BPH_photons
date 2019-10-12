@@ -110,8 +110,8 @@ if __name__ == '__main__':
     #if dset == '/Charmonium/Run2017D-PromptReco-v1/AOD':
     #    config.Site.ignoreGlobalBlacklist = True
     #
-    config.General.requestName = 'Bfinder_' + task + '_' + dset[19] + '2'
-    config.General.workArea = 'crab_projects_' + task
+    config.General.requestName = 'Bfinder_' + task + '_' + dset[19]
+    config.General.workArea = 'crab_projects_Bs18'
     config.Data.inputDataset = dset
     print '\n', config.General.requestName
     print config.General.workArea

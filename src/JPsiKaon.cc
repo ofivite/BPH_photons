@@ -788,24 +788,24 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
  // ********************* muon-trigger-machint ****************
 
-		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t1 = iMuon1->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
-		   const pat::TriggerObjectStandAloneCollection muHLTMatches2_t1 = iMuon2->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
+//		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t1 = iMuon1->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
+//		   const pat::TriggerObjectStandAloneCollection muHLTMatches2_t1 = iMuon2->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
 
-		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t2 = iMuon1->triggerObjectMatchesByFilter("hltJpsiTkVertexFilter");
-		   const pat::TriggerObjectStandAloneCollection muHLTMatches2_t2 = iMuon2->triggerObjectMatchesByFilter("hltJpsiTkVertexFilter");
+//		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t2 = iMuon1->triggerObjectMatchesByFilter("hltJpsiTkVertexFilter");
+//		   const pat::TriggerObjectStandAloneCollection muHLTMatches2_t2 = iMuon2->triggerObjectMatchesByFilter("hltJpsiTkVertexFilter");
+//
+//		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t4 = iMuon1->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon20JpsiBarrelnoCow");
+//		   const pat::TriggerObjectStandAloneCollection muHLTMatches2_t4 = iMuon2->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon20JpsiBarrelnoCow");
 
-		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t4 = iMuon1->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon20JpsiBarrelnoCow");
-		   const pat::TriggerObjectStandAloneCollection muHLTMatches2_t4 = iMuon2->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon20JpsiBarrelnoCow");
-
-		   int tri_Dim25_tmp = 0, tri_JpsiTk_tmp = 0,  tri_Dim20_tmp = 0;
-
-		   if (muHLTMatches1_t1.size() > 0 && muHLTMatches2_t1.size() > 0) tri_Dim25_tmp = 1;
-		   if (muHLTMatches1_t2.size() > 0 && muHLTMatches2_t2.size() > 0) tri_JpsiTk_tmp = 1;
-		   if (muHLTMatches1_t4.size() > 0 && muHLTMatches2_t4.size() > 0) tri_Dim20_tmp = 1;
-
-		   tri_Dim25->push_back( tri_Dim25_tmp );
-		   tri_JpsiTk->push_back( tri_JpsiTk_tmp );
-		   tri_Dim20->push_back( tri_Dim20_tmp );
+//		   int tri_Dim25_tmp = 0, tri_JpsiTk_tmp = 0,  tri_Dim20_tmp = 0;
+//
+//		   if (muHLTMatches1_t1.size() > 0 && muHLTMatches2_t1.size() > 0) tri_Dim25_tmp = 1;
+//		   if (muHLTMatches1_t2.size() > 0 && muHLTMatches2_t2.size() > 0) tri_JpsiTk_tmp = 1;
+//		   if (muHLTMatches1_t4.size() > 0 && muHLTMatches2_t4.size() > 0) tri_Dim20_tmp = 1;
+//
+//		   tri_Dim25->push_back( tri_Dim25_tmp );
+//		   tri_JpsiTk->push_back( tri_JpsiTk_tmp );
+//		   tri_Dim20->push_back( tri_Dim20_tmp );
 
 	   // ************ Different muons Id, and other properties  ****************
 
