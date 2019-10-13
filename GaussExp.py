@@ -52,20 +52,20 @@ for evt in range(nEvt):
     if (cuts == True) :
 
        # B cuts 
-       if ch.Bst_minus_B_withMC  < .025           :continue
-       if ch.Bst_minus_B_withMC  > .065           :continue
+       if ch.Bst_minus_B_noMC  < .025           :continue
+       if ch.Bst_minus_B_noMC  > .065           :continue
        if ch.B_mass       < 5.16           :continue
        if ch.B_mass       > 5.44           :continue
-       if ch.Bst_withMC_mass     < 5.18           :continue
-       if ch.Bst_withMC_mass     > 5.51           :continue
+       if ch.Bst_noMC_mass     < 5.18           :continue
+       if ch.Bst_noMC_mass     > 5.51           :continue
 
 #       if (ch.photon_flags_1 / 100) % 10 > 0.5      :continue
        if ch.B_cos2D_PV         < 0.9999    :continue
        if ch.B_DS2_PV           < 3        :continue
-       if ch.photon_withMC_pt       < 0.05     :continue
-       if ch.photon_withMC_cos3D_PV < 0.9999    :continue
-#       if abs(ch.mu1_eta_Cjp)   < 1.5      :continue
-#       if abs(ch.mu2_eta_Cjp)   < 1.5      :continue
+       if ch.photon_noMC_pt       < 0.05     :continue
+       if ch.photon_noMC_cos3D_PV < 0.9999    :continue
+       if abs(ch.mu1_eta_Cjp)   < 1.4      :continue
+       if abs(ch.mu2_eta_Cjp)   < 1.4      :continue
 
    # Phi cuts 
    
@@ -83,11 +83,11 @@ for evt in range(nEvt):
     #   if ch.B_mass > 5.4 : continue
     #   if ch.B_mass < 5.05 : continue
        par_0 = par
-       mBst    .setVal( ch.Bst_minus_B_withMC  )
-       PhotExy .setVal( ch.photon_withMC_pt )
-       PhotE   .setVal( ch.photon_withMC_E  ) 
+       mBst    .setVal( ch.Bst_minus_B_noMC  )
+       PhotExy .setVal( ch.photon_noMC_pt )
+       PhotE   .setVal( ch.photon_noMC_E  ) 
        mB      .setVal( ch.B_mass       )
-       mB1     .setVal( ch.Bst_withMC_mass     )
+       mB1     .setVal( ch.Bst_noMC_mass     )
  #      mB.setVal(ch.B_mass)
        if (Dhists == True):
           JPLA_data.Fill(ch.JPLA_mass)
@@ -284,7 +284,7 @@ mframe.Draw()
 #l1=TLine(S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() - 2.5 * S1_sigma.getVal(), 80)
 #l2=TLine(S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 0.0, S1_mean.getVal() + 2.5 * S1_sigma.getVal(), 80)
 #l1.Draw('same'); l2.Draw('same')
-cB.SaveAs('Bstar_res/Mdiff_distribution_withMC.png')
+cB.SaveAs('Bstar_res/Mdiff_distribution_noMC_endcap_eta1p4.png')
 #print "Fit chi^2", mframe.chiSquare(7)
 
 sPlot_list = RooArgList(B_signal, Bg)
