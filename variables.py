@@ -31,9 +31,9 @@ PDG_DMBstB          =   0.04538
 
 bmin = 6; bmax = 6.6; binN = 120
 
-mB      = RooRealVar ( "mB"   ,"M(B), [Gev]", 5.16 , 5.44)
-mB1     = RooRealVar ( "mB1"   ,"M(B), [Gev]", 5.18 , 5.51)
-mBst    = RooRealVar ( "mBst-mB"     ,"M(B*) - M(B), [Gev]", 0.025, 0.065)
+mB      = RooRealVar ( "mB"   ,"M(Bs), [Gev]", 5.26 , 5.46)
+mB1     = RooRealVar ( "mB1"   ,"M(Bs*), [Gev]", 5.2 , 5.55)
+mBst    = RooRealVar ( "mBst-mB"     ,"M(Bs*) - M(Bs), [Gev]", 0.025, 0.065)
 PhotExy = RooRealVar ( "PhotonPt","Pt(#gamma), [Gev]", 0, 2.5)
 PhotE   = RooRealVar ( "PhotonE","E(#gamma), [Gev]", 0, 4.5)
 PhotM   = RooRealVar ( "PhotonM","M(#gamma), [Gev]", -0.001, 0.1)
