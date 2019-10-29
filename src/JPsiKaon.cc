@@ -747,7 +747,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
  // ********************* muon-trigger-machint ****************
 
-		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t1 = iMuon1->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
+/*		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t1 = iMuon1->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
 		   const pat::TriggerObjectStandAloneCollection muHLTMatches2_t1 = iMuon2->triggerObjectMatchesByFilter("hltDisplacedmumuFilterDimuon25Jpsis");
 
 		   const pat::TriggerObjectStandAloneCollection muHLTMatches1_t2 = iMuon1->triggerObjectMatchesByFilter("hltJpsiTkVertexFilter");
@@ -765,7 +765,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   tri_Dim25->push_back( tri_Dim25_tmp );
 		   tri_JpsiTk->push_back( tri_JpsiTk_tmp );
 		   tri_Dim20->push_back( tri_Dim20_tmp );
-
+*/
 	   // ************ Different muons Id, and other properties  ****************
 
 		   mu1soft->push_back(iMuon1->isSoftMuon(bestVtx) );
