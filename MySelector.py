@@ -14,7 +14,7 @@ for fName in  MyFileNames[__aa: __bb]:
     ii = ch.Add(fName);
 print ('get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created')
 
-_fileOUT = '2017_Igorek_v1_Best_PhotMC_' + str(len(MyFileNames)) + '_of_2017.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
+_fileOUT = '2017_Igorek_v1_Bst_PhotonXYZ_' + str(len(MyFileNames)) + '_of_1271.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
 fileOUT  = ROOT.TFile (_fileOUT, "recreate");    mytree = ROOT.TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print ("entries: from", 0, 'to', nEvt-1);
@@ -45,7 +45,7 @@ _MY_VARS_ = [
 
 'photon_c0_mass_1', 'photon_c0_VtxProb_1', 'photon_mass_FromColl',
 
-'photon_VtxX', 'photon_VtxY',
+'photon_VtxX', 'photon_VtxY', 'photon_VtxZ',
 'photon_noMC_VtxProb', 'photon_noMC_pt', 'photon_noMC_eta', 'photon_noMC_E', 
 'photon_withMC_pt', 'photon_withMC_eta', 'photon_withMC_E',
 #'photon_c0_DS2_common_1', 
@@ -218,8 +218,8 @@ for evt in range(0, nEvt):
         Bst_noMC_P4 = MUMUP4_cjp + K1_P4_cjp + photon_noMC_P4
         Bst_withMC_P4 = MUMUP4_cjp + K1_P4_cjp + photon_withMC_P4
 	
-	if (DirectionCos3( photonV_noMC - PV, photon_noMC_P3 ) < 0.99): continue
-        if (DirectionCos3( photonV_noMC - PV, photon_withMC_P3 ) < 0.99): continue
+	#if (DirectionCos3( photonV_noMC - PV, photon_noMC_P3 ) < 0.99): continue
+        #if (DirectionCos3( photonV_noMC - PV, photon_withMC_P3 ) < 0.99): continue
 
         #####~~~~~~~~~~~~~~~~~~#####
         ###~~~~~~~~~~B~~~~~~~~~~~###
@@ -281,7 +281,8 @@ for evt in range(0, nEvt):
         #-----~-----
         photon_VtxX[0]      = ch.PhotonDecayVtxX_1[ibs]
         photon_VtxY[0]      = ch.PhotonDecayVtxY_1[ibs]
-        
+        photon_VtxZ[0]      = ch.PhotonDecayVtxZ_1[ibs]
+
  #       photon_cjp_mass_1[0] = ch.photon_mass_1[ibs]
  #       photon_cjp_pt_1[0] = photon_cjp_P4_1.Pt()
  #       photon_cjp_eta_1[0] = photon_cjp_P4_1.Eta()
