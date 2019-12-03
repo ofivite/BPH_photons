@@ -5,7 +5,7 @@ import ROOT
 from math import sqrt
 
 #__aa = 0;    __bb = 50
-MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_10_2_5/src/myAnalyzers/JPsiKsPAT/crab_projects_Bs1?/crab_Bfinder_201?_Igorek_*/results/*.root")
+MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_10_2_5/src/myAnalyzers/JPsiKsPAT/crab_projects_Bz1?/crab_Bfinder_201?_Igorek_*/results/*.root")
 ch = ROOT.TChain('rootuple/ntuple');
 
 __aa = 0;  __bb =  len(MyFileNames);
@@ -14,7 +14,7 @@ for fName in  MyFileNames[__aa: __bb]:
     ii = ch.Add(fName);
 print ('get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created')
 
-_fileOUT = 'Igorek_v1_Bs_' + str(len(MyFileNames)) + '_of_2017_18.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
+_fileOUT = 'Igorek_v1_Bz_' + str(len(MyFileNames)) + '_test.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
 fileOUT  = ROOT.TFile (_fileOUT, "recreate");    mytree = ROOT.TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print ("entries: from", 0, 'to', nEvt-1);
@@ -22,7 +22,7 @@ H_cuts = ROOT.TH1F("H_cuts", "H_cuts", 40, 0, 20)
 
 ###  declaration and connecting to the branches of my new variables {{{1
 NOUT, NOUT_evt, BBB, ibs = [int(0) for i in range(4)];
-MU1P4_cjp, MU2P4_cjp, K1_P4_cjp, K2_P4_cjp, photon_noMC_P4, photon_withMC_P4, B_P4 = [ROOT.TLorentzVector() for i in range(7)];
+MU1P4_cjp, MU2P4_cjp, K_P4_cjp, Pi_P4_cjp, photon_noMC_P4, photon_withMC_P4, B_P4 = [ROOT.TLorentzVector() for i in range(7)];
 
 
 _MY_VARS_ = [
@@ -61,9 +61,9 @@ _MY_VARS_ = [
 
 #-----~-----
 
-'K1_pt_cjp', 'K1_eta_cjp',
-'K2_pt_cjp', 'K2_eta_cjp',
-'Phi_mass_cjp',
+'K_pt_cjp', 'K_eta_cjp',
+'Pi_pt_cjp', 'Pi_eta_cjp',
+'Kst_mass_cjp',
 
 #-----~-----
 # 'areSoft', 'areTight_def', 'areTight_HM', 'areMyGlobal',
@@ -173,8 +173,8 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~Kaon~~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~~#####
 
-        K1_P4_cjp   .SetXYZM(ch.B_k1_px[ibs], ch.B_k1_py[ibs], ch.B_k1_pz[ibs], PDG_KAON_MASS)
-        K2_P4_cjp   .SetXYZM(ch.B_k2_px[ibs], ch.B_k2_py[ibs], ch.B_k2_pz[ibs], PDG_KAON_MASS)
+        K_P4_cjp   .SetXYZM(ch.B_k1_px[ibs], ch.B_k1_py[ibs], ch.B_k1_pz[ibs], PDG_KAON_MASS)
+        Pi_P4_cjp   .SetXYZM(ch.B_k2_px[ibs], ch.B_k2_py[ibs], ch.B_k2_pz[ibs], PDG_PION_MASS)
 
 
         #####~~~~~~~~~~~~~~~~~~~~~~~~~#####
@@ -222,8 +222,8 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~Chi~~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~#####
 
-        Bst_noMC_P4 = MUMUP4_cjp + K1_P4_cjp + K2_P4_cjp + photon_noMC_P4
-        Bst_withMC_P4 = MUMUP4_cjp + K1_P4_cjp + K2_P4_cjp + photon_withMC_P4
+        Bst_noMC_P4 = MUMUP4_cjp + K_P4_cjp + Pi_P4_cjp + photon_noMC_P4
+        Bst_withMC_P4 = MUMUP4_cjp + K_P4_cjp + Pi_P4_cjp + photon_withMC_P4
 	
 	if (DirectionCos3( photonV_noMC - PV, photon_noMC_P3 ) < 0.99): continue
         if (DirectionCos3( photonV_withMC - PV, photon_withMC_P3 ) < 0.99): continue
@@ -251,7 +251,7 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~ B ~~~~~~~~~~###
 
         B_mass[0]          = ch.B_mass[ibs]
-        B_mass_0[0]        = (MUMUP4_cjp + K1_P4_cjp + K2_P4_cjp).M()
+        B_mass_0[0]        = (MUMUP4_cjp + K_P4_cjp + Pi_P4_cjp).M()
         B_Pt[0]            = B_P4.Pt()
         B_Phi[0]           = B_P4.Phi()
         B_Eta[0]           = B_P4.Eta()
@@ -321,11 +321,11 @@ for evt in range(0, nEvt):
 
         ###~~~~~~~~~~ KAON ~~~~~~~~~~###
 
-        K1_pt_cjp[0] = K1_P4_cjp.Pt()
-        K1_eta_cjp[0] = K1_P4_cjp.Eta()
-        K2_pt_cjp[0] = K2_P4_cjp.Pt()
-        K2_eta_cjp[0] = K2_P4_cjp.Eta()
-	Phi_mass_cjp[0] = (K1_P4_cjp + K2_P4_cjp).M()
+        K_pt_cjp[0] = K_P4_cjp.Pt()
+        K_eta_cjp[0] = K_P4_cjp.Eta()
+        Pi_pt_cjp[0] = Pi_P4_cjp.Pt()
+        Pi_eta_cjp[0] = Pi_P4_cjp.Eta()
+	Kst_mass_cjp[0] = (K_P4_cjp + Pi_P4_cjp).M()
 
         ###~~~~~~~~~~ ELECTRONS ~~~~~~~~~~###
 

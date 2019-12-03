@@ -47,7 +47,7 @@ if __name__ == '__main__':
     import sys
     from CRABAPI.RawCommand import crabCommand
     from httplib import HTTPException
-    task = '2018_Igorek_Bs_v1'
+    task = '2018_Igorek_Bz_v1'
     ####
     ## MY: b1 == Bc+ --> J/psi pi+
     ##      x1 = Xi-    -> Lambda pi
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     #
     ## 2017_bs = B0s (Jpsi phi)
     ####
-    units_per_job = 220
+    units_per_job = 100
     #
     n = 0
     if len(sys.argv) >= 2:
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     #    config.Site.ignoreGlobalBlacklist = True
     #
     config.General.requestName = 'Bfinder_' + task + '_' + dset[19]
-    config.General.workArea = 'crab_projects_Bs18'
+    config.General.workArea = 'crab_projects_Bz18'
     config.Data.inputDataset = dset
     print '\n', config.General.requestName
     print config.General.workArea
@@ -120,11 +120,11 @@ if __name__ == '__main__':
     lumi_mask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON_MuonPhys.txt'
     #
     split_modifier = 1;
-    #if ('2018C' in dset) : split_modifier = 1.6
+    #if ('2018C' in dset) : split_modifier = .6
     #
-    #if ('2017E' in dset) : split_modifier = 1
+    #if ('2017E' in dset) : split_modifier = .8
     #
-    if ('2018D' in dset) : split_modifier = 0.6
+    if ('2018D' in dset) : split_modifier = .8
     #
     config.Data.unitsPerJob = int(units_per_job * split_modifier)
     config.Data.lumiMask = lumi_mask

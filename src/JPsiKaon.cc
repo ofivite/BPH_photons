@@ -367,13 +367,13 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 		   reco::TransientTrack kaonTT1((*theB).build(iTrack1->pseudoTrack()));
                    
-		   ParticleMass kaon_mass = 0.493677;
+		   ParticleMass kaon_mass = 0.493677, pion_mass = 0.139571;
                    TLorentzVector kaon14V, p4_jpsi;
 		   kaon14V.SetXYZM(iTrack1->px(),iTrack1->py(),iTrack1->pz(),kaon_mass);
                    p4_jpsi.SetXYZM(psi_vFit_noMC->currentState().globalMomentum().x(),psi_vFit_noMC->currentState().globalMomentum().y(),psi_vFit_noMC->currentState().globalMomentum().z(),psi_vFit_noMC->currentState().mass());
 		   
 		   		   
-		   for (View<pat::PackedCandidate>::const_iterator iTrack2 = iTrack1 + 1;
+		   for (View<pat::PackedCandidate>::const_iterator iTrack2 = thePATTrackHandle->begin();
                    	iTrack2 != thePATTrackHandle->end(); ++iTrack2)
 			{
 	                   if(iTrack2->charge()*iTrack1->charge() > -0.5) continue;
@@ -384,11 +384,11 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 			   reco::TransientTrack kaonTT2((*theB).build(iTrack2->pseudoTrack()));
                    
 			   TLorentzVector kaon24V, p4chi0, p4phi;
-                           kaon24V.SetXYZM(iTrack2->px(),iTrack2->py(),iTrack2->pz(),kaon_mass);
+                           kaon24V.SetXYZM(iTrack2->px(),iTrack2->py(),iTrack2->pz(),pion_mass);
 			   p4phi = kaon14V + kaon24V;
 			   p4chi0 = p4phi + p4_jpsi;
-			   if (p4phi.M() > 1.05) continue;
-			   if (p4chi0.M() < 4.4 || p4chi0.M() > 6.4) continue;
+			   if (p4phi.M() > 1.2) continue;
+			   if (p4chi0.M() < 4.3 || p4chi0.M() > 6.3) continue;
 
 
 
@@ -490,7 +490,8 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 
-		   float kaon_sigma = kaon_mass*1.e-6;
+		   float kaon_sigma = kaon_mass*1.e-6, pion_sigma = pion_mass*1.e-6;
+                   
 
 		   float chi = 0.;
 		   float ndf = 0.;
@@ -508,7 +509,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		   vFitMCParticles.push_back(pFactory.particle(muon1TT,muon_mass,chi,ndf,muon_sigma));
 		   vFitMCParticles.push_back(pFactory.particle(muon2TT,muon_mass,chi,ndf,muon_sigma));
 		   vFitMCParticles.push_back(pFactory.particle(kaonTT1,kaon_mass ,chi,ndf,kaon_sigma));
-                   vFitMCParticles.push_back(pFactory.particle(kaonTT2,kaon_mass ,chi,ndf,kaon_sigma));
+                   vFitMCParticles.push_back(pFactory.particle(kaonTT2,pion_mass ,chi,ndf,pion_sigma));
                    //vFitMCParticles.push_back(photon_vFit_noMC_1);
 
 		   MultiTrackKinematicConstraint *  j_psi_c = new  TwoTrackMassKinematicConstraint(psi_mass);
@@ -526,7 +527,7 @@ void JPsiKaon::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         if (!bCandMC->currentState().isValid()) continue;
         if (!bDecayVertexMC->vertexIsValid())  continue;
 
-		    if ( (bCandMC->currentState().mass() < 5.15) || (bCandMC->currentState().mass() > 5.55) ) {
+		    if ( (bCandMC->currentState().mass() < 5.1) || (bCandMC->currentState().mass() > 5.5) ) {
 		      continue;
 		    }
 
