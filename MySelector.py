@@ -5,7 +5,7 @@ import ROOT
 from math import sqrt
 
 #__aa = 0;    __bb = 50
-MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_10_2_5/src/myAnalyzers/JPsiKsPAT/crab_projects_Bs1?/crab_Bfinder_201?_Igorek_*/results/*.root")
+MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_10_2_5/src/myAnalyzers/JPsiKsPAT/crab_projects_Bs16/crab_Bfinder_201?_Igorek_*/results/*.root")
 ch = ROOT.TChain('rootuple/ntuple');
 
 __aa = 0;  __bb =  len(MyFileNames);
@@ -14,7 +14,7 @@ for fName in  MyFileNames[__aa: __bb]:
     ii = ch.Add(fName);
 print ('get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created')
 
-_fileOUT = 'Igorek_v1_Bs_' + str(len(MyFileNames)) + '_of_2017_18.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
+_fileOUT = 'Igorek_v1_Bs_' + str(len(MyFileNames)) + '_of_2016_17_18.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
 fileOUT  = ROOT.TFile (_fileOUT, "recreate");    mytree = ROOT.TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print ("entries: from", 0, 'to', nEvt-1);
