@@ -5,7 +5,7 @@ import ROOT
 from math import sqrt
 
 #__aa = 0;    __bb = 50
-MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_10_2_5/src/myAnalyzers/JPsiKsPAT/crab_projects_Bs16/crab_Bfinder_201?_Igorek_*/results/*.root")
+MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_10_2_5/src/myAnalyzers/JPsiKsPAT/crab_projects_Bs1?/crab_Bfinder_201?_Igorek_*/results/*.root")
 ch = ROOT.TChain('rootuple/ntuple');
 
 __aa = 0;  __bb =  len(MyFileNames);
