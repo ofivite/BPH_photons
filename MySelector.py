@@ -5,7 +5,7 @@ import ROOT
 from math import sqrt
 
 #__aa = 0;    __bb = 50
-MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_10_2_5/src/myAnalyzers/JPsiKsPAT/crab_projects_Bst*/crab_Bfinder_2018_Igorek_*D/results/*.root")
+MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_10_2_5/src/myAnalyzers/JPsiKsPAT/crab_projects_C*/crab_*/results/*.root")
 ch = ROOT.TChain('rootuple/ntuple');
 
 __aa = 0;  __bb =  len(MyFileNames);
@@ -14,7 +14,7 @@ for fName in  MyFileNames[__aa: __bb]:
     ii = ch.Add(fName);
 print ('get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created')
 
-_fileOUT = 'Igorek_v1_Bpl_' + str(len(MyFileNames)) + '_of_16_17_18.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
+_fileOUT = 'Igorek_v1_Chi_' + str(len(MyFileNames)) + '_of_16.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
 fileOUT  = ROOT.TFile (_fileOUT, "recreate");    mytree = ROOT.TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print ("entries: from", 0, 'to', nEvt-1);
@@ -171,7 +171,6 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~Kaon~~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~~#####
 
-        K1_P4_cjp   .SetXYZM(ch.B_k_px[ibs], ch.B_k_py[ibs], ch.B_k_pz[ibs], PDG_KAON_MASS)
 
 
         #####~~~~~~~~~~~~~~~~~~~~~~~~~#####
@@ -215,8 +214,8 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~Chi~~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~#####
 
-        Bst_noMC_P4 = MUMUP4_cjp + K1_P4_cjp + photon_noMC_P4
-        Bst_withMC_P4 = MUMUP4_cjp + K1_P4_cjp + photon_withMC_P4
+        Bst_noMC_P4 = MUMUP4_cjp + photon_noMC_P4
+        Bst_withMC_P4 = MUMUP4_cjp + photon_withMC_P4
 	if Bst_noMC_P4.M() > 6. :continue
 	#if photon_noMC_P4.Pt() > 100 :continue
 	#if (DirectionCos3( photonV_noMC - PV, photon_noMC_P3 ) < 0.99): continue
@@ -245,13 +244,14 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~ B ~~~~~~~~~~###
 
         B_mass[0]          = ch.B_mass[ibs]
-        B_mass_0[0]        = (MUMUP4_cjp + K1_P4_cjp).M()
+        B_mass_0[0]        = (MUMUP4_cjp).M()
         B_Pt[0]            = B_P4.Pt()
         B_Phi[0]           = B_P4.Phi()
         B_Eta[0]           = B_P4.Eta()
 
         B_vtxprob[0]       = ch.B_Prob[ibs]
         B_cos3D_PV_Bfinder[0] = ch.B_cos3D_PV[ibs]
+	if DirectionCos2 ( photonV_noMC - PV, photon_noMC_P3 ) < 0.9999 : continue
         B_cos2D_PV[0] = DirectionCos2 ( B_V - PV , B_P3 )
         B_DS2_PV[0] = DetachSignificance2(B_V - PV, PVE, B_VE)
 
@@ -314,8 +314,6 @@ for evt in range(0, nEvt):
 
         ###~~~~~~~~~~ KAON ~~~~~~~~~~###
 
-        K_pt_cjp[0] = K1_P4_cjp.Pt()
-        K_eta_cjp[0] = K1_P4_cjp.Eta()
 
         ###~~~~~~~~~~ ELECTRONS ~~~~~~~~~~###
 

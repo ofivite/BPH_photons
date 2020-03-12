@@ -9,8 +9,8 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 
 #process.GlobalTag = GlobalTag(process.GlobalTag, '94X_dataRun2_v11', '') # 2016 2017
-process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_v11', '') # 2018 ABC
-#process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Prompt_v14', '') # 2018D
+#process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_v11', '') # 2018 ABC
+process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Prompt_v14', '') # 2018D
 
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -39,12 +39,12 @@ process.source = cms.Source("PoolSource",
 #)
 
 process.triggerSelection = cms.EDFilter("TriggerResultsFilter",
-                                        triggerConditions = cms.vstring(#'HLT_Dimuon20_Jpsi_Barrel_Seagulls_v*',
-                                                                        #'HLT_Dimuon25_Jpsi_v*',
-#                                                                        'HLT_DoubleMu4_3_Jpsi_Displaced_v*',
-                                                                        #'HLT_DoubleMu4_JpsiTrkTrk_Displaced_v*',
+                                        triggerConditions = cms.vstring('HLT_Dimuon20_Jpsi_Barrel_Seagulls_v*',
+                                                                        'HLT_Dimuon25_Jpsi_v*',
+                                                                        'HLT_DoubleMu4_3_Jpsi_Displaced_v*',
+                                                                        'HLT_DoubleMu4_JpsiTrkTrk_Displaced_v*',
                                                                         'HLT_DoubleMu4_JpsiTrk_Displaced_v*',
-                                                                        #'HLT_DoubleMu4_Jpsi_Displaced_v*'
+                                                                        'HLT_DoubleMu4_Jpsi_Displaced_v*'
                                                                        ),
                                         hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
                                         l1tResults = cms.InputTag( "" ),
