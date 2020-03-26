@@ -33,7 +33,7 @@ bmin = 6; bmax = 6.6; binN = 120
 
 mB       = RooRealVar ( "mB"   ,"M(B+), [Gev]", 5.15 , 5.45)
 mB1      = RooRealVar ( "mB1"   ,"M(B+*), [Gev]", 5.18 , 5.45)
-mBst     = RooRealVar ( "mBst-mB"     ,"M(B+*) - M(B+), [Gev]", 0.025, 0.065)
+mBst     = RooRealVar ( "mBst-mB"     ,"M(#Chi) - M(J/#Psi), [Gev]", 0.25, 0.65)
 PhotExy  = RooRealVar ( "PhotonPt","Pt(#gamma), [Gev]", 0, 2.5)
 PhotE    = RooRealVar ( "PhotonE","E(#gamma), [Gev]", 0, 4.5)
 PhotM    = RooRealVar ( "PhotonM","M(#gamma), [Gev]", -0.001, 0.1)
