@@ -20,7 +20,7 @@ config.Data.splitting = 'LumiBased'
 config.Data.publication = False
 config.Data.publishDBS = 'phys03'
 config.Data.outputDatasetTag = 'CRAB3_Bfinder'
-config.Data.outLFNDirBase = '/store/user/'+getUsernameFromSiteDB()+'/Bfinder/'
+config.Data.outLFNDirBase = '/store/user/ivilkin/Bfinder/'
 config.Data.ignoreLocality = True
 
 config.section_("Site")
