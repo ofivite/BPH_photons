@@ -4,8 +4,10 @@ from variables import *
 import ROOT
 from math import sqrt
 
+alpha = 0.99176 	#photon E_reco/E_0 ratio (Photon Energy Scale)
+
 #__aa = 0;    __bb = 50
-MyFileNames = glob.glob("/afs/cern.ch/user/i/ivilkin/CMSSW_10_2_5/src/myAnalyzers/JPsiKsPAT/crab_projects_C*8/crab_*/results/*.root")
+MyFileNames = glob.glob("/afs/cern.ch/work/i/ivilkin/ivilkin/CMSSW_10_2_5/src/myAnalyzers/JPsiKsPAT/crab_projects_C*/crab_*/results/*.root")
 ch = ROOT.TChain('rootuple/ntuple');
 
 __aa = 0;  __bb =  len(MyFileNames);
@@ -14,7 +16,7 @@ for fName in  MyFileNames[__aa: __bb]:
     ii = ch.Add(fName);
 print ('get ', len(MyFileNames), 'files from', __aa,'to',__bb,';  chain created')
 
-_fileOUT = 'Igorek_v1_Chi_' + str(len(MyFileNames)) + '_of_18.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
+_fileOUT = 'Igorek_v1_Chi_' + str(len(MyFileNames)) + '_PES.root'   #16 -> 1067; 17 -> 1271; 18 -> 1504
 fileOUT  = ROOT.TFile (_fileOUT, "recreate");    mytree = ROOT.TTree("mytree","mytree");
 
 nEvt = ch.GetEntries(); print ("entries: from", 0, 'to', nEvt-1);
@@ -205,9 +207,9 @@ for evt in range(0, nEvt):
         ###~~~~~~~~~~Photon 1 with zero-mass constraint~~~~~~~~~~###
         #####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#####
 
-        photon_noMC_P4.SetXYZM(ch.photon0_px_1[ibs], ch.photon0_py_1[ibs], ch.photon0_pz_1[ibs], 0. )
+        photon_noMC_P4.SetXYZM(ch.photon0_px_1[ibs]/alpha, ch.photon0_py_1[ibs]/alpha, ch.photon0_pz_1[ibs]/alpha, 0. )
         photon_noMC_P3 = photon_noMC_P4.Vect() 
-        photon_withMC_P4.SetXYZM(ch.photon_px_1[ibs], ch.photon_py_1[ibs], ch.photon_pz_1[ibs], 0. )
+        photon_withMC_P4.SetXYZM(ch.photon_px_1[ibs0]/alpha, ch.photon_py_1[ibs]/alpha, ch.photon_pz_1[ibs]/alpha, 0. )
         photon_withMC_P3 = photon_withMC_P4.Vect()  
 
         #####~~~~~~~~~~~~~~~~~~~~#####
